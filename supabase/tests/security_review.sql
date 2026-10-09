@@ -1,4 +1,4 @@
--- Security review checks. Requires migrations 0001-0012. READ-ONLY: it changes nothing.
+-- Security review checks. Requires migrations 0001-0013. READ-ONLY: it changes nothing.
 -- Paste into the Supabase SQL Editor and Run. Success: the result shows "SECURITY REVIEW PASSED".
 -- Any problem raises an error that lists exactly what is wrong. Re-run it after every new migration.
 
@@ -76,6 +76,13 @@ begin
   end if;
   if not has_column_privilege('authenticated', 'public.communities', 'payment_instructions', 'SELECT') then
     raise exception 'FAIL [logged-in users cannot read the payment instructions]';
+  end if;
+  if has_column_privilege('anon', 'public.communities', 'upi_id', 'SELECT') or has_column_privilege('anon', 'public.communities', 'upi_payee_name', 'SELECT') then
+    raise exception 'FAIL [logged-out visitors can read the UPI settings]';
+  end if;
+  if not (has_column_privilege('authenticated', 'public.communities', 'upi_id', 'SELECT')
+          and has_column_privilege('authenticated', 'public.communities', 'upi_id', 'UPDATE')) then
+    raise exception 'FAIL [logged-in users cannot read the UPI id, or it cannot be updated]';
   end if;
   if has_column_privilege('authenticated', 'public.communities', 'name', 'UPDATE')
      or has_column_privilege('authenticated', 'public.communities', 'slug', 'UPDATE')

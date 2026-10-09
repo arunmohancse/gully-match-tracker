@@ -1,4 +1,5 @@
 import { PaymentBadge } from '@/components/RegistrationBadges'
+import { UpiPay } from '@/components/UpiPay'
 import { usePaymentInstructions } from '@/hooks/useCommunity'
 import type { Match, Registration } from '@/types/domain'
 import { amountDue, hasPayments, isShared } from '@/utils/cost'
@@ -46,6 +47,7 @@ export function PlayerPaymentInfo({ match, reg, variant = 'full' }: Props) {
           {instructions ? `How to pay:\n${instructions}` : 'Pay the organiser. They will mark it as paid.'}
         </p>
       )}
+      {full && unpaid && owed !== null && <UpiPay communityId={match.community_id} amount={owed} note={match.title} />}
     </div>
   )
 }

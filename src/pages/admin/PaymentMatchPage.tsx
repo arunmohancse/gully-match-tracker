@@ -7,6 +7,7 @@ import { PaymentSummary } from '@/components/PaymentSummary'
 import { PaymentBadge } from '@/components/RegistrationBadges'
 import { ReminderButton, ReminderStamp } from '@/components/ReminderButton'
 import { ReminderQueue } from '@/components/ReminderQueue'
+import { SharePaymentsCard } from '@/components/SharePaymentsCard'
 import { SettleUpPanel } from '@/components/SettleUpPanel'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -74,6 +75,7 @@ export function PaymentMatchPage() {
               <PaymentInstructionsCard communityId={match.community_id} />
               <PaymentSummary matchId={match.id} />
               <SettleUpPanel match={match} />
+              <SharePaymentsCard match={match} />
 
               {queue && queueRegs.length > 0 && <ReminderQueue regs={queueRegs} match={match} onClose={() => { setQueue(null); setPicked(new Set()) }} />}
 

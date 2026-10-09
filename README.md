@@ -26,6 +26,7 @@ React + TypeScript + Vite + Tailwind + Supabase (Postgres, Auth, RLS, Storage). 
    | `0010_set_user_role.sql` | admins can promote players to admin (or remove admin) from the Players page |
    | `0011_account_status_passwords.sql` | signup approval (new users start pending), blocking, admin-set temporary passwords, admin-enabled "reset password" |
    | `0012_list_players.sql` | paged, searchable player list (replaces downloading every player and registration) |
+   | `0013_upi_settings.sql` | community-wide UPI id and payee name, used for pay-with-UPI links and QR codes |
    | `0009_shared_cost.sql` | shared-cost matches: expenses split equally after the match, per-player amount due, payment instructions |
 
    Then run `supabase/seed.sql` once (creates the community).
