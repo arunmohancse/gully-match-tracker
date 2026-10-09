@@ -1,4 +1,4 @@
--- Security review checks. Requires migrations 0001-0011. READ-ONLY: it changes nothing.
+-- Security review checks. Requires migrations 0001-0012. READ-ONLY: it changes nothing.
 -- Paste into the Supabase SQL Editor and Run. Success: the result shows "SECURITY REVIEW PASSED".
 -- Any problem raises an error that lists exactly what is wrong. Re-run it after every new migration.
 
@@ -6,7 +6,7 @@ do $$
 declare
   v_bad text;
   v_expected_anon text[] := array['get_match_counts', 'is_admin', 'reset_password_with_phone'];
-  v_expected_auth text[] := array['admin_move_registration', 'admin_set_password_reset', 'admin_set_payment', 'admin_set_temp_password', 'admin_set_user_status',
+  v_expected_auth text[] := array['admin_list_players', 'admin_move_registration', 'admin_player_counts', 'admin_set_password_reset', 'admin_set_payment', 'admin_set_temp_password', 'admin_set_user_status',
                                   'cancel_registration', 'complete_own_password_reset', 'finalize_match_shares', 'get_match_counts',
                                   'get_match_roster', 'is_admin', 'log_reminder_opened', 'match_financials', 'register_for_match',
                                   'reset_password_with_phone', 'set_user_role'];

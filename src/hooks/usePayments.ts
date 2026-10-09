@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { expenseService, type ExpenseInput } from '@/services/expenseService'
 import { paymentService, type SetPaymentInput } from '@/services/paymentService'
-import { playerService } from '@/services/playerService'
+import { playerService, type PlayerFilters } from '@/services/playerService'
 import type { Role } from '@/types/domain'
 
 export function useFinancials(matchIds: string[], enabled = true) {
@@ -56,8 +56,22 @@ export function useDeleteExpense() {
   })
 }
 
-export function usePlayers() {
-  return useQuery({ queryKey: ['players'], queryFn: () => playerService.list() })
+/** Players one page at a time (searched and filtered in the database). Keeps showing the old list while a new search loads. */
+export function usePlayers(filters: PlayerFilters) {
+  return useInfiniteQuery({
+    queryKey: ['players', 'list', filters],
+    queryFn: ({ pageParam }) => playerService.list(filters, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (last, pages) => {
+      const loaded = pages.reduce((n, p) => n + p.players.length, 0)
+      return loaded < last.total ? loaded : undefined
+    },
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function usePlayerCounts() {
+  return useQuery({ queryKey: ['players', 'counts'], queryFn: () => playerService.counts() })
 }
 
 export function useSetRole() {

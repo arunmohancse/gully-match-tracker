@@ -7,9 +7,10 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { useAuth } from '@/hooks/useAuth'
+import { useDebounced } from '@/hooks/useDebounced'
 import { isResetOpen } from '@/utils/password'
 import { TempPasswordDialog } from '@/components/TempPasswordDialog'
-import { usePlayerHistory, usePlayers, useSetPasswordReset, useSetRole, useSetStatus } from '@/hooks/usePayments'
+import { usePlayerCounts, usePlayerHistory, usePlayers, useSetPasswordReset, useSetRole, useSetStatus } from '@/hooks/usePayments'
 import { toFriendlyMessage } from '@/lib/errors'
 import type { PlayerSummary } from '@/types/domain'
 import { formatShortDate } from '@/utils/dates'
@@ -43,8 +44,14 @@ function History({ userId }: { userId: string }) {
 }
 
 export function PlayersPage() {
-  const { data, isLoading, error, refetch } = usePlayers()
   const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'BLOCKED'>('ALL')
+  const search = useDebounced(query, 300)
+  const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isPlaceholderData } = usePlayers({
+    query: search,
+    status: filter === 'ALL' ? null : filter,
+  })
+  const { data: counts } = usePlayerCounts()
   const [openId, setOpenId] = useState<string | null>(null)
   const { session } = useAuth()
   const setRole = useSetRole()
@@ -52,7 +59,6 @@ export function PlayersPage() {
   const [roleError, setRoleError] = useState<string | null>(null)
   const setStatus = useSetStatus()
   const setPasswordReset = useSetPasswordReset()
-  const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'BLOCKED'>('ALL')
   const [blocking, setBlocking] = useState<PlayerSummary | null>(null)
   const [tempFor, setTempFor] = useState<PlayerSummary | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -81,10 +87,9 @@ export function PlayersPage() {
     )
   }
 
-  const q = query.trim().toLowerCase()
-  const all = data ?? []
-  const pendingCount = all.filter((p) => p.status === 'PENDING').length
-  const players = all.filter((p) => (filter === 'ALL' || p.status === filter) && (!q || p.full_name.toLowerCase().includes(q) || (p.phone ?? '').includes(q)))
+  const players = data?.pages.flatMap((p) => p.players) ?? []
+  const total = data?.pages[0]?.total ?? 0
+  const pendingCount = counts?.pending ?? 0
   const resetOpen = (p: PlayerSummary) => isResetOpen(p.password_reset_until)
 
   return (
@@ -94,7 +99,7 @@ export function PlayersPage() {
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter players">
         {(['ALL', 'PENDING', 'BLOCKED'] as const).map((f) => (
           <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} aria-pressed={filter === f} onClick={() => setFilter(f)}>
-            {f === 'ALL' ? 'All' : f === 'PENDING' ? `Pending approval (${pendingCount})` : 'Blocked'}
+            {f === 'ALL' ? 'All' : f === 'PENDING' ? `Pending approval (${pendingCount})` : `Blocked${counts ? ` (${counts.blocked})` : ''}`}
           </Button>
         ))}
       </div>
@@ -106,7 +111,7 @@ export function PlayersPage() {
       {players.length === 0 ? (
         <p className="text-slate-500">No players found.</p>
       ) : (
-        <div className="space-y-2">
+        <div className={`space-y-2 ${isPlaceholderData ? 'opacity-60' : ''}`}>
           {players.map((p) => (
             <Card key={p.id} className="p-0">
               <div className="flex flex-wrap items-center gap-2 px-3 py-3">
@@ -175,6 +180,19 @@ export function PlayersPage() {
               {openId === p.id && <History userId={p.id} />}
             </Card>
           ))}
+        </div>
+      )}
+
+      {players.length > 0 && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-slate-500" aria-live="polite">
+            Showing {players.length} of {total}
+          </p>
+          {hasNextPage && (
+            <Button variant="outline" onClick={() => void fetchNextPage()} loading={isFetchingNextPage}>
+              {isFetchingNextPage ? 'Loading...' : 'Show more'}
+            </Button>
+          )}
         </div>
       )}
 

@@ -25,6 +25,7 @@ React + TypeScript + Vite + Tailwind + Supabase (Postgres, Auth, RLS, Storage). 
    | `0008_security_hardening.sql` | hides internal `matches` columns from clients |
    | `0010_set_user_role.sql` | admins can promote players to admin (or remove admin) from the Players page |
    | `0011_account_status_passwords.sql` | signup approval (new users start pending), blocking, admin-set temporary passwords, admin-enabled "reset password" |
+   | `0012_list_players.sql` | paged, searchable player list (replaces downloading every player and registration) |
    | `0009_shared_cost.sql` | shared-cost matches: expenses split equally after the match, per-player amount due, payment instructions |
 
    Then run `supabase/seed.sql` once (creates the community).
@@ -53,6 +54,7 @@ update public.profiles set role = 'ADMIN', status = 'ACTIVE' where id = (select 
 | Reminder log | `supabase/tests/phase7_reminders.sql` |
 | Promoting / demoting admins | `supabase/tests/phase10_roles.sql` |
 | Signup approval, blocking, password resets | `supabase/tests/phase11_status_passwords.sql` |
+| Paged player list (search, filters, paging) | `supabase/tests/phase12_list_players.sql` |
 | Shared-cost settlement (rounding, staleness, privacy) | `supabase/tests/phase9_shared_cost.sql` |
 | Permissions and RLS review (read-only) | `supabase/tests/security_review.sql`. Re-run after every new migration. |
 | Simultaneous registrations | `node --env-file=.env.local scripts/concurrency-test.mjs <matchId> 12` (see the script header; it creates throwaway users) |

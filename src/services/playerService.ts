@@ -3,7 +3,26 @@ import { unwrap } from '@/lib/errors'
 import { supabase } from '@/lib/supabase'
 import type { AccountStatus, PlayerSummary, RegistrationWithMatch, Role } from '@/types/domain'
 
-interface ProfileRow {
+export const PLAYERS_PAGE_SIZE = 50
+
+export interface PlayerFilters {
+  query: string
+  status: AccountStatus | null
+}
+
+export interface PlayerPage {
+  players: PlayerSummary[]
+  /** Players matching the filters, across all pages. */
+  total: number
+}
+
+export interface PlayerCounts {
+  total: number
+  pending: number
+  blocked: number
+}
+
+interface ListRow {
   id: string
   full_name: string
   phone: string | null
@@ -11,16 +30,32 @@ interface ProfileRow {
   status: AccountStatus
   password_reset_until: string | null
   created_at: string
+  registration_count: number
+  total_count: number
 }
 
 export const playerService = {
-  /** Admin only: every profile with how many matches they have registered for. */
-  async list(): Promise<PlayerSummary[]> {
-    const profiles = (unwrap(await supabase.from('profiles').select('id, full_name, phone, role, status, password_reset_until, created_at').order('full_name')) ?? []) as ProfileRow[]
-    const regs = (unwrap(await supabase.from('registrations').select('user_id')) ?? []) as { user_id: string }[]
-    const counts = new Map<string, number>()
-    for (const r of regs) counts.set(r.user_id, (counts.get(r.user_id) ?? 0) + 1)
-    return profiles.map((p) => ({ ...p, registration_count: counts.get(p.id) ?? 0 }))
+  /** Admin only: one page of players (searched and filtered in the database) with their registration counts. */
+  async list(filters: PlayerFilters, offset: number): Promise<PlayerPage> {
+    const rows = (unwrap(
+      await supabase.rpc('admin_list_players', {
+        p_query: filters.query.trim() || null,
+        p_status: filters.status,
+        p_limit: PLAYERS_PAGE_SIZE,
+        p_offset: offset,
+      }),
+    ) ?? []) as ListRow[]
+    return {
+      players: rows.map(({ total_count: _total, ...p }) => ({ ...p, registration_count: Number(p.registration_count) })),
+      total: rows.length ? Number(rows[0].total_count) : 0,
+    }
+  },
+
+  /** Admin only: totals for the filter buttons. */
+  async counts(): Promise<PlayerCounts> {
+    const rows = (unwrap(await supabase.rpc('admin_player_counts')) ?? []) as { total_count: number; pending_count: number; blocked_count: number }[]
+    const r = rows[0]
+    return { total: Number(r?.total_count ?? 0), pending: Number(r?.pending_count ?? 0), blocked: Number(r?.blocked_count ?? 0) }
   },
 
   /** Admin only. Promote a player to ADMIN or return an admin to USER. The database refuses changes to your own role. */
