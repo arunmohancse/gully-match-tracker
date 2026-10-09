@@ -36,6 +36,11 @@ export function todayISO(now: Date = new Date()): string {
   return `${now.getFullYear()}-${mm}-${dd}`
 }
 
+/** Local calendar date `days` days before `now`, as YYYY-MM-DD. */
+export function daysAgoISO(days: number, now: Date = new Date()): string {
+  return todayISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - days))
+}
+
 /** ISO timestamp -> value for <input type="datetime-local"> in local time. */
 export function toLocalInput(iso: string | null): string {
   if (!iso) return ''
