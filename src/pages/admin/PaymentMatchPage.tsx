@@ -120,7 +120,8 @@ export function PaymentMatchPage() {
                       {rows.map((r) => {
                         const selectable = remindable.some((x) => x.id === r.id)
                         return (
-                          <li key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-3">
+                          <li key={r.id} className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:gap-3">
+                            <div className="flex min-w-0 flex-1 items-center gap-3">
                             {selectable ? (
                               <input
                                 type="checkbox"
@@ -143,7 +144,9 @@ export function PaymentMatchPage() {
                                 <ReminderStamp reg={r} match={match} lastAt={lastReminders?.[r.id]} />
                               </div>
                             </div>
-                            <div className="flex flex-wrap items-start gap-2">
+                            </div>
+                            {/* On phones the buttons sit on their own line under the name, lined up with it. */}
+                            <div className="flex flex-wrap items-start gap-2 pl-[4.25rem] sm:pl-0">
                               {canTrackPayment(match, r) && <PaymentActions reg={r} match={match} />}
                               <ReminderButton reg={r} match={match} />
                             </div>

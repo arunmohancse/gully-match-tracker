@@ -114,9 +114,9 @@ export function PlayersPage() {
         <div className={`space-y-2 ${isPlaceholderData ? 'opacity-60' : ''}`}>
           {players.map((p) => (
             <Card key={p.id} className="p-0">
-              <div className="flex flex-wrap items-center gap-2 px-3 py-3">
+              <div className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate font-medium">{p.full_name}</span>
                     {p.role === 'ADMIN' && <Badge className="bg-blue-100 text-blue-800">Admin</Badge>}
                     {p.status === 'PENDING' && <Badge className="bg-amber-100 text-amber-800">Pending approval</Badge>}

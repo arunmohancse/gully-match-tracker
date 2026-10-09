@@ -18,13 +18,16 @@ const nameOf = (r: AdminRegistration) => r.player?.full_name ?? 'Unknown player'
 
 function Row({ reg, children, detail }: { reg: AdminRegistration; children: React.ReactNode; detail: React.ReactNode }) {
   return (
-    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-3">
-      <span className="w-7 text-right text-slate-500">{reg.list_position}.</span>
-      <div className="min-w-0 flex-1">
-        <div className="truncate font-medium">{nameOf(reg)}</div>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">{detail}</div>
+    <li className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <span className="w-7 shrink-0 text-right text-slate-500">{reg.list_position}.</span>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-medium">{nameOf(reg)}</div>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">{detail}</div>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2">{children}</div>
+      {/* On phones the buttons sit on their own line under the name, lined up with it. */}
+      <div className="flex flex-wrap gap-2 pl-10 sm:pl-0">{children}</div>
     </li>
   )
 }
