@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { MyDuesCard } from '@/components/MyDuesCard'
 import { MatchList } from '@/components/MatchList'
 import { RegistrationItem } from '@/components/RegistrationItem'
 import { useAuth } from '@/hooks/useAuth'
@@ -14,6 +15,8 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Hi {profile?.full_name.split(' ')[0]}</h1>
+
+      <MyDuesCard />
 
       {upcoming.length > 0 && (
         <section className="space-y-3">

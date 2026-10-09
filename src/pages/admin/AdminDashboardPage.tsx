@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { MyDuesCard } from '@/components/MyDuesCard'
 import { MatchList } from '@/components/MatchList'
 import { Tile } from '@/components/PaymentSummary'
 import { Button } from '@/components/ui/button'
@@ -44,6 +45,9 @@ export function AdminDashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Admins play too: their own unpaid shares, if any. */}
+      <MyDuesCard />
 
       <UpcomingTotals />
 
