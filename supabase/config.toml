@@ -1,0 +1,8 @@
+# Minimal config; run `npx supabase init` to regenerate a full one if preferred.
+project_id = "cric-expense-tracker"
+
+[auth]
+enable_signup = true
+
+[auth.email]
+enable_confirmations = false
