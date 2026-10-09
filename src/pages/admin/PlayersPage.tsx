@@ -120,8 +120,14 @@ export function PlayersPage() {
         <p className="text-slate-500">No players found.</p>
       ) : (
         <div className={`space-y-2 ${isPlaceholderData ? 'opacity-60' : ''}`}>
-          {players.map((p) => (
-            <Card key={p.id} className="p-0">
+          {players.map((p, i) => (
+            <div key={p.id} className="space-y-2">
+              {/* Admins come first from the database; label the two groups when both are present. */}
+              {i === 0 && p.role === 'ADMIN' && <h2 className="px-1 pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Admins</h2>}
+              {i > 0 && p.role !== 'ADMIN' && players[i - 1].role === 'ADMIN' && (
+                <h2 className="px-1 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Players</h2>
+              )}
+            <Card className="p-0">
               <div className="flex items-start gap-3 px-3 py-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand/10 text-sm font-semibold text-brand" aria-hidden>
                   {initials(p.full_name)}
@@ -168,6 +174,7 @@ export function PlayersPage() {
               </div>
               {openId === p.id && <History userId={p.id} />}
             </Card>
+            </div>
           ))}
         </div>
       )}

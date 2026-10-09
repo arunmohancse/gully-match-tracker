@@ -1,4 +1,4 @@
--- Phase 12 database tests (paged player list). Requires migrations 0001-0012.
+-- Phase 12 database tests (paged player list). Requires migrations 0001-0014 (0014 puts admins first).
 -- Paste into the Supabase SQL Editor and Run. Runs in a transaction that is ROLLED BACK, so no data is kept.
 -- Success: the final result shows "ALL PHASE 12 TESTS PASSED".
 
@@ -60,7 +60,8 @@ begin
 
   -- Search, filter, order, paging (the search words only match these test users) ----------------------------------
   perform pg_temp.check_eq('search by name, ordered', pg_temp.list_as(u[1], 'test', null, 50, 0), 'Asha Test,Bala Test,Chitra 50% Test,Dev_Test|4');
-  perform pg_temp.check_eq('search by phone', pg_temp.list_as(u[1], '+9100000700', null, 50, 0), 'Asha Test,Bala Test,Chitra 50% Test,Dev_Test,Zed Admin|5');
+  perform pg_temp.check_eq('search by phone', pg_temp.list_as(u[1], '+9100000700', null, 50, 0), 'Zed Admin,Asha Test,Bala Test,Chitra 50% Test,Dev_Test|5'); -- admins first, then by name
+  perform pg_temp.check_eq('admins stay first across pages', pg_temp.list_as(u[1], '+9100000700', null, 1, 0), 'Zed Admin|5');
   perform pg_temp.check_eq('wildcard % is literal', pg_temp.list_as(u[1], '50%', null, 50, 0), 'Chitra 50% Test|1');
   perform pg_temp.check_eq('wildcard _ is literal', pg_temp.list_as(u[1], 'dev_', null, 50, 0), 'Dev_Test|1');
   perform pg_temp.check_eq('status filter', pg_temp.list_as(u[1], 'test', 'PENDING', 50, 0), 'Chitra 50% Test|1');
