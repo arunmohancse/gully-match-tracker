@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { PaymentActions } from '@/components/PaymentActions'
-import { ReminderButton } from '@/components/ReminderButton'
+import { ReminderButton, ReminderStamp } from '@/components/ReminderButton'
 import { useLastReminders } from '@/hooks/useReminders'
 import { PaymentBadge } from '@/components/RegistrationBadges'
 import { Button } from '@/components/ui/button'
@@ -136,6 +136,7 @@ export function AdminRegistrations({ match }: { match: Match }) {
                     <>
                       <PaymentBadge status={r.payment_status} />
                       <span>{amountText(match, r)}</span>
+                      <ReminderStamp reg={r} match={match} lastAt={lastReminders?.[r.id]} />
                     </>
                   ) : (
                     <span>Registered {formatClock(r.registered_at)}</span>
@@ -143,7 +144,7 @@ export function AdminRegistrations({ match }: { match: Match }) {
                 }
               >
                 {canTrackPayment(match, r) && <PaymentActions reg={r} match={match} />}
-                <ReminderButton reg={r} match={match} lastAt={lastReminders?.[r.id]} />
+                <ReminderButton reg={r} match={match} />
                 {waiting.length > 0 && (
                   <Button size="sm" variant="outline" onClick={() => open('demote', r)}>
                     Move to waiting

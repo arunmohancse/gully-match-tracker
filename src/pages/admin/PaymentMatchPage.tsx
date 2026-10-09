@@ -5,7 +5,7 @@ import { PaymentActions } from '@/components/PaymentActions'
 import { PaymentInstructionsCard } from '@/components/PaymentInstructionsCard'
 import { PaymentSummary } from '@/components/PaymentSummary'
 import { PaymentBadge } from '@/components/RegistrationBadges'
-import { ReminderButton } from '@/components/ReminderButton'
+import { ReminderButton, ReminderStamp } from '@/components/ReminderButton'
 import { ReminderQueue } from '@/components/ReminderQueue'
 import { SettleUpPanel } from '@/components/SettleUpPanel'
 import { Button } from '@/components/ui/button'
@@ -138,11 +138,12 @@ export function PaymentMatchPage() {
                                 <span>{amountText(match, r)}</span>
                                 {r.payment_method && <span>· {r.payment_method}</span>}
                                 {r.payment_reference && <span>· Ref {r.payment_reference}</span>}
+                                <ReminderStamp reg={r} match={match} lastAt={lastReminders?.[r.id]} />
                               </div>
                             </div>
                             <div className="flex flex-wrap items-start gap-2">
                               {canTrackPayment(match, r) && <PaymentActions reg={r} match={match} />}
-                              <ReminderButton reg={r} match={match} lastAt={lastReminders?.[r.id]} />
+                              <ReminderButton reg={r} match={match} />
                             </div>
                           </li>
                         )
