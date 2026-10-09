@@ -19,9 +19,14 @@ export function ViewerLayout() {
         <span className="text-brand">
           <BrandLockup />
         </span>
-        <Link to="/login" className="text-sm font-medium text-brand underline">
-          Log in
-        </Link>
+        <span className="flex items-center gap-4 text-sm font-medium">
+          <Link to="/about" className="text-slate-600 hover:underline">
+            About
+          </Link>
+          <Link to="/login" className="text-brand underline">
+            Log in
+          </Link>
+        </span>
       </header>
       <main className="mx-auto max-w-4xl p-4 md:p-8">
         <Suspense fallback={<p className="text-slate-500">Loading...</p>}>

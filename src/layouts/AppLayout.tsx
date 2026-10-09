@@ -68,6 +68,9 @@ export function AppLayout() {
         </nav>
         <div className="space-y-2 border-t border-slate-200 pt-3 text-sm">
           <div className="space-y-1.5 pb-1 text-center">
+            <NavLink to="/about" className="block text-xs text-slate-500 hover:text-brand hover:underline">
+              About us
+            </NavLink>
             <InstagramLink label="Instagram" />
             <PartOfParent />
           </div>

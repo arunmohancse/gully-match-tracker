@@ -11,6 +11,8 @@ export function RequireAuth() {
   const { session, loading, profile } = useAuth()
   const location = useLocation()
   if (loading) return <FullPageSpinner />
+  // Logged-out visitors opening the site's home address see the public About page; everything else asks them to log in.
+  if (!session && location.pathname === '/') return <Navigate to="/about" replace />
   if (!session) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
   if (profile?.status === 'PENDING' || profile?.status === 'BLOCKED') return <AccountGate status={profile.status} />
   return <Outlet />

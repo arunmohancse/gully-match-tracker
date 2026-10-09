@@ -10,7 +10,7 @@ export function BrandLockup({ large, className }: { large?: boolean; className?:
       <span className="flex flex-col text-left leading-tight">
         <span className={cn('font-bold', large ? 'text-xl' : 'text-base')}>{brand.name}</span>
         {brand.subtitle && (
-          <span className={cn('font-medium uppercase tracking-widest opacity-80', large ? 'text-xs' : 'text-[10px]')}>{brand.subtitle}</span>
+          <span className={cn('font-medium uppercase tracking-widest text-slate-500', large ? 'text-xs' : 'text-[10px]')}>{brand.subtitle}</span>
         )}
       </span>
     </span>

@@ -6,6 +6,7 @@ import { AuthProvider } from '@/hooks/useAuth'
 import { AppLayout } from '@/layouts/AppLayout'
 import { ViewerLayout } from '@/layouts/ViewerLayout'
 import { queryClient } from '@/lib/queryClient'
+import { AboutPage } from '@/pages/AboutPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage'
 import { SignupPage } from '@/pages/auth/SignupPage'
@@ -40,6 +41,7 @@ export default function App() {
 
             {/* Shareable match link: visible to everyone, including logged-out visitors. */}
             <Route element={<ViewerLayout />}>
+              <Route path="about" element={<AboutPage />} />
               <Route path="matches/:id" element={<MatchDetailPage />} />
             </Route>
 

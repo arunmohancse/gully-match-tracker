@@ -7,7 +7,7 @@ import { brand } from './src/config/brand.ts'
 // Puts the brand name and theme color into index.html (the tab title and phone browser color).
 const brandHtml: Plugin = {
   name: 'brand-html',
-  transformIndexHtml: (html) => html.replaceAll('%APP_NAME%', brand.fullName).replaceAll('%THEME_COLOR%', brand.themeColor),
+  transformIndexHtml: (html) => html.replaceAll('%APP_NAME%', brand.fullName).replaceAll('%THEME_COLOR%', brand.themeColor).replaceAll('%APP_DESCRIPTION%', brand.description),
 }
 
 export default defineConfig({

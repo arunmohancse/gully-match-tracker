@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { brand } from '@/config/brand'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -50,6 +51,11 @@ export function LoginPage() {
       <p className="text-center text-sm">
         <Link to="/reset-password" className="font-medium text-brand underline">
           Forgot password?
+        </Link>
+      </p>
+      <p className="text-center text-sm">
+        <Link to="/about" className="font-medium text-brand underline">
+          About {brand.name}
         </Link>
       </p>
       <p className="text-center text-sm text-slate-600">

@@ -23,6 +23,8 @@ export const brand = {
   subtitle,
   /** Both together: used for the browser tab title. */
   fullName: `${name} ${subtitle}`.trim(),
+  /** Search-engine and link-preview description of the site. */
+  description: `${name} ${subtitle}: a friendly cricket community. Join, register for matches and share the cost.`,
   /** Optional line under the name on the login pages. With a parent logo it reads "<taglineLead> [logo]". */
   tagline: `${taglineLead} ${parentName}`,
   taglineLead,

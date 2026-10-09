@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
 import { Button } from '@/components/ui/button'
@@ -55,7 +56,6 @@ export function ProfilePage() {
           <Field label="Phone (WhatsApp)" htmlFor="phone">
             <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </Field>
-          <p className="text-sm text-slate-500">Role: {profile.role}</p>
           {message && (
             <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-red-600' : 'text-sm text-green-700'}>
               {message.text}
@@ -67,6 +67,9 @@ export function ProfilePage() {
         </form>
       </Card>
       <div className="space-y-2 pt-4 text-center md:hidden">
+        <Link to="/about" className="block text-xs text-slate-500 hover:text-brand hover:underline">
+          About us
+        </Link>
         <InstagramLink />
         <PartOfParent />
       </div>
