@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react'
 import { useState } from 'react'
+import { RegistrationNote } from '@/components/RegistrationNote'
 import { PlayerPaymentInfo } from '@/components/PlayerPaymentInfo'
 import { CancelledBadge, ListBadge } from '@/components/RegistrationBadges'
 import { Button } from '@/components/ui/button'
@@ -65,6 +66,7 @@ export function RegistrationPanel({ match }: { match: Match }) {
         <ListBadge listType={active.list_type} position={active.list_position} />
         {notice && <p role="status" className="text-sm text-green-800">{notice}</p>}
         <PlayerPaymentInfo match={match} reg={active} />
+        <RegistrationNote match={match} />
         {!main && <p className="text-sm text-slate-600">If a main-list spot opens up, you will be moved up automatically.</p>}
         {window === 'OPEN' ? (
           <Button variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50" onClick={() => { setError(null); setConfirmOpen(true) }}>
@@ -110,6 +112,7 @@ export function RegistrationPanel({ match }: { match: Match }) {
       )}
       {canRegister ? (
         <>
+          <RegistrationNote match={match} />
           {full && <p className="text-sm text-orange-700">The main list is full. You will join the waiting list.</p>}
           <Button size="lg" className="w-full" onClick={onRegister} loading={register.isPending}>
             {register.isPending ? 'Registering...' : full ? 'Join waiting list' : 'Register'}

@@ -32,6 +32,8 @@ export const brand = {
   logoSrc: '/logo.png' as string | null,
   /** Fallback when there is no logo. */
   emoji: '🏏',
+  /** Shown next to Register / "You are registered" and in the shared player list, for matches with a cost. Empty string to hide. */
+  registrationNote: 'If your name is on the list, you are responsible for your match share, whether you attend or not.',
   /** Browser UI color on phones. Keep equal to --color-brand in src/index.css. */
   themeColor: '#0e773d',
 }

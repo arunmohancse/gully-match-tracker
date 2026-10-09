@@ -8,6 +8,7 @@ import { RegistrationPanel } from '@/components/RegistrationPanel'
 import { PaymentSummary } from '@/components/PaymentSummary'
 import { SettleUpPanel } from '@/components/SettleUpPanel'
 import { MatchDetails } from '@/components/MatchDetails'
+import { ShareListButton } from '@/components/ShareListButton'
 import { ShareMatchButton } from '@/components/ShareMatchButton'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -79,6 +80,14 @@ export function AdminMatchPage() {
         <Card className="space-y-3">
           <h2 className="font-semibold">Share match</h2>
           <ShareMatchButton match={match} />
+        </Card>
+      )}
+
+      {match.status !== 'DRAFT' && (
+        <Card className="space-y-3">
+          <h2 className="font-semibold">Share player list</h2>
+          <p className="text-sm text-slate-600">The current main list and waiting list, ready to post in your WhatsApp group.</p>
+          <ShareListButton match={match} />
         </Card>
       )}
 
