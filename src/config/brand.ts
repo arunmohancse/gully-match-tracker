@@ -34,6 +34,8 @@ export const brand = {
   emoji: '🏏',
   /** Shown next to Register / "You are registered" and in the shared player list, for matches with a cost. Empty string to hide. */
   registrationNote: 'If your name is on the list, you are responsible for your match share, whether you attend or not.',
+  /** Instagram page, linked from the login screens, footers and sidebar. Set handle to '' to hide every link. */
+  instagram: { handle: 'gullyleague.tvm', url: 'https://www.instagram.com/gullyleague.tvm/' },
   /** Browser UI color on phones. Keep equal to --color-brand in src/index.css. */
   themeColor: '#0e773d',
 }

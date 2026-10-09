@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { BrandLockup } from '@/components/BrandLockup'
+import { InstagramLink } from '@/components/InstagramLink'
 import { ParentLogo } from '@/components/ParentBrand'
 import { Card } from '@/components/ui/card'
 import { brand } from '@/config/brand'
@@ -7,7 +8,8 @@ import { brand } from '@/config/brand'
 export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="grid min-h-screen place-items-center p-4">
-      <Card className="w-full max-w-sm space-y-4 p-6">
+      <div className="w-full max-w-sm space-y-4">
+      <Card className="space-y-4 p-6">
         <div className="text-center">
           <div className="mb-1 flex justify-center text-brand">
             <BrandLockup large />
@@ -22,6 +24,10 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
         </div>
         {children}
       </Card>
+      <div className="text-center">
+        <InstagramLink />
+      </div>
+      </div>
     </div>
   )
 }

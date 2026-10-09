@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { BrandLockup } from '@/components/BrandLockup'
+import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
 import { FullPageSpinner } from '@/components/RouteGuards'
 import { useAuth } from '@/hooks/useAuth'
@@ -27,7 +28,8 @@ export function ViewerLayout() {
           <Outlet />
         </Suspense>
       </main>
-      <footer className="border-t border-slate-200 bg-white py-4">
+      <footer className="space-y-2 border-t border-slate-200 bg-white py-4 text-center">
+        <InstagramLink />
         <PartOfParent />
       </footer>
     </div>

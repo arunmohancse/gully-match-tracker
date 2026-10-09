@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { InstagramLink } from '@/components/InstagramLink'
 import { BrandLockup } from '@/components/BrandLockup'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
@@ -42,6 +43,7 @@ export function AccountGate({ status }: { status: 'PENDING' | 'BLOCKED' }) {
             {error}
           </p>
         )}
+        {pending && <InstagramLink label="While you wait, follow us on Instagram" />}
         <div className="flex flex-col gap-2">
           {pending && (
             <Button onClick={() => run(refreshProfile)} loading={busy}>

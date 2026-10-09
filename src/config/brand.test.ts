@@ -19,6 +19,9 @@ describe('brand config', () => {
     expect(brand.tagline).toContain(brand.parent.name)
     if (brand.parent.logoSrc) expect(brand.parent.logoSrc.startsWith('/')).toBe(true)
   })
+  it('has a valid Instagram link when a handle is set', () => {
+    if (brand.instagram.handle) expect(brand.instagram.url).toBe(`https://www.instagram.com/${brand.instagram.handle}/`)
+  })
   it('logoSrc, when set, is an absolute path to a file served from /public', () => {
     if (brand.logoSrc) expect(brand.logoSrc.startsWith('/')).toBe(true)
   })

@@ -2,6 +2,7 @@ import { CalendarDays, CreditCard, LayoutDashboard, ListChecks, LogOut, User, Us
 import { Suspense, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { BrandLockup } from '@/components/BrandLockup'
+import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
@@ -66,7 +67,10 @@ export function AppLayout() {
           ))}
         </nav>
         <div className="space-y-2 border-t border-slate-200 pt-3 text-sm">
-          <PartOfParent className="pb-1" />
+          <div className="space-y-1.5 pb-1 text-center">
+            <InstagramLink label="Instagram" />
+            <PartOfParent />
+          </div>
           <div className="truncate text-slate-600">
             {profile?.full_name}
             {isAdmin && ' (Admin)'}

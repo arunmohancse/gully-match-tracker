@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -65,7 +66,10 @@ export function ProfilePage() {
           </Button>
         </form>
       </Card>
-      <PartOfParent className="pt-4 md:hidden" />
+      <div className="space-y-2 pt-4 text-center md:hidden">
+        <InstagramLink />
+        <PartOfParent />
+      </div>
       {isResetOpen(profile.password_reset_until) && <ChangePasswordCard onChanged={refreshProfile} />}
     </div>
   )
