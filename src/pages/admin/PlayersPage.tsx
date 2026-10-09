@@ -9,11 +9,13 @@ import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { useAuth } from '@/hooks/useAuth'
 import { useDebounced } from '@/hooks/useDebounced'
 import { isResetOpen } from '@/utils/password'
+import { ManagePlayerSheet } from '@/components/ManagePlayerSheet'
 import { TempPasswordDialog } from '@/components/TempPasswordDialog'
 import { usePlayerCounts, usePlayerHistory, usePlayers, useSetPasswordReset, useSetRole, useSetStatus } from '@/hooks/usePayments'
 import { toFriendlyMessage } from '@/lib/errors'
 import type { PlayerSummary } from '@/types/domain'
 import { formatShortDate } from '@/utils/dates'
+import { initials } from '@/utils/initials'
 
 function History({ userId }: { userId: string }) {
   const { data, isLoading, error } = usePlayerHistory(userId)
@@ -61,8 +63,14 @@ export function PlayersPage() {
   const setPasswordReset = useSetPasswordReset()
   const [blocking, setBlocking] = useState<PlayerSummary | null>(null)
   const [tempFor, setTempFor] = useState<PlayerSummary | null>(null)
+  const [managing, setManaging] = useState<PlayerSummary | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [blockError, setBlockError] = useState<string | null>(null)
+
+  function startBlock(p: PlayerSummary) {
+    setBlockError(null)
+    setBlocking(p)
+  }
 
   async function run(action: () => Promise<unknown>) {
     setActionError(null)
@@ -114,67 +122,48 @@ export function PlayersPage() {
         <div className={`space-y-2 ${isPlaceholderData ? 'opacity-60' : ''}`}>
           {players.map((p) => (
             <Card key={p.id} className="p-0">
-              <div className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center">
-                <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-3 px-3 py-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-brand/10 text-sm font-semibold text-brand" aria-hidden>
+                  {initials(p.full_name)}
+                </span>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate font-medium">{p.full_name}</span>
+                      {p.role === 'ADMIN' && <Badge className="bg-blue-100 text-blue-800">Admin</Badge>}
+                      {p.status === 'PENDING' && <Badge className="bg-amber-100 text-amber-800">Pending approval</Badge>}
+                      {p.status === 'BLOCKED' && <Badge className="bg-red-100 text-red-800">Blocked</Badge>}
+                      {resetOpen(p) && <Badge className="bg-slate-100 text-slate-700">Reset link on</Badge>}
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      {p.phone ?? 'No phone'} · {p.registration_count} registration{p.registration_count === 1 ? '' : 's'}
+                    </div>
+                  </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate font-medium">{p.full_name}</span>
-                    {p.role === 'ADMIN' && <Badge className="bg-blue-100 text-blue-800">Admin</Badge>}
-                    {p.status === 'PENDING' && <Badge className="bg-amber-100 text-amber-800">Pending approval</Badge>}
-                    {p.status === 'BLOCKED' && <Badge className="bg-red-100 text-red-800">Blocked</Badge>}
-                    {resetOpen(p) && <Badge className="bg-slate-100 text-slate-700">Reset link on</Badge>}
-                  </div>
-                  <div className="text-sm text-slate-600">
-                    {p.phone ?? 'No phone'} · {p.registration_count} registration{p.registration_count === 1 ? '' : 's'}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {p.id !== session?.user.id && (p.status === 'PENDING' || p.status === 'BLOCKED') && (
-                    <Button size="sm" disabled={setStatus.isPending} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
-                      {p.status === 'PENDING' ? 'Approve' : 'Unblock'}
-                    </Button>
-                  )}
-                  {p.id !== session?.user.id && p.status !== 'BLOCKED' && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setBlockError(null)
-                        setBlocking(p)
-                      }}
-                    >
-                      {p.status === 'PENDING' ? 'Reject' : 'Block'}
-                    </Button>
-                  )}
-                  {p.id !== session?.user.id && p.status === 'ACTIVE' && (
-                    <Button
-                      size="sm"
-                      variant={p.role === 'ADMIN' ? 'outline' : 'default'}
-                      onClick={() => {
-                        setRoleError(null)
-                        setRoleChange(p)
-                      }}
-                    >
-                      {p.role === 'ADMIN' ? 'Remove admin' : 'Make admin'}
-                    </Button>
-                  )}
-                  {p.id !== session?.user.id && (
-                    <>
-                      <Button size="sm" variant="outline" onClick={() => setTempFor(p)}>
-                        Set password
+                    {p.id !== session?.user.id && p.status === 'PENDING' && (
+                      <>
+                        <Button size="sm" disabled={setStatus.isPending} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
+                          Approve
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => startBlock(p)}>
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                    {p.id !== session?.user.id && p.status === 'BLOCKED' && (
+                      <Button size="sm" disabled={setStatus.isPending} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
+                        Unblock
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={setPasswordReset.isPending}
-                        onClick={() => run(() => setPasswordReset.mutateAsync({ userId: p.id, enabled: !resetOpen(p) }))}
-                      >
-                        {resetOpen(p) ? 'Turn off reset link' : 'Allow reset link'}
+                    )}
+                    {p.id !== session?.user.id && (
+                      <Button size="sm" variant="outline" onClick={() => setManaging(p)}>
+                        Manage
                       </Button>
-                    </>
-                  )}
-                  <Button size="sm" variant="outline" aria-expanded={openId === p.id} onClick={() => setOpenId(openId === p.id ? null : p.id)}>
-                    {openId === p.id ? 'Hide history' : 'View history'}
-                  </Button>
+                    )}
+                    <Button size="sm" variant="ghost" aria-expanded={openId === p.id} onClick={() => setOpenId(openId === p.id ? null : p.id)}>
+                      {openId === p.id ? 'Hide history' : 'History'}
+                    </Button>
+                  </div>
                 </div>
               </div>
               {openId === p.id && <History userId={p.id} />}
@@ -195,6 +184,21 @@ export function PlayersPage() {
           )}
         </div>
       )}
+
+      <ManagePlayerSheet
+        player={managing}
+        resetOpen={managing ? resetOpen(managing) : false}
+        busy={setStatus.isPending || setPasswordReset.isPending}
+        onClose={() => setManaging(null)}
+        onBlock={startBlock}
+        onUnblock={(p) => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}
+        onChangeRole={(p) => {
+          setRoleError(null)
+          setRoleChange(p)
+        }}
+        onSetPassword={setTempFor}
+        onToggleReset={(p) => run(() => setPasswordReset.mutateAsync({ userId: p.id, enabled: !resetOpen(p) }))}
+      />
 
       <TempPasswordDialog key={tempFor?.id ?? 'none'} player={tempFor} onClose={() => setTempFor(null)} />
 
