@@ -85,13 +85,14 @@ export function MatchForm({ match, submitting, error, submitLabel, submittingLab
       </fieldset>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Registration opens (optional)" htmlFor="opensAt" error={errors.opensAt}>
-          <Input id="opensAt" type="datetime-local" value={values.opensAt} onChange={set('opensAt')} />
+        <Field label="Registration opens on (optional)" htmlFor="opensAt" error={errors.opensAt}>
+          <Input id="opensAt" type="date" value={values.opensAt} onChange={set('opensAt')} />
         </Field>
-        <Field label="Registration closes (optional)" htmlFor="closesAt" error={errors.closesAt}>
-          <Input id="closesAt" type="datetime-local" value={values.closesAt} onChange={set('closesAt')} />
+        <Field label="Registration closes on (optional)" htmlFor="closesAt" error={errors.closesAt}>
+          <Input id="closesAt" type="date" value={values.closesAt} onChange={set('closesAt')} />
         </Field>
       </div>
+      <p className="-mt-2 text-sm text-slate-500">Registration opens at the start of the opening day and closes at the end of the closing day. Leave blank for no limit.</p>
 
       <Field label="Rules & instructions" htmlFor="rules">
         <Textarea id="rules" value={values.rules} onChange={set('rules')} />

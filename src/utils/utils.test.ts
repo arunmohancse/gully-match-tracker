@@ -88,9 +88,21 @@ describe('matchForm', () => {
     expect(Object.keys(errors).sort()).toEqual(['matchDate', 'maxPlayers', 'registrationFee', 'startTime', 'title', 'venue'])
   })
   it('requires end after start and close after open', () => {
-    const errors = validateMatchForm({ ...valid, endTime: '05:00', opensAt: '2026-10-10T10:00', closesAt: '2026-10-09T10:00' })
+    const errors = validateMatchForm({ ...valid, endTime: '05:00', opensAt: '2026-10-10', closesAt: '2026-10-09' })
     expect(errors.endTime).toBeDefined()
     expect(errors.closesAt).toBeDefined()
+    expect(validateMatchForm({ ...valid, opensAt: '2026-10-10', closesAt: '2026-10-10' }).closesAt).toBeUndefined() // same day is fine
+  })
+  it('registration days become start-of-day and end-of-day, and unchanged days keep the saved time when editing', () => {
+    const input = formToInput({ ...valid, opensAt: '2026-10-10', closesAt: '2026-10-17' }, null)
+    expect(toLocalInput(input.registration_opens_at)).toBe('2026-10-10T00:00')
+    expect(toLocalInput(input.registration_closes_at)).toBe('2026-10-17T23:59')
+    const saved = fromLocalInput('2026-10-17T18:30')
+    const edited = formToInput({ ...valid, opensAt: '', closesAt: '2026-10-17' }, null, { registration_opens_at: null, registration_closes_at: saved } as Match)
+    expect(edited.registration_closes_at).toBe(saved)
+    expect(edited.registration_opens_at).toBeNull()
+    const moved = formToInput({ ...valid, opensAt: '', closesAt: '2026-10-18' }, null, { registration_opens_at: null, registration_closes_at: saved } as Match)
+    expect(toLocalInput(moved.registration_closes_at)).toBe('2026-10-18T23:59')
   })
   it('converts blanks to null and numbers to numbers', () => {
     const input = formToInput({ ...valid, costModel: 'FIXED_FEE', maxPlayers: '20', registrationFee: '150' }, null)

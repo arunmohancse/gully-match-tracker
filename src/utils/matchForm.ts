@@ -1,6 +1,10 @@
 import type { CostModel, Match, MatchInput } from '@/types/domain'
 import { fromLocalInput, toLocalInput } from './dates'
 
+/** Registration dates are picked as a day only: it opens at the start of that day and closes at the end of it. */
+const OPENS_TIME = '00:00'
+const CLOSES_TIME = '23:59'
+
 export interface MatchFormValues {
   title: string
   description: string
@@ -44,8 +48,8 @@ export function matchToForm(m: Match): MatchFormValues {
     maxPlayers: String(m.max_players),
     costModel: m.cost_model ?? 'FIXED_FEE',
     registrationFee: String(m.registration_fee),
-    opensAt: toLocalInput(m.registration_opens_at),
-    closesAt: toLocalInput(m.registration_closes_at),
+    opensAt: toLocalInput(m.registration_opens_at).slice(0, 10),
+    closesAt: toLocalInput(m.registration_closes_at).slice(0, 10),
     rules: m.rules ?? '',
   }
 }
@@ -67,14 +71,24 @@ export function validateMatchForm(v: MatchFormValues): MatchFormErrors {
     if (!v.registrationFee.trim() || Number.isNaN(fee) || fee < 0) e.registrationFee = 'Enter 0 or more.'
   }
 
-  if (v.opensAt && v.closesAt && new Date(v.closesAt) <= new Date(v.opensAt)) {
-    e.closesAt = 'Closing time must be after the opening time.'
+  if (v.opensAt && v.closesAt && v.closesAt < v.opensAt) {
+    e.closesAt = 'The closing date cannot be before the opening date.'
   }
   return e
 }
 
-/** Call only after validateMatchForm returns no errors. */
-export function formToInput(v: MatchFormValues, imagePath: string | null): MatchInput {
+/**
+ * Day picked in the form -> timestamp. When editing and the day is unchanged, the match's existing timestamp
+ * is kept, so saving an older match does not move a time that was set with the old date-and-time fields.
+ */
+function dayToTimestamp(day: string, time: string, existing: string | null | undefined): string | null {
+  if (!day) return null
+  if (existing && toLocalInput(existing).slice(0, 10) === day) return existing
+  return fromLocalInput(`${day}T${time}`)
+}
+
+/** Call only after validateMatchForm returns no errors. `original` is the match being edited, if any. */
+export function formToInput(v: MatchFormValues, imagePath: string | null, original?: Match | null): MatchInput {
   const blankToNull = (s: string) => (s.trim() ? s.trim() : null)
   return {
     title: v.title.trim(),
@@ -86,8 +100,8 @@ export function formToInput(v: MatchFormValues, imagePath: string | null): Match
     max_players: Number(v.maxPlayers),
     registration_fee: v.costModel === 'SHARED_COST' ? 0 : Number(v.registrationFee),
     cost_model: v.costModel,
-    registration_opens_at: fromLocalInput(v.opensAt),
-    registration_closes_at: fromLocalInput(v.closesAt),
+    registration_opens_at: dayToTimestamp(v.opensAt, OPENS_TIME, original?.registration_opens_at),
+    registration_closes_at: dayToTimestamp(v.closesAt, CLOSES_TIME, original?.registration_closes_at),
     rules: blankToNull(v.rules),
     image_path: imagePath,
   }

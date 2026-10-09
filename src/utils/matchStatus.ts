@@ -4,7 +4,7 @@ export const STATUS_LABEL: Record<MatchStatus, string> = {
   DRAFT: 'Draft',
   OPEN: 'Registration open',
   FULL: 'Full',
-  CLOSED: 'Closed',
+  CLOSED: 'Registration closed',
   COMPLETED: 'Completed',
   CANCELLED: 'Cancelled',
 }

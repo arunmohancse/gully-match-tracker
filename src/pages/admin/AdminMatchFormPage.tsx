@@ -22,7 +22,7 @@ export function AdminMatchFormPage() {
     try {
       const saved = await save.mutateAsync({
         id,
-        input: formToInput(values, match?.image_path ?? null),
+        input: formToInput(values, match?.image_path ?? null, match),
         imageFile,
         previousImagePath: match?.image_path ?? null,
       })
