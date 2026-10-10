@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { brand } from '@/config/brand'
-import { deliverySpeed, hitWindow, loadBest, runsForTiming, saveBest } from '@/utils/gullyDash'
+import { useAuth } from '@/hooks/useAuth'
+import { ballHeight, hitWindow, loadBest, makeDelivery, runsForTiming, saveBest, type Delivery } from '@/utils/gullyDash'
 
 // Logical size; the canvas is scaled to the screen.
 const W = 480
@@ -13,7 +14,6 @@ const HAND = { x: 86, y: 156 }
 const BAT_LEN = 44
 const BAT_REST = -1.9
 const BAT_THROUGH = 0.9
-const PITCH_PERIOD = 160
 
 type Phase = 'ready' | 'playing' | 'over'
 type BallState = 'incoming' | 'hit' | 'gap'
@@ -23,12 +23,14 @@ interface Game {
   score: number
   faced: number
   best: number
-  ball: { state: BallState; x: number; y: number; vx: number; vy: number; t: number }
+  ball: { state: BallState; x: number; y: number; vx: number; vy: number; t: number; plan: Delivery; paced: boolean }
+  next: Delivery // the ball being bowled after the current wait
   swingT: number // seconds since the swing started, -1 when idle
   gap: number
   popup: { text: string; t: number } | null
   reason: string
   overAt: number
+  player: string
 }
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
@@ -40,24 +42,26 @@ function batAngle(swingT: number): number {
   return lerp(BAT_THROUGH, BAT_REST, Math.min(1, (swingT - 0.4) / 0.1))
 }
 
-/** Height of the ball above its resting line: it bounces on the way in, then rolls along the ground past the bat. */
-function bounce(x: number): number {
-  if (x <= SWEET) return 0
-  return 60 * Math.abs(Math.sin(((x - SWEET) / PITCH_PERIOD) * Math.PI))
+/** A new ball from the bowler: vx is its speed in px/s towards the bat, which changes only if the plan has a change of pace. */
+function bowl(plan: Delivery): Game['ball'] {
+  return { state: 'incoming', x: W + 10, y: BALL_BASE, vx: plan.speed, vy: 0, t: 0, plan, paced: false }
 }
 
 function newGame(best: number): Game {
+  const first = makeDelivery(0)
   return {
     phase: 'ready',
     score: 0,
     faced: 0,
     best,
-    ball: { state: 'gap', x: W + 10, y: BALL_BASE, vx: 0, vy: 0, t: 0 },
+    ball: { ...bowl(first), state: 'gap' },
+    next: first,
     swingT: -1,
     gap: 0,
     popup: null,
     reason: '',
     overAt: 0,
+    player: 'Anonymous',
   }
 }
 
@@ -121,8 +125,20 @@ function draw(ctx: CanvasRenderingContext2D, g: Game) {
   ctx.font = 'bold 20px system-ui, sans-serif'
   ctx.textAlign = 'left'
   ctx.fillText(`Runs ${g.score}`, 12, 10)
+  // The ball that got you out counts as faced, like on a scorecard.
+  ctx.fillStyle = '#475569'
+  ctx.font = '600 13px system-ui, sans-serif'
+  ctx.fillText(`Balls ${g.faced + (g.phase === 'over' ? 1 : 0)}`, 12, 34)
+  ctx.fillStyle = '#0f172a'
+  ctx.font = 'bold 20px system-ui, sans-serif'
   ctx.textAlign = 'right'
   ctx.fillText(`Best ${g.best}`, W - 12, 10)
+  // Drawn on the canvas so the name shows up in screenshots people share.
+  ctx.textAlign = 'center'
+  ctx.fillStyle = '#475569'
+  ctx.font = '600 14px system-ui, sans-serif'
+  ctx.fillText(g.player.length > 18 ? `${g.player.slice(0, 17)}…` : g.player, W / 2, 13)
+  ctx.fillStyle = '#0f172a'
 
   if (g.popup) {
     ctx.globalAlpha = Math.max(0, 1 - g.popup.t / 0.9)
@@ -150,6 +166,10 @@ function draw(ctx: CanvasRenderingContext2D, g: Game) {
 export function GullyDash() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState('')
+  const { profile } = useAuth()
+  // The game loop runs once; it reads the name from a ref so a profile that loads late still shows.
+  const playerRef = useRef('Anonymous')
+  playerRef.current = profile?.full_name?.trim() || 'Anonymous'
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -180,7 +200,7 @@ export function GullyDash() {
       g.faced = 0
       g.swingT = -1
       g.popup = null
-      g.ball = { state: 'incoming', x: W + 10, y: BALL_BASE, vx: 0, vy: 0, t: 0 }
+      g.ball = bowl(makeDelivery(0))
       setStatus('')
     }
 
@@ -199,7 +219,7 @@ export function GullyDash() {
       g.faced += 1
       g.popup = { text: runs === 6 ? 'SIX!' : runs === 4 ? 'FOUR!' : String(runs), t: 0 }
       const fly = { 6: [200, -380], 4: [380, -90], 2: [150, -60], 1: [90, -30] }[runs] ?? [90, -30]
-      g.ball = { state: 'hit', x: SWEET, y: BALL_BASE, vx: fly[0], vy: fly[1], t: 0 }
+      g.ball = { ...g.ball, state: 'hit', x: SWEET, vx: fly[0], vy: fly[1], t: 0 }
     }
 
     function update(dt: number) {
@@ -214,8 +234,12 @@ export function GullyDash() {
       if (g.phase !== 'playing') return
       const b = g.ball
       if (b.state === 'incoming') {
-        b.x -= deliverySpeed(g.faced) * dt
-        b.y = BALL_BASE - bounce(b.x)
+        b.x -= b.vx * dt
+        if (b.plan.paceChange && !b.paced && b.x - SWEET < b.plan.paceChange.at) {
+          b.paced = true
+          b.vx *= b.plan.paceChange.factor
+        }
+        b.y = BALL_BASE - ballHeight(b.x - SWEET, b.plan.pitches)
         if (b.x < STUMPS + 8) finish('Bowled!')
       } else if (b.state === 'hit') {
         b.t += dt
@@ -224,11 +248,12 @@ export function GullyDash() {
         b.y = Math.min(BALL_BASE, b.y + b.vy * dt)
         if (b.t > 0.8) {
           b.state = 'gap'
-          g.gap = 0.4
+          g.next = makeDelivery(g.faced)
+          g.gap = g.next.wait
         }
       } else {
         g.gap -= dt
-        if (g.gap <= 0) g.ball = { state: 'incoming', x: W + 10, y: BALL_BASE, vx: 0, vy: 0, t: 0 }
+        if (g.gap <= 0) g.ball = bowl(g.next)
       }
     }
 
@@ -237,6 +262,7 @@ export function GullyDash() {
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
+      g.player = playerRef.current
       update(dt)
       draw(ctx!, g)
       raf = requestAnimationFrame(frame)
