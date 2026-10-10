@@ -27,6 +27,7 @@ const AdminMatchPage = lazy(() => import('@/pages/admin/AdminMatchPage').then((m
 const PlayersPage = lazy(() => import('@/pages/admin/PlayersPage').then((m) => ({ default: m.PlayersPage })))
 const PaymentsPage = lazy(() => import('@/pages/admin/PaymentsPage').then((m) => ({ default: m.PaymentsPage })))
 const PaymentMatchPage = lazy(() => import('@/pages/admin/PaymentMatchPage').then((m) => ({ default: m.PaymentMatchPage })))
+const MoneyReportPage = lazy(() => import('@/pages/admin/MoneyReportPage').then((m) => ({ default: m.MoneyReportPage })))
 const ActivityPage = lazy(() => import('@/pages/admin/ActivityPage').then((m) => ({ default: m.ActivityPage })))
 
 export default function App() {
@@ -65,6 +66,7 @@ export default function App() {
                   <Route path="players" element={<PlayersPage />} />
                   <Route path="payments" element={<PaymentsPage />} />
                   <Route path="payments/:matchId" element={<PaymentMatchPage />} />
+                  <Route path="money" element={<MoneyReportPage />} />
                   <Route path="activity" element={<ActivityPage />} />
                 </Route>
               </Route>

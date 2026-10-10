@@ -26,9 +26,14 @@ function MoneyOverview() {
     <Card className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold">Money</h2>
-        <Link to="/admin/payments" className="text-sm font-medium text-brand underline">
-          Open payments
-        </Link>
+        <span className="flex gap-4">
+          <Link to="/admin/money" className="text-sm font-medium text-brand underline">
+            Full report
+          </Link>
+          <Link to="/admin/payments" className="text-sm font-medium text-brand underline">
+            Open payments
+          </Link>
+        </span>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Tile
