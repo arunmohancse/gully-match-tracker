@@ -15,6 +15,12 @@ export function buildWhatsAppChatUrl(phone: string, text: string): string | null
   return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`
 }
 
+/** Prefilled for the admin who is vetting a signup: sent only if the person turns out not to be in the community group. Plain text only. */
+export function buildNotMemberMessage(fullName: string, communityName: string): string {
+  const firstName = fullName.trim().split(/\s+/)[0] || 'there'
+  return `Hi ${firstName}, thanks for signing up. You need to be a member of the ${communityName} WhatsApp community to use this app, so we could not approve your account. Please contact an organiser to join the group and then sign up again.`
+}
+
 export interface ReminderOptions {
   /** What this player owes. Defaults to the match fee. */
   amount?: number | null
