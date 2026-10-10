@@ -81,6 +81,12 @@ export function AboutPage() {
         <h2 className="text-xl font-semibold">Upcoming matches</h2>
         <MatchList scope="upcoming" basePath="/matches" actionLabel="View match" emptyText="No upcoming matches yet. Follow us to hear first." hideCancelled />
       </section>
+
+      <p className="text-center text-sm">
+        <Link to="/privacy" className="text-slate-500 hover:text-brand hover:underline">
+          Privacy policy
+        </Link>
+      </p>
     </div>
   )
 }

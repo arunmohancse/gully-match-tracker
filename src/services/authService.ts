@@ -17,6 +17,12 @@ export const authService = {
     if (error) throw new AppError(toFriendlyMessage(error))
   },
 
+  /** Redirects to Google and back to the site root; the session is picked up from the URL on return. */
+  async signInWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+    if (error) throw new AppError(toFriendlyMessage(error))
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw new AppError(toFriendlyMessage(error))

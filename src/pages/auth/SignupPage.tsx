@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { GoogleButton } from '@/components/GoogleButton'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -50,6 +51,7 @@ export function SignupPage() {
           Account created. If you aren't logged in automatically, check your email to confirm, then log in. An admin must approve your account before you can register for matches.
         </p>
       )}
+      <GoogleButton />
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field label="Full name" htmlFor="fullName" error={errors.fullName}>
           <Input id="fullName" autoComplete="name" value={form.fullName} onChange={set('fullName')} />

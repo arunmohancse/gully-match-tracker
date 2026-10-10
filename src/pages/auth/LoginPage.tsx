@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { brand } from '@/config/brand'
+import { GoogleButton } from '@/components/GoogleButton'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -32,6 +33,7 @@ export function LoginPage() {
 
   return (
     <AuthShell title="Log in">
+      <GoogleButton />
       <form onSubmit={onSubmit} className="space-y-4">
         <Field label="Email" htmlFor="email">
           <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />

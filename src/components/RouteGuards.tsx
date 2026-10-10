@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AccountGate } from '@/components/AccountGate'
+import { PhoneGate } from '@/components/PhoneGate'
 import { useAuth } from '@/hooks/useAuth'
 
 export function FullPageSpinner() {
@@ -14,6 +15,7 @@ export function RequireAuth() {
   // Logged-out visitors opening the site's home address see the public About page; everything else asks them to log in.
   if (!session && location.pathname === '/') return <Navigate to="/about" replace />
   if (!session) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
+  if (profile && profile.status !== 'BLOCKED' && !profile.phone) return <PhoneGate />
   if (profile?.status === 'PENDING' || profile?.status === 'BLOCKED') return <AccountGate status={profile.status} />
   return <Outlet />
 }
