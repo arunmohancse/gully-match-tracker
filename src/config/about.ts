@@ -15,6 +15,18 @@ export const about = {
     { title: 'Play, then share the cost', text: 'After the match, the expenses are split equally among the players and you pay your share by UPI.' },
   ],
   rules: [
-    'If your name is on the list, you are responsible for your match share, whether you attend or not.',
+    { title: 'Enjoy the Game', text: "We're here to play cricket, have fun, make friends, and build a stronger community. Let's keep the spirit of friendly cricket alive!" },
+    { title: 'Commitment Matters', text: 'If your name is on the confirmed player list, you are responsible for your match share, whether you attend or not.' },
+    {
+      title: 'Register Responsibly',
+      text: "Please register only when you're reasonably sure you can attend. If your plans change, cancel as early as possible so someone on the waiting list gets a chance to play.",
+    },
+    { title: 'Pay on Time', text: 'Please settle your match share promptly. Everyone shares the cost, and timely payments help keep things running smoothly.' },
+    { title: 'Be On Time', text: "Arrive at the ground before the scheduled start time. Let's respect everyone's time and make the most of our time together." },
+    { title: 'Respect Everyone', text: 'Treat fellow players, captains, and organisers with respect. Keep the atmosphere friendly and welcoming for everyone.' },
+    {
+      title: 'Play Fair and Keep It Friendly',
+      text: 'Respect decisions, avoid unnecessary arguments, and remember that friendship matters more than the result.',
+    },
   ],
 }

@@ -70,11 +70,13 @@ export function AboutPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Ground rules</h2>
-        <ul className="list-disc space-y-1 pl-5 text-slate-700">
+        <ol className="list-decimal space-y-2 pl-5 text-slate-700">
           {about.rules.map((r) => (
-            <li key={r}>{r}</li>
+            <li key={r.title}>
+              <strong>{r.title}:</strong> {r.text}
+            </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
       <section className="space-y-3">
