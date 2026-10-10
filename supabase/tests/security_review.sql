@@ -1,4 +1,4 @@
--- Security review checks. Requires migrations 0001-0015. READ-ONLY: it changes nothing.
+-- Security review checks. Requires migrations 0001-0016. READ-ONLY: it changes nothing.
 -- Paste into the Supabase SQL Editor and Run. Success: the result shows "SECURITY REVIEW PASSED".
 -- Any problem raises an error that lists exactly what is wrong. Re-run it after every new migration.
 
@@ -115,6 +115,14 @@ begin
    where not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
                       where n.nspname = 'public' and p.proname = x);
   if v_bad is not null then raise exception 'FAIL [expected functions are missing]: %', v_bad; end if;
+
+  -- 5b. Trigger functions are not callable through the API (migration 0016) --------------------------------------------
+  select string_agg(p.proname, ', ' order by p.proname) into v_bad
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.prorettype in ('trigger'::regtype, 'event_trigger'::regtype)
+     and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')
+     and (has_function_privilege('anon', p.oid, 'EXECUTE') or has_function_privilege('authenticated', p.oid, 'EXECUTE'));
+  if v_bad is not null then raise exception 'FAIL [trigger functions callable by clients, run 0016]: %', v_bad; end if;
 
   -- 6. Every SECURITY DEFINER function pins its search_path (prevents search_path hijacking) ------------------------
   select string_agg(p.proname, ', ') into v_bad

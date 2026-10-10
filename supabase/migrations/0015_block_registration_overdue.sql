@@ -11,7 +11,7 @@
 
 -- One place to change the grace period.
 create or replace function public.payment_grace_days()
-returns integer language sql immutable as $$ select 3 $$;
+returns integer language sql immutable set search_path = public as $$ select 3 $$;
 
 -- Overdue dues of one user (internal; clients use my_payment_block()).
 create or replace function public.overdue_dues(p_user_id uuid)
@@ -66,6 +66,8 @@ begin
   end if;
   return new;
 end $$;
+
+revoke all on function public.require_no_overdue_payment() from public, anon, authenticated;
 
 drop trigger if exists registrations_require_no_overdue on public.registrations;
 create trigger registrations_require_no_overdue before insert or update on public.registrations
