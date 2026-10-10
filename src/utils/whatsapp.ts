@@ -63,6 +63,8 @@ export function buildReminderMessage(fullName: string, match: Match, options: Re
     ask,
     ...(instructions ? ['', 'Payment details:', instructions] : []),
     '',
+    'If you have already paid, please let the admin know so we can update the payment status.',
+    '',
     'Thank you!',
   ].join('\n')
 }
