@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import { Share2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { brand } from '@/config/brand'
 import { useAuth } from '@/hooks/useAuth'
 import { ballHeight, hitWindow, loadBest, makeDelivery, runsForTiming, saveBest, type Delivery } from '@/utils/gullyDash'
+import { shareOrDownloadImage } from '@/utils/upiImage'
 
 // Logical size; the canvas is scaled to the screen.
 const W = 480
@@ -166,6 +169,8 @@ function draw(ctx: CanvasRenderingContext2D, g: Game) {
 export function GullyDash() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState('')
+  const [finished, setFinished] = useState(false) // true once the batter is out
+  const [note, setNote] = useState('')
   const { profile } = useAuth()
   // The game loop runs once; it reads the name from a ref so a profile that loads late still shows.
   const playerRef = useRef('Anonymous')
@@ -192,6 +197,7 @@ export function GullyDash() {
         saveBest(g.best)
       }
       setStatus(`Out! ${reason} You scored ${g.score}.`)
+      setFinished(true)
     }
 
     function start() {
@@ -202,6 +208,8 @@ export function GullyDash() {
       g.popup = null
       g.ball = bowl(makeDelivery(0))
       setStatus('')
+      setFinished(false)
+      setNote('')
     }
 
     function act() {
@@ -289,6 +297,16 @@ export function GullyDash() {
     }
   }, [])
 
+  /** Sends a picture of the game as it is now (name, runs, balls and the "Out!" banner). Saves it as a file where sharing is not available. */
+  async function shareScore() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+    if (!blob) return setNote('Could not create the picture. Please take a screenshot instead.')
+    const result = await shareOrDownloadImage(blob, 'gully-dash-score.png')
+    setNote(result === 'downloaded' ? 'Picture saved. Send it from your gallery or downloads.' : '')
+  }
+
   return (
     <div className="space-y-2">
       <canvas
@@ -298,7 +316,16 @@ export function GullyDash() {
         className="w-full cursor-pointer select-none rounded-lg border border-slate-200 bg-white"
         style={{ aspectRatio: `${W} / ${H}`, touchAction: 'manipulation' }}
       />
-      <p className="text-center text-xs text-slate-500">Tap, click or press Space to swing.</p>
+      {finished ? (
+        <div className="flex flex-col items-center gap-1">
+          <Button onClick={shareScore}>
+            <Share2 className="size-4" aria-hidden /> Share score
+          </Button>
+          {note && <p className="text-center text-xs text-slate-500">{note}</p>}
+        </div>
+      ) : (
+        <p className="text-center text-xs text-slate-500">Tap, click or press Space to swing.</p>
+      )}
       <p className="sr-only" aria-live="polite">
         {status}
       </p>

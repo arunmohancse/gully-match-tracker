@@ -81,7 +81,7 @@ export function runsForTiming(offset: number, window: number): number | null {
   return 1
 }
 
-const BEST_KEY = 'gully-dash-best'
+const BEST_KEY ='gully-dash-best'
 
 /** Best score is kept on the device only. Storage can be blocked (private mode), so never throw. */
 export function loadBest(): number {

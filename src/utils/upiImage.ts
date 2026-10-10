@@ -49,11 +49,11 @@ export async function makeUpiQrImage({ uri, title, amountText, payee, upiId }: U
 export type ShareResult = 'shared' | 'downloaded' | 'cancelled'
 
 /** Opens the phone's share sheet with the image attached when the browser allows it; otherwise downloads the image. */
-export async function shareOrDownloadImage(blob: Blob, fileName: string, text: string): Promise<ShareResult> {
+export async function shareOrDownloadImage(blob: Blob, fileName: string, text?: string): Promise<ShareResult> {
   const file = new File([blob], fileName, { type: blob.type })
   if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], text })
+      await navigator.share(text ? { files: [file], text } : { files: [file] })
       return 'shared'
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return 'cancelled'
