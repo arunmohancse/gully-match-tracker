@@ -1,5 +1,6 @@
 import type { CostModel, Match, MatchInput } from '@/types/domain'
-import { fromLocalInput, toLocalInput } from './dates'
+import { addDaysISO, fromLocalInput, toLocalInput } from './dates'
+import { isGoogleMapsUrl } from './mapLink'
 
 /** Registration dates are picked as a day only: it opens at the start of that day and closes at the end of it. */
 const OPENS_TIME = '00:00'
@@ -12,6 +13,7 @@ export interface MatchFormValues {
   startTime: string
   endTime: string
   venue: string
+  mapUrl: string
   maxPlayers: string
   costModel: CostModel
   registrationFee: string
@@ -29,6 +31,7 @@ export const EMPTY_FORM: MatchFormValues = {
   startTime: '',
   endTime: '',
   venue: '',
+  mapUrl: '',
   maxPlayers: '20',
   costModel: 'SHARED_COST',
   registrationFee: '0',
@@ -45,6 +48,7 @@ export function matchToForm(m: Match): MatchFormValues {
     startTime: m.start_time.slice(0, 5),
     endTime: m.end_time?.slice(0, 5) ?? '',
     venue: m.venue,
+    mapUrl: m.map_url ?? '',
     maxPlayers: String(m.max_players),
     costModel: m.cost_model ?? 'FIXED_FEE',
     registrationFee: String(m.registration_fee),
@@ -54,10 +58,19 @@ export function matchToForm(m: Match): MatchFormValues {
   }
 }
 
+/**
+ * Starting values for a new match copied from an existing one: every detail is kept, the date moves a week on
+ * (matches are usually weekly), and the registration open/close days are cleared because they belonged to the old match.
+ */
+export function copyMatchToForm(m: Match): MatchFormValues {
+  return { ...matchToForm(m), matchDate: addDaysISO(m.match_date, 7), opensAt: '', closesAt: '' }
+}
+
 export function validateMatchForm(v: MatchFormValues): MatchFormErrors {
   const e: MatchFormErrors = {}
   if (!v.title.trim()) e.title = 'Enter a title.'
   if (!v.venue.trim()) e.venue = 'Enter the venue.'
+  if (v.mapUrl.trim() && !isGoogleMapsUrl(v.mapUrl)) e.mapUrl = 'Paste a Google Maps link (in Google Maps tap Share, then Copy link).'
   if (!v.matchDate) e.matchDate = 'Pick the match date.'
   if (!v.startTime) e.startTime = 'Pick a start time.'
   if (v.endTime && v.startTime && v.endTime <= v.startTime) e.endTime = 'End time must be after the start time.'
@@ -97,6 +110,7 @@ export function formToInput(v: MatchFormValues, imagePath: string | null, origin
     start_time: v.startTime,
     end_time: v.endTime || null,
     venue: v.venue.trim(),
+    map_url: blankToNull(v.mapUrl),
     max_players: Number(v.maxPlayers),
     registration_fee: v.costModel === 'SHARED_COST' ? 0 : Number(v.registrationFee),
     cost_model: v.costModel,

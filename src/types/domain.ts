@@ -29,6 +29,7 @@ export interface Match {
   start_time: string // HH:MM:SS
   end_time: string | null
   venue: string
+  map_url: string | null // Google Maps link to the venue
   max_players: number
   registration_fee: number
   cost_model: CostModel
@@ -149,6 +150,7 @@ export interface MatchInput {
   start_time: string
   end_time: string | null
   venue: string
+  map_url: string | null
   max_players: number
   registration_fee: number
   cost_model: CostModel

@@ -21,6 +21,7 @@ export function buildAnnouncement(match: Match, url: string): string {
     `Date: ${formatMatchDate(match.match_date)}`,
     `Time: ${time}`,
     `Venue: ${match.venue}`,
+    ...(match.map_url ? [`Location: ${match.map_url}`] : []),
     '',
     ...(isShared(match) ? ['Cost: shared equally among players after the match'] : match.registration_fee > 0 ? [`Match Fee: ${formatINR(match.registration_fee)}`] : []),
     `Maximum Players: ${match.max_players}`,

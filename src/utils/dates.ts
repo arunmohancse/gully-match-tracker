@@ -41,6 +41,12 @@ export function daysAgoISO(days: number, now: Date = new Date()): string {
   return todayISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - days))
 }
 
+/** A YYYY-MM-DD date moved by `days` (negative = earlier), as YYYY-MM-DD. Works across month and year ends. */
+export function addDaysISO(iso: string, days: number): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return todayISO(new Date(y, m - 1, d + days))
+}
+
 /** ISO timestamp -> value for <input type="datetime-local"> in local time. */
 export function toLocalInput(iso: string | null): string {
   if (!iso) return ''

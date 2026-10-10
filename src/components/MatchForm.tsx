@@ -9,6 +9,8 @@ import { EMPTY_FORM, matchToForm, validateMatchForm, type MatchFormErrors, type 
 
 interface Props {
   match?: Match
+  /** Starting values for a new match (for example the venue of the last one). Ignored when editing. */
+  defaults?: Partial<MatchFormValues>
   submitting: boolean
   error: string | null
   submitLabel: string
@@ -16,8 +18,8 @@ interface Props {
   onSubmit: (values: MatchFormValues, imageFile: File | null) => void
 }
 
-export function MatchForm({ match, submitting, error, submitLabel, submittingLabel, onSubmit }: Props) {
-  const [values, setValues] = useState<MatchFormValues>(match ? matchToForm(match) : EMPTY_FORM)
+export function MatchForm({ match, defaults, submitting, error, submitLabel, submittingLabel, onSubmit }: Props) {
+  const [values, setValues] = useState<MatchFormValues>(match ? matchToForm(match) : { ...EMPTY_FORM, ...defaults })
   const [errors, setErrors] = useState<MatchFormErrors>({})
 
   const set = (key: keyof MatchFormValues) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -56,6 +58,11 @@ export function MatchForm({ match, submitting, error, submitLabel, submittingLab
       <Field label="Venue" htmlFor="venue" error={errors.venue}>
         <Input id="venue" value={values.venue} onChange={set('venue')} />
       </Field>
+
+      <Field label="Google Maps link (optional)" htmlFor="mapUrl" error={errors.mapUrl}>
+        <Input id="mapUrl" type="url" inputMode="url" value={values.mapUrl} onChange={set('mapUrl')} placeholder="https://maps.app.goo.gl/..." />
+      </Field>
+      <p className="-mt-2 text-sm text-slate-500">In Google Maps, open the turf, tap Share, then Copy link, and paste it here. Players get an Open in Google Maps button.</p>
 
       <Field label="Maximum players" htmlFor="maxPlayers" error={errors.maxPlayers}>
         <Input id="maxPlayers" type="number" inputMode="numeric" min={1} value={values.maxPlayers} onChange={set('maxPlayers')} />

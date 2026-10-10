@@ -30,7 +30,7 @@ export function AdminMatchesPage() {
           </Button>
         ))}
       </div>
-      <MatchList scope={scope} basePath="/admin/matches" actionLabel="Manage" emptyText="No matches found." showPayments />
+      <MatchList scope={scope} basePath="/admin/matches" actionLabel="Manage" emptyText="No matches found." showPayments copyPath="/admin/matches/new" />
     </div>
   )
 }

@@ -28,7 +28,7 @@ export const AUDIT_CATEGORIES = {
 export type AuditCategory = keyof typeof AUDIT_CATEGORIES
 
 const FIELD_LABELS: Record<string, string> = {
-  title: 'title', description: 'description', match_date: 'date', start_time: 'start time', end_time: 'end time', venue: 'venue',
+  title: 'title', description: 'description', match_date: 'date', start_time: 'start time', end_time: 'end time', venue: 'venue', map_url: 'map location',
   max_players: 'maximum players', registration_fee: 'fee', cost_model: 'cost model', registration_opens_at: 'registration opening', registration_closes_at: 'registration closing',
   rules: 'rules', image_path: 'image', status: 'status',
 }

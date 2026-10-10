@@ -17,9 +17,11 @@ interface Props {
   hideCancelled?: boolean
   /** Admin views: show paid / unpaid / collected on each card. */
   showPayments?: boolean
+  /** Admin views: adds a Copy button that opens this create-match path with ?copy=<match id>. */
+  copyPath?: string
 }
 
-export function MatchList({ scope, basePath, actionLabel, emptyText, hideCancelled, showPayments }: Props) {
+export function MatchList({ scope, basePath, actionLabel, emptyText, hideCancelled, showPayments, copyPath }: Props) {
   const { data, isLoading, error, refetch } = useMatches(scope)
   const { data: counts } = useMatchCounts((data ?? []).map((m) => m.id))
   const countsById = new Map((counts ?? []).map((c) => [c.match_id, c]))
@@ -53,9 +55,16 @@ export function MatchList({ scope, basePath, actionLabel, emptyText, hideCancell
           financials={financialsById.get(m.id)}
           to={`${basePath}/${m.id}`}
           action={
-            <Button asChild size="sm" variant="outline">
-              <Link to={`${basePath}/${m.id}`}>{actionLabel}</Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link to={`${basePath}/${m.id}`}>{actionLabel}</Link>
+              </Button>
+              {copyPath && (
+                <Button asChild size="sm" variant="outline">
+                  <Link to={`${copyPath}?copy=${m.id}`}>Copy</Link>
+                </Button>
+              )}
+            </div>
           }
         />
       ))}

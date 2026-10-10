@@ -36,6 +36,13 @@ describe('buildReminderMessage', () => {
     expect(buildReminderMessage('Arun', match, { instructions: '  ' })).not.toContain('Payment details')
     expect(buildReminderMessage('Arun', match, { instructions: 'UPI: x@upi' })).toContain('UPI: x@upi')
   })
+  it('adds the map location only for an upcoming match, not for payment-only reminders', () => {
+    const link = 'https://maps.app.goo.gl/abc123'
+    expect(buildReminderMessage('Arun', match)).not.toContain('Location')
+    expect(buildReminderMessage('Arun', { ...match, map_url: link })).toContain(`Venue: Velocity Turf\nLocation: ${link}`)
+    expect(buildReminderMessage('Arun', { ...match, map_url: link, status: 'COMPLETED' })).not.toContain('Location')
+    expect(buildReminderMessage('Arun', { ...match, map_url: link, cost_model: 'SHARED_COST' })).not.toContain('Location')
+  })
   it('uses "payment pending" wording once the match is completed', () => {
     const done = buildReminderMessage('Arun Kumar', { ...match, status: 'COMPLETED' })
     expect(done).toContain('Payment is still pending for the match: Gully League Community Match.')

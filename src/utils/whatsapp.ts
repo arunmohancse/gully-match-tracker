@@ -57,6 +57,7 @@ export function buildReminderMessage(fullName: string, match: Match, options: Re
     `Date: ${formatMatchDate(match.match_date)}`,
     `Time: ${time}`,
     `Venue: ${match.venue}`,
+    ...(match.map_url && !done && !shared ? [`Location: ${match.map_url}`] : []), // only while the match is still ahead
     '',
     amountLine,
     '',

@@ -1,4 +1,4 @@
--- Security review checks. Requires migrations 0001-0016. READ-ONLY: it changes nothing.
+-- Security review checks. Requires migrations 0001-0018. READ-ONLY: it changes nothing.
 -- Paste into the Supabase SQL Editor and Run. Success: the result shows "SECURITY REVIEW PASSED".
 -- Any problem raises an error that lists exactly what is wrong. Re-run it after every new migration.
 

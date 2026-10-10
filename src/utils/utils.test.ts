@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { Match } from '@/types/domain'
 import { buildAnnouncement } from './announcement'
-import { formatMatchDate, formatShortDate, formatTime, fromLocalInput, todayISO, toLocalInput } from './dates'
-import { EMPTY_FORM, formToInput, validateMatchForm } from './matchForm'
+import { addDaysISO, formatMatchDate, formatShortDate, formatTime, fromLocalInput, todayISO, toLocalInput } from './dates'
+import { copyMatchToForm, EMPTY_FORM, formToInput, validateMatchForm } from './matchForm'
 import { availableStatusActions } from './matchStatus'
 import { formatINR, parseMoney } from './money'
 
@@ -15,6 +15,7 @@ const match: Match = {
   start_time: '06:00:00',
   end_time: '08:00:00',
   venue: 'Velocity Turf',
+  map_url: null,
   max_players: 20,
   registration_fee: 150,
   cost_model: 'FIXED_FEE',
@@ -115,6 +116,31 @@ describe('matchForm', () => {
   it('new matches default to shared cost', () => {
     expect(EMPTY_FORM.costModel).toBe('SHARED_COST')
   })
+  it('a copied match keeps its details, moves a week on, and drops the registration window', () => {
+    const source = { ...match, map_url: 'https://maps.app.goo.gl/abc123', rules: 'Bring shoes', registration_opens_at: '2026-10-10T00:00:00Z', registration_closes_at: '2026-10-17T18:29:00Z' } as Match
+    const copy = copyMatchToForm(source)
+    expect(copy).toMatchObject({ title: source.title, venue: 'Velocity Turf', mapUrl: 'https://maps.app.goo.gl/abc123', rules: 'Bring shoes', startTime: '06:00', endTime: '08:00', maxPlayers: '20', costModel: 'FIXED_FEE', registrationFee: '150' })
+    expect(copy.matchDate).toBe('2026-10-25')
+    expect(copy.opensAt).toBe('')
+    expect(copy.closesAt).toBe('')
+    expect(validateMatchForm(copy)).toEqual({}) // ready to save as it is
+  })
+  it('the map link is optional, must be a Google Maps link, and is stored trimmed or as null', () => {
+    expect(validateMatchForm({ ...valid, mapUrl: '' }).mapUrl).toBeUndefined()
+    expect(validateMatchForm({ ...valid, mapUrl: 'https://maps.app.goo.gl/abc123' }).mapUrl).toBeUndefined()
+    expect(validateMatchForm({ ...valid, mapUrl: 'https://example.com/maps/abc' }).mapUrl).toBeDefined()
+    expect(formToInput({ ...valid, mapUrl: '  https://maps.app.goo.gl/abc123 ' }, null).map_url).toBe('https://maps.app.goo.gl/abc123')
+    expect(formToInput({ ...valid, mapUrl: '  ' }, null).map_url).toBeNull()
+  })
+})
+
+describe('addDaysISO', () => {
+  it('moves a date across month and year ends', () => {
+    expect(addDaysISO('2026-10-18', 7)).toBe('2026-10-25')
+    expect(addDaysISO('2026-10-28', 7)).toBe('2026-11-04')
+    expect(addDaysISO('2026-12-28', 7)).toBe('2027-01-04')
+    expect(addDaysISO('2026-03-02', -3)).toBe('2026-02-27')
+  })
 })
 
 describe('buildAnnouncement', () => {
@@ -132,6 +158,11 @@ describe('buildAnnouncement', () => {
     const text = buildAnnouncement({ ...match, cost_model: 'SHARED_COST', registration_fee: 0 }, 'https://x.test/matches/m1')
     expect(text).toContain('Cost: shared equally among players after the match')
     expect(text).not.toContain('Match Fee')
+  })
+  it('adds a Location line only when the match has a map link', () => {
+    expect(buildAnnouncement(match, 'https://x.test/matches/m1')).not.toContain('Location')
+    const text = buildAnnouncement({ ...match, map_url: 'https://maps.app.goo.gl/abc123' }, 'https://x.test/matches/m1')
+    expect(text).toContain('Venue: Velocity Turf\nLocation: https://maps.app.goo.gl/abc123')
   })
   it('omits the fee line when the match is free', () => {
     const text = buildAnnouncement({ ...match, registration_fee: 0 }, 'https://x.test/matches/m1')

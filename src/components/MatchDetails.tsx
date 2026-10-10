@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, MapPin, Users, Wallet } from 'lucide-react'
+import { CalendarDays, Clock, MapPin, Navigation, Users, Wallet } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { MatchStatusBadge } from '@/components/MatchStatusBadge'
 import { matchService } from '@/services/matchService'
@@ -36,7 +36,19 @@ export function MatchDetails({ match }: { match: Match }) {
         <div className="grid gap-3 sm:grid-cols-2">
           <Row icon={CalendarDays} label="Date">{formatMatchDate(match.match_date)}</Row>
           <Row icon={Clock} label="Time">{time}</Row>
-          <Row icon={MapPin} label="Venue">{match.venue}</Row>
+          <Row icon={MapPin} label="Venue">
+            {match.venue}
+            {match.map_url && (
+              <a
+                href={match.map_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 flex w-fit items-center gap-1 text-sm font-medium text-brand underline"
+              >
+                <Navigation className="size-4" aria-hidden /> Open in Google Maps
+              </a>
+            )}
+          </Row>
           {isShared(match) ? (
             <Row icon={Wallet} label="Cost">
               Shared equally after the match

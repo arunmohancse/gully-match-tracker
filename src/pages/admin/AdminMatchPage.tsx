@@ -1,4 +1,4 @@
-import { Pencil } from 'lucide-react'
+import { Copy, Pencil } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AdminRegistrations } from '@/components/AdminRegistrations'
@@ -60,6 +60,11 @@ export function AdminMatchPage() {
               </Link>
             </Button>
           )}
+          <Button asChild variant="outline">
+            <Link to={`/admin/matches/new?copy=${match.id}`}>
+              <Copy className="size-4" aria-hidden /> Copy as new match
+            </Link>
+          </Button>
           {actions.map((a) => (
             <Button
               key={a.to}

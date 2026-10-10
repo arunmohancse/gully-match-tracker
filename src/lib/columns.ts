@@ -3,5 +3,5 @@
  * refuses them (migration 0008), so never use `select('*')` on matches.
  */
 export const MATCH_COLUMNS =
-  'id, community_id, title, description, match_date, start_time, end_time, venue, max_players, registration_fee, cost_model, ' +
+  'id, community_id, title, description, match_date, start_time, end_time, venue, map_url, max_players, registration_fee, cost_model, ' +
   'registration_opens_at, registration_closes_at, rules, image_path, status, created_at, updated_at'
