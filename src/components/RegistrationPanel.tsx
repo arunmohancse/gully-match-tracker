@@ -1,19 +1,25 @@
 import { Check } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { RegistrationNote } from '@/components/RegistrationNote'
 import { PlayerPaymentInfo } from '@/components/PlayerPaymentInfo'
 import { CancelledBadge, ListBadge } from '@/components/RegistrationBadges'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
-import { useCancelRegistration, useMyRegistration, useRegister } from '@/hooks/useRegistrations'
+import { useAuth } from '@/hooks/useAuth'
+import { useCancelRegistration, useMyRegistration, usePaymentBlock, useRegister } from '@/hooks/useRegistrations'
 import { toFriendlyMessage } from '@/lib/errors'
 import type { Match } from '@/types/domain'
+import { formatShortDate } from '@/utils/dates'
+import { formatINR } from '@/utils/money'
 import { registrationWindow } from '@/utils/registration'
 
 /** The signed-in player's registration state for a match, plus the Register action. */
 export function RegistrationPanel({ match }: { match: Match }) {
   const { data: mine, isLoading, error: loadError } = useMyRegistration(match.id)
+  const { data: paymentBlock } = usePaymentBlock()
+  const { isAdmin } = useAuth()
   const register = useRegister(match.id)
   const cancel = useCancelRegistration()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -102,6 +108,7 @@ export function RegistrationPanel({ match }: { match: Match }) {
   }
 
   const canRegister = window === 'OPEN'
+  const blocked = (paymentBlock?.overdue_count ?? 0) > 0 // an overdue payment: the server would refuse anyway
   return (
     // When the Register button is available it floats just above the bottom navigation on phones.
     <Card className={canRegister ? 'sticky bottom-20 z-10 space-y-3 shadow-lg md:static md:shadow-sm' : 'space-y-3'}>
@@ -114,7 +121,20 @@ export function RegistrationPanel({ match }: { match: Match }) {
         <>
           <RegistrationNote match={match} />
           {full && <p className="text-sm text-orange-700">The main list is full. You will join the waiting list.</p>}
-          <Button size="lg" className="w-full" onClick={onRegister} loading={register.isPending}>
+          {blocked && paymentBlock && (
+            <div role="status" className="space-y-1 rounded-md border border-orange-300 bg-orange-50 p-3 text-sm text-orange-900">
+              <p className="font-semibold">Registration is paused until your payment is cleared</p>
+              <p>
+                You have {formatINR(paymentBlock.overdue_total)} overdue
+                {paymentBlock.oldest_title ? ` (${paymentBlock.oldest_title}, ${formatShortDate(paymentBlock.oldest_date!)})` : ''}. Payments older than {paymentBlock.grace_days} days
+                must be cleared before you register again. Already paid? The organiser will mark it as paid, then you can register.
+              </p>
+              <Link to={isAdmin ? '/admin' : '/'} className="font-medium underline">
+                See what you owe and pay
+              </Link>
+            </div>
+          )}
+          <Button size="lg" className="w-full" onClick={onRegister} loading={register.isPending} disabled={blocked}>
             {register.isPending ? 'Registering...' : full ? 'Join waiting list' : 'Register'}
           </Button>
         </>

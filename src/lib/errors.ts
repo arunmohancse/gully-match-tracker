@@ -3,6 +3,7 @@
 const MESSAGES: Record<string, string> = {
   REGISTRATION_CLOSED: 'Registration is currently closed.',
   REGISTRATION_NOT_OPEN: "Registration hasn't opened yet.",
+  PAYMENT_DUE: 'You have a payment that is overdue. Please pay it (the organiser will mark it as paid) before registering for another match.',
   MATCH_CANCELLED: 'This match has been cancelled.',
   MATCH_NOT_FOUND: 'This match could not be found.',
   NOT_AUTHENTICATED: 'Please log in to continue.',

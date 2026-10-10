@@ -21,6 +21,16 @@ export function useMyRegistrations() {
   })
 }
 
+/** Overdue payments that stop the player registering. Shares the 'registrations' key prefix, so payment changes refresh it. */
+export function usePaymentBlock() {
+  const userId = useAuth().session?.user.id
+  return useQuery({
+    queryKey: ['registrations', 'payment-block', userId],
+    queryFn: () => registrationService.paymentBlock(),
+    enabled: !!userId,
+  })
+}
+
 export function useRoster(matchId: string | undefined, enabled: boolean) {
   return useQuery({
     queryKey: ['registrations', 'roster', matchId],

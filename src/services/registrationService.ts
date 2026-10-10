@@ -14,6 +14,14 @@ export interface RegisterResult {
   already_registered: boolean
 }
 
+export interface PaymentBlock {
+  overdue_count: number
+  overdue_total: number
+  oldest_title: string | null
+  oldest_date: string | null
+  grace_days: number
+}
+
 export const registrationService = {
   /** The caller's own registration for a match (null if never registered). Filters by user so admins get theirs too. */
   async getMine(matchId: string, userId: string): Promise<Registration | null> {
@@ -27,6 +35,12 @@ export const registrationService = {
       await supabase.from('registrations').select(`*, match:matches(${MATCH_COLUMNS})`).eq('user_id', userId).order('registered_at', { ascending: false }),
     ) as unknown as RegistrationWithMatch[] | null
     return rows ?? []
+  },
+
+  /** The caller's overdue payments (older than the grace period). When there are any, the server refuses new registrations. */
+  async paymentBlock(): Promise<PaymentBlock> {
+    const row = (unwrap(await supabase.rpc('my_payment_block')) as PaymentBlock[] | null)?.[0]
+    return row ?? { overdue_count: 0, overdue_total: 0, oldest_title: null, oldest_date: null, grace_days: 3 }
   },
 
   /**
