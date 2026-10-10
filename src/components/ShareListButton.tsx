@@ -1,6 +1,7 @@
-import { Check, ClipboardCopy, Share2 } from 'lucide-react'
+import { Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { LinkButton } from '@/components/ui/link-button'
 import { useAdminRegistrations } from '@/hooks/useRegistrations'
 import { matchShareUrl } from '@/lib/config'
 import { toFriendlyMessage } from '@/lib/errors'
@@ -37,21 +38,21 @@ export function ShareListButton({ match }: { match: Match }) {
   }
 
   return (
-    <div className="space-y-3">
-      <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 p-3 text-sm" aria-label="Player list message">
-        {message}
-      </pre>
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         <Button asChild>
-          <a href={buildWhatsAppShareUrl(message)} target="_blank" rel="noopener noreferrer">
-            <Share2 className="size-4" aria-hidden /> Share list on WhatsApp
+          <a href={buildWhatsAppShareUrl(message)} target="_blank" rel="noopener noreferrer" aria-label="Share player list on WhatsApp">
+            <Share2 className="size-4" aria-hidden /> WhatsApp
           </a>
         </Button>
-        <Button variant="outline" onClick={copy}>
-          {copied ? <Check className="size-4" aria-hidden /> : <ClipboardCopy className="size-4" aria-hidden />}
-          {copied ? 'List copied' : 'Copy list'}
-        </Button>
+        <LinkButton onClick={copy}>{copied ? 'List copied' : 'Copy list'}</LinkButton>
       </div>
+      <details>
+        <summary className="cursor-pointer text-sm text-slate-600">Preview the list</summary>
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 p-3 text-sm" aria-label="Player list message">
+          {message}
+        </pre>
+      </details>
       {copyError && (
         <p role="alert" className="text-sm text-red-600">
           {copyError}

@@ -3,7 +3,7 @@ import type { Match } from '@/types/domain'
 import { buildAnnouncement } from './announcement'
 import { addDaysISO, formatMatchDate, formatShortDate, formatTime, fromLocalInput, todayISO, toLocalInput } from './dates'
 import { copyMatchToForm, EMPTY_FORM, formToInput, validateMatchForm } from './matchForm'
-import { availableStatusActions } from './matchStatus'
+import { availableStatusActions, cancelAction, nextStepAction, secondaryStatusActions } from './matchStatus'
 import { formatINR, parseMoney } from './money'
 
 const match: Match = {
@@ -76,6 +76,32 @@ describe('matchStatus transitions', () => {
     for (const s of ['DRAFT', 'OPEN', 'FULL', 'CLOSED'] as const) {
       expect(availableStatusActions(s).some((a) => a.to === 'FULL')).toBe(false)
     }
+  })
+})
+
+describe('admin page actions', () => {
+  it('picks the usual next step for each status, and none for a finished match', () => {
+    expect(nextStepAction('DRAFT')?.to).toBe('OPEN')
+    expect(nextStepAction('OPEN')?.to).toBe('CLOSED')
+    expect(nextStepAction('FULL')?.to).toBe('CLOSED')
+    expect(nextStepAction('CLOSED')?.to).toBe('COMPLETED')
+    expect(nextStepAction('COMPLETED')).toBeNull()
+    expect(nextStepAction('CANCELLED')).toBeNull()
+  })
+  it('keeps the other changes as quiet links and cancelling out of them', () => {
+    expect(secondaryStatusActions('DRAFT')).toEqual([])
+    expect(secondaryStatusActions('OPEN').map((a) => a.to)).toEqual(['COMPLETED'])
+    expect(secondaryStatusActions('CLOSED').map((a) => [a.to, a.label])).toEqual([['OPEN', 'Reopen registration']])
+    expect(secondaryStatusActions('COMPLETED')).toEqual([])
+  })
+  it('offers cancelling only while a match can still be cancelled, never twice', () => {
+    for (const s of ['DRAFT', 'OPEN', 'FULL', 'CLOSED'] as const) {
+      expect(cancelAction(s)?.to).toBe('CANCELLED')
+      const all = [nextStepAction(s), ...secondaryStatusActions(s), cancelAction(s)].map((a) => a?.to)
+      expect(new Set(all).size).toBe(all.length) // every status change is reachable from exactly one place
+    }
+    expect(cancelAction('COMPLETED')).toBeNull()
+    expect(cancelAction('CANCELLED')).toBeNull()
   })
 })
 

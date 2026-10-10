@@ -56,3 +56,24 @@ const TRANSITIONS: Record<MatchStatus, StatusAction[]> = {
 export function availableStatusActions(status: MatchStatus): StatusAction[] {
   return TRANSITIONS[status]
 }
+
+/** The one big button on the admin page: the usual next step. Nothing for finished matches. */
+export function nextStepAction(status: MatchStatus): StatusAction | null {
+  if (status === 'DRAFT') return OPEN
+  if (status === 'OPEN' || status === 'FULL') return CLOSED
+  if (status === 'CLOSED') return COMPLETED
+  return null
+}
+
+/** The other, less common status changes (shown as quiet links). Cancelling is separate, in the danger zone. */
+export function secondaryStatusActions(status: MatchStatus): StatusAction[] {
+  const next = nextStepAction(status)
+  return availableStatusActions(status)
+    .filter((a) => a.to !== next?.to && !a.destructive)
+    .map((a) => (a.to === 'OPEN' && status === 'CLOSED' ? { ...a, label: 'Reopen registration' } : a))
+}
+
+/** Cancelling the match, when it is still possible. */
+export function cancelAction(status: MatchStatus): StatusAction | null {
+  return availableStatusActions(status).find((a) => a.destructive) ?? null
+}

@@ -1,6 +1,7 @@
-import { Check, ClipboardCopy, Link2, Share2 } from 'lucide-react'
+import { Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { LinkButton } from '@/components/ui/link-button'
 import { matchShareUrl } from '@/lib/config'
 import type { Match } from '@/types/domain'
 import { buildAnnouncement } from '@/utils/announcement'
@@ -27,20 +28,14 @@ export function ShareMatchButton({ match }: { match: Match }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         <Button asChild>
-          <a href={buildWhatsAppShareUrl(announcement)} target="_blank" rel="noopener noreferrer">
-            <Share2 className="size-4" aria-hidden /> Share on WhatsApp
+          <a href={buildWhatsAppShareUrl(announcement)} target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
+            <Share2 className="size-4" aria-hidden /> WhatsApp
           </a>
         </Button>
-        <Button variant="outline" onClick={() => copy('text', announcement)}>
-          {copied === 'text' ? <Check className="size-4" aria-hidden /> : <ClipboardCopy className="size-4" aria-hidden />}
-          {copied === 'text' ? 'Announcement copied' : 'Copy announcement'}
-        </Button>
-        <Button variant="outline" onClick={() => copy('link', url)}>
-          {copied === 'link' ? <Check className="size-4" aria-hidden /> : <Link2 className="size-4" aria-hidden />}
-          {copied === 'link' ? 'Link copied' : 'Copy link'}
-        </Button>
+        <LinkButton onClick={() => copy('text', announcement)}>{copied === 'text' ? 'Announcement copied' : 'Copy announcement'}</LinkButton>
+        <LinkButton onClick={() => copy('link', url)}>{copied === 'link' ? 'Link copied' : 'Copy link'}</LinkButton>
       </div>
       {error && (
         <p role="alert" className="break-all text-sm text-red-600">
