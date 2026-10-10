@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { InstagramLink } from '@/components/InstagramLink'
@@ -6,6 +6,8 @@ import { BrandLockup } from '@/components/BrandLockup'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
+
+const GullyDash = lazy(() => import('@/components/GullyDash').then((m) => ({ default: m.GullyDash })))
 
 /** Shown instead of the app to accounts that are waiting for approval or have been blocked. UX only; the database enforces it. */
 export function AccountGate({ status }: { status: 'PENDING' | 'BLOCKED' }) {
@@ -44,6 +46,14 @@ export function AccountGate({ status }: { status: 'PENDING' | 'BLOCKED' }) {
           </p>
         )}
         {pending && <InstagramLink label="While you wait, follow us on Instagram" />}
+        {pending && (
+          <div className="space-y-1 text-left">
+            <p className="text-center text-sm font-medium text-slate-700">Or play a quick game while you wait</p>
+            <Suspense fallback={<p className="text-center text-xs text-slate-500">Loading game...</p>}>
+              <GullyDash />
+            </Suspense>
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           {pending && (
             <Button onClick={() => run(refreshProfile)} loading={busy}>

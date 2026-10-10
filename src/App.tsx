@@ -14,6 +14,7 @@ import { SignupPage } from '@/pages/auth/SignupPage'
 
 // Everything behind the login is loaded on demand, so the first screen stays small.
 // The admin area in particular is never downloaded by ordinary players.
+const PlayPage = lazy(() => import('@/pages/PlayPage').then((m) => ({ default: m.PlayPage })))
 const MatchDetailPage = lazy(() => import('@/pages/MatchDetailPage').then((m) => ({ default: m.MatchDetailPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const DashboardPage = lazy(() => import('@/pages/user/DashboardPage').then((m) => ({ default: m.DashboardPage })))
@@ -44,6 +45,7 @@ export default function App() {
             <Route element={<ViewerLayout />}>
               <Route path="about" element={<AboutPage />} />
               <Route path="privacy" element={<PrivacyPage />} />
+              <Route path="play" element={<PlayPage />} />
               <Route path="matches/:id" element={<MatchDetailPage />} />
             </Route>
 
