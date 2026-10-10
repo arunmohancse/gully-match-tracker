@@ -81,6 +81,18 @@ export function runsForTiming(offset: number, window: number): number | null {
   return 1
 }
 
+/** Runs per 100 balls, to one decimal place, as a scorecard shows it. */
+export function strikeRate(runs: number, balls: number): string {
+  return balls > 0 ? ((runs / balls) * 100).toFixed(1) : '0.0'
+}
+
+/** Celebration text when a score passes a multiple of 50 (fifty, century, then every further 50), otherwise null. */
+export function milestone(before: number, after: number): string | null {
+  const reached = Math.floor(after / 50) * 50
+  if (reached === 0 || before >= reached) return null
+  return reached === 50 ? 'FIFTY!' : reached === 100 ? 'CENTURY!' : `${reached}!`
+}
+
 const BEST_KEY ='gully-dash-best'
 
 /** Best score is kept on the device only. Storage can be blocked (private mode), so never throw. */

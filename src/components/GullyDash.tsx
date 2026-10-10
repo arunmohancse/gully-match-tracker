@@ -3,7 +3,7 @@ import { Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { brand } from '@/config/brand'
 import { useAuth } from '@/hooks/useAuth'
-import { ballHeight, hitWindow, loadBest, makeDelivery, runsForTiming, saveBest, type Delivery } from '@/utils/gullyDash'
+import { ballHeight, hitWindow, loadBest, makeDelivery, milestone, runsForTiming, saveBest, strikeRate, type Delivery } from '@/utils/gullyDash'
 import { shareOrDownloadImage } from '@/utils/upiImage'
 
 // Logical size; the canvas is scaled to the screen.
@@ -25,15 +25,48 @@ interface Game {
   phase: Phase
   score: number
   faced: number
+  fours: number
+  sixes: number
   best: number
   ball: { state: BallState; x: number; y: number; vx: number; vy: number; t: number; plan: Delivery; paced: boolean }
   next: Delivery // the ball being bowled after the current wait
   swingT: number // seconds since the swing started, -1 when idle
   gap: number
   popup: { text: string; t: number } | null
+  celebration: { text: string; t: number } | null // fifty / century banner
+  confetti: Confetti[]
   reason: string
   overAt: number
   player: string
+}
+
+interface Confetti {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  size: number
+  color: string
+  spin: number
+  angle: number
+}
+
+const CELEBRATION_SECONDS = 2.6
+const CONFETTI_COLORS = [brand.themeColor, '#facc15', '#ef4444', '#3b82f6', '#ec4899', '#f97316']
+
+/** A burst of confetti shooting up from behind the banner. Skipped for people who ask for less motion. */
+function burstConfetti(): Confetti[] {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return []
+  return Array.from({ length: 90 }, (_, i) => ({
+    x: W / 2 + (Math.random() - 0.5) * 120,
+    y: 110,
+    vx: (Math.random() - 0.5) * 420,
+    vy: -150 - Math.random() * 330,
+    size: 4 + Math.random() * 5,
+    color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+    spin: (Math.random() - 0.5) * 14,
+    angle: Math.random() * Math.PI,
+  }))
 }
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
@@ -56,16 +89,77 @@ function newGame(best: number): Game {
     phase: 'ready',
     score: 0,
     faced: 0,
+    fours: 0,
+    sixes: 0,
     best,
     ball: { ...bowl(first), state: 'gap' },
     next: first,
     swingT: -1,
     gap: 0,
     popup: null,
+    celebration: null,
+    confetti: [],
     reason: '',
     overAt: 0,
     player: 'Anonymous',
   }
+}
+
+/** End-of-innings card: runs, balls, fours, sixes, strike rate and how the batter got out. This is also what gets shared as the picture. */
+function drawScorecard(ctx: CanvasRenderingContext2D, g: Game) {
+  const x = 50
+  const y = 42
+  const w = W - 100
+  const h = 152
+  const balls = g.faced + 1 // the ball that got you out counts as faced
+  const clean = g.reason.replace(/!$/, '')
+
+  ctx.save()
+  ctx.shadowColor = 'rgba(15, 23, 42, 0.3)'
+  ctx.shadowBlur = 14
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.roundRect(x, y, w, h, 10)
+  ctx.fill()
+  ctx.restore()
+
+  ctx.fillStyle = brand.themeColor
+  ctx.beginPath()
+  ctx.roundRect(x, y, w, 28, [10, 10, 0, 0])
+  ctx.fill()
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 14px system-ui, sans-serif'
+  ctx.fillText('SCORECARD', W / 2, y + 15)
+
+  const stats: [string, string][] = [
+    ['RUNS', String(g.score)],
+    ['BALLS', String(balls)],
+    ['4s', String(g.fours)],
+    ['6s', String(g.sixes)],
+    ['S/R', strikeRate(g.score, balls)],
+  ]
+  const col = w / stats.length
+  stats.forEach(([label, value], i) => {
+    const cx = x + col * i + col / 2
+    ctx.fillStyle = '#0f172a'
+    ctx.font = `bold ${i === 0 ? 32 : 24}px system-ui, sans-serif`
+    ctx.fillText(value, cx, y + 62)
+    ctx.fillStyle = '#64748b'
+    ctx.font = '600 11px system-ui, sans-serif'
+    ctx.fillText(label, cx, y + 90)
+  })
+
+  ctx.fillStyle = '#e2e8f0'
+  ctx.fillRect(x + 16, y + 106, w - 32, 1)
+  ctx.fillStyle = '#b91c1c'
+  ctx.font = 'bold 16px system-ui, sans-serif'
+  ctx.fillText(`OUT  -  ${clean}`, W / 2, y + 122)
+  ctx.fillStyle = '#64748b'
+  ctx.font = '13px system-ui, sans-serif'
+  ctx.fillText('Tap to bat again', W / 2, y + 141)
+  ctx.textBaseline = 'top'
 }
 
 function draw(ctx: CanvasRenderingContext2D, g: Game) {
@@ -152,16 +246,46 @@ function draw(ctx: CanvasRenderingContext2D, g: Game) {
     ctx.globalAlpha = 1
   }
 
-  if (g.phase !== 'playing') {
+  if (g.phase === 'ready') {
     ctx.fillStyle = 'rgba(15, 23, 42, 0.55)'
     ctx.fillRect(0, 70, W, 110)
     ctx.fillStyle = '#ffffff'
     ctx.textAlign = 'center'
     ctx.font = 'bold 28px system-ui, sans-serif'
-    ctx.fillText(g.phase === 'ready' ? 'Gully Dash' : `Out! ${g.reason}`, W / 2, 84)
+    ctx.fillText('Gully Dash', W / 2, 84)
     ctx.font = '18px system-ui, sans-serif'
-    ctx.fillText(g.phase === 'ready' ? 'Tap when the ball reaches your bat' : `You scored ${g.score}. Tap to bat again`, W / 2, 124)
-    if (g.phase === 'ready') ctx.fillText('Closer to the middle of the bat = more runs', W / 2, 148)
+    ctx.fillText('Tap when the ball reaches your bat', W / 2, 124)
+    ctx.fillText('Closer to the middle of the bat = more runs', W / 2, 148)
+  }
+  if (g.phase === 'over') drawScorecard(ctx, g)
+
+  for (const c of g.confetti) {
+    ctx.save()
+    ctx.translate(c.x, c.y)
+    ctx.rotate(c.angle)
+    ctx.fillStyle = c.color
+    ctx.fillRect(-c.size / 2, -c.size / 4, c.size, c.size / 2)
+    ctx.restore()
+  }
+
+  if (g.celebration) {
+    const t = g.celebration.t
+    const grow = Math.min(1, t / 0.25) // pops in
+    const fade = Math.min(1, (CELEBRATION_SECONDS - t) / 0.5) // fades out at the end
+    ctx.save()
+    ctx.globalAlpha = Math.max(0, fade)
+    ctx.translate(W / 2, 110)
+    ctx.scale(0.5 + 0.5 * grow + 0.06 * Math.sin(t * 8), 0.5 + 0.5 * grow + 0.06 * Math.sin(t * 8))
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.font = '900 54px system-ui, sans-serif'
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = 8
+    ctx.strokeStyle = '#ffffff'
+    ctx.strokeText(g.celebration.text, 0, 0)
+    ctx.fillStyle = brand.themeColor
+    ctx.fillText(g.celebration.text, 0, 0)
+    ctx.restore()
   }
 }
 
@@ -204,8 +328,12 @@ export function GullyDash() {
       g.phase = 'playing'
       g.score = 0
       g.faced = 0
+      g.fours = 0
+      g.sixes = 0
       g.swingT = -1
       g.popup = null
+      g.celebration = null
+      g.confetti = []
       g.ball = bowl(makeDelivery(0))
       setStatus('')
       setFinished(false)
@@ -223,8 +351,15 @@ export function GullyDash() {
       const runs = runsForTiming(offset, hitWindow(g.faced))
       g.swingT = 0
       if (runs === null) return finish(offset > 0 ? 'Too early!' : 'Too late!')
+      const cheer = milestone(g.score, g.score + runs)
       g.score += runs
       g.faced += 1
+      if (runs === 4) g.fours += 1
+      if (runs === 6) g.sixes += 1
+      if (cheer) {
+        g.celebration = { text: cheer, t: 0 }
+        g.confetti = burstConfetti()
+      }
       g.popup = { text: runs === 6 ? 'SIX!' : runs === 4 ? 'FOUR!' : String(runs), t: 0 }
       const fly = { 6: [200, -380], 4: [380, -90], 2: [150, -60], 1: [90, -30] }[runs] ?? [90, -30]
       g.ball = { ...g.ball, state: 'hit', x: SWEET, vx: fly[0], vy: fly[1], t: 0 }
@@ -235,6 +370,17 @@ export function GullyDash() {
         g.popup.t += dt
         if (g.popup.t > 0.9) g.popup = null
       }
+      if (g.celebration) {
+        g.celebration.t += dt
+        if (g.celebration.t > CELEBRATION_SECONDS) g.celebration = null
+      }
+      for (const c of g.confetti) {
+        c.vy += 520 * dt
+        c.x += c.vx * dt
+        c.y += c.vy * dt
+        c.angle += c.spin * dt
+      }
+      if (g.confetti.length > 0) g.confetti = g.confetti.filter((c) => c.y < H + 20)
       if (g.swingT >= 0) {
         g.swingT += dt
         if (g.swingT > 0.5) g.swingT = -1

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ballHeight, deliverySpeed, hitWindow, makeDelivery, RELEASE_DISTANCE, runsForTiming, STEADY_BALLS } from './gullyDash'
+import { ballHeight, deliverySpeed, hitWindow, makeDelivery, milestone, RELEASE_DISTANCE, runsForTiming, STEADY_BALLS, strikeRate } from './gullyDash'
 
 describe('difficulty', () => {
   it('keeps the first over steady, whatever the random numbers', () => {
@@ -81,6 +81,29 @@ describe('ballHeight', () => {
     for (let d = 1; d <= RELEASE_DISTANCE; d += 5) expect(ballHeight(d, [])).toBeGreaterThanOrEqual(30)
     expect(ballHeight(0, [])).toBe(30)
     expect(ballHeight(-100, [])).toBe(0)
+  })
+})
+
+describe('strikeRate', () => {
+  it('is runs per 100 balls to one decimal, and 0.0 with no balls', () => {
+    expect(strikeRate(34, 12)).toBe('283.3')
+    expect(strikeRate(50, 50)).toBe('100.0')
+    expect(strikeRate(0, 1)).toBe('0.0')
+    expect(strikeRate(0, 0)).toBe('0.0')
+  })
+})
+
+describe('milestone', () => {
+  it('celebrates fifty and century, even when a boundary jumps past the exact number', () => {
+    expect(milestone(48, 50)).toBe('FIFTY!')
+    expect(milestone(48, 54)).toBe('FIFTY!')
+    expect(milestone(99, 105)).toBe('CENTURY!')
+  })
+  it('then every further 50, and stays quiet otherwise', () => {
+    expect(milestone(148, 154)).toBe('150!')
+    expect(milestone(0, 6)).toBeNull()
+    expect(milestone(50, 56)).toBeNull()
+    expect(milestone(100, 102)).toBeNull()
   })
 })
 
