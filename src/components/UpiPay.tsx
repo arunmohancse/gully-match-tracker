@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { usePaymentSettings } from '@/hooks/useCommunity'
 import { formatINR } from '@/utils/money'
 import { buildUpiUri } from '@/utils/upi'
-import { makeUpiQrImage, shareOrDownloadImage } from '@/utils/upiImage'
+import { downloadImage, makeUpiQrImage } from '@/utils/upiImage'
 
 /** The QR picture for a UPI link, drawn in the browser. */
 function QrPicture({ uri }: { uri: string }) {
@@ -45,8 +45,8 @@ export function UpiPay({ communityId, amount, note }: { communityId: string; amo
     setMessage(null)
     try {
       const blob = await makeUpiQrImage({ uri, title: note, amountText: formatINR(amount), payee: payeeName, upiId })
-      const result = await shareOrDownloadImage(blob, 'upi-payment-qr.png')
-      if (result === 'downloaded') setMessage('QR saved. Open your UPI app, choose Scan QR, then pick this image from your gallery.')
+      downloadImage(blob, 'upi-payment-qr.png')
+      setMessage('QR saved to your downloads. Open your UPI app, choose Scan QR, then pick this image from your gallery.')
     } catch {
       setMessage('Could not create the QR image. Please try again.')
     } finally {
@@ -85,7 +85,7 @@ export function UpiPay({ communityId, amount, note }: { communityId: string; amo
         </p>
       )}
       <p className="text-xs text-slate-500">
-        On your phone: save the QR, open GPay, PhonePe or Paytm, tap Scan QR and pick the saved image. Check the amount before you confirm.
+        On your phone: save the QR (it goes to your downloads or gallery), open GPay, PhonePe or Paytm, tap Scan QR and pick the saved image. Check the amount before you confirm.
       </p>
     </div>
   )

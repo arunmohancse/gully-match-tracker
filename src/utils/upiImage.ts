@@ -60,11 +60,16 @@ export async function shareOrDownloadImage(blob: Blob, fileName: string, text?: 
       // Any other failure: fall back to a download below.
     }
   }
+  downloadImage(blob, fileName)
+  return 'downloaded'
+}
+
+/** Saves the image straight to the device's downloads, without the share sheet. */
+export function downloadImage(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = fileName
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
-  return 'downloaded'
 }
