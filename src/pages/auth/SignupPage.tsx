@@ -1,12 +1,12 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { GoogleButton } from '@/components/GoogleButton'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
 import { normalizePhone } from '@/utils/phone'
+import { AuthMethods } from './AuthMethods'
 import { AuthShell } from './AuthShell'
 
 type FormState = { fullName: string; phone: string; email: string; password: string }
@@ -51,29 +51,30 @@ export function SignupPage() {
           Account created. If you aren't logged in automatically, check your email to confirm, then log in. An admin must approve your account before you can register for matches.
         </p>
       )}
-      <GoogleButton />
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <Field label="Full name" htmlFor="fullName" error={errors.fullName}>
-          <Input id="fullName" autoComplete="name" value={form.fullName} onChange={set('fullName')} />
-        </Field>
-        <Field label="Phone (WhatsApp)" htmlFor="phone" error={errors.phone}>
-          <Input id="phone" type="tel" autoComplete="tel" placeholder="98765 43210" value={form.phone} onChange={set('phone')} />
-        </Field>
-        <Field label="Email" htmlFor="email">
-          <Input id="email" type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
-        </Field>
-        <Field label="Password" htmlFor="password" error={errors.password}>
-          <Input id="password" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} />
-        </Field>
-        {formError && (
-          <p role="alert" className="text-sm text-red-600">
-            {formError}
-          </p>
-        )}
-        <Button type="submit" className="w-full" loading={submitting}>
-          {submitting ? 'Creating account...' : 'Sign up'}
-        </Button>
-      </form>
+      <AuthMethods emailLabel="Sign up with email instead">
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <Field label="Full name" htmlFor="fullName" error={errors.fullName}>
+            <Input id="fullName" autoComplete="name" value={form.fullName} onChange={set('fullName')} />
+          </Field>
+          <Field label="Phone (WhatsApp)" htmlFor="phone" error={errors.phone}>
+            <Input id="phone" type="tel" autoComplete="tel" placeholder="98765 43210" value={form.phone} onChange={set('phone')} />
+          </Field>
+          <Field label="Email" htmlFor="email">
+            <Input id="email" type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
+          </Field>
+          <Field label="Password" htmlFor="password" error={errors.password}>
+            <Input id="password" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} />
+          </Field>
+          {formError && (
+            <p role="alert" className="text-sm text-red-600">
+              {formError}
+            </p>
+          )}
+          <Button type="submit" className="w-full" loading={submitting}>
+            {submitting ? 'Creating account...' : 'Sign up'}
+          </Button>
+        </form>
+      </AuthMethods>
       <p className="text-center text-sm text-slate-600">
         Already registered?{' '}
         <Link to="/login" className="font-medium text-brand underline">

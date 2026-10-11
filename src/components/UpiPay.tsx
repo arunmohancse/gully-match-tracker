@@ -1,8 +1,11 @@
+import { Check, ClipboardCopy, Download } from 'lucide-react'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { usePaymentSettings } from '@/hooks/useCommunity'
+import { formatINR } from '@/utils/money'
 import { buildUpiUri } from '@/utils/upi'
+import { makeUpiQrImage, shareOrDownloadImage } from '@/utils/upiImage'
 
 /** The QR picture for a UPI link, drawn in the browser. */
 function QrPicture({ uri }: { uri: string }) {
@@ -21,28 +24,69 @@ function QrPicture({ uri }: { uri: string }) {
 }
 
 /**
- * Pay with UPI for one amount: a button that opens the player's UPI app (on a phone) and a QR code to scan
- * (from another device or a screenshot). The amount and payee come filled in; the payer can still change them.
- * Renders nothing until an admin has set the community's UPI id.
+ * Pay with UPI for one amount. UPI apps such as GPay refuse payment links opened from a browser, and a phone can't
+ * scan its own screen, so the player saves the QR picture and scans it from the gallery in their UPI app.
+ * The UPI id can also be copied for a manual payment. Renders nothing until an admin has set the community's UPI id.
  */
 export function UpiPay({ communityId, amount, note }: { communityId: string; amount: number; note: string }) {
   const { data } = usePaymentSettings(communityId)
   const [showQr, setShowQr] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   if (!data?.upiId || !(amount > 0)) return null
+  const { upiId, payeeName } = data
 
-  const uri = buildUpiUri({ upiId: data.upiId, payeeName: data.payeeName, amount, note })
+  const uri = buildUpiUri({ upiId, payeeName, amount, note })
+
+  async function saveQr() {
+    if (busy) return
+    setBusy(true)
+    setMessage(null)
+    try {
+      const blob = await makeUpiQrImage({ uri, title: note, amountText: formatINR(amount), payee: payeeName, upiId })
+      const result = await shareOrDownloadImage(blob, 'upi-payment-qr.png')
+      if (result === 'downloaded') setMessage('QR saved. Open your UPI app, choose Scan QR, then pick this image from your gallery.')
+    } catch {
+      setMessage('Could not create the QR image. Please try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function copyId() {
+    try {
+      await navigator.clipboard.writeText(upiId)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setMessage(`Could not copy automatically. UPI ID: ${upiId}`)
+    }
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        <Button asChild size="sm">
-          <a href={uri}>Pay with UPI app</a>
+        <Button size="sm" loading={busy} onClick={saveQr}>
+          <Download className="size-4" aria-hidden /> Save QR to pay
         </Button>
         <Button size="sm" variant="outline" aria-expanded={showQr} onClick={() => setShowQr(!showQr)}>
           {showQr ? 'Hide QR code' : 'Show QR code'}
         </Button>
+        <Button size="sm" variant="outline" onClick={copyId}>
+          {copied ? <Check className="size-4" aria-hidden /> : <ClipboardCopy className="size-4" aria-hidden />}
+          {copied ? 'Copied' : 'Copy UPI ID'}
+        </Button>
       </div>
       {showQr && <QrPicture uri={uri} />}
-      <p className="text-xs text-slate-500">Opens your UPI app with the amount filled in. Check the amount before you confirm.</p>
+      {message && (
+        <p role="status" className="text-sm text-slate-700">
+          {message}
+        </p>
+      )}
+      <p className="text-xs text-slate-500">
+        On your phone: save the QR, open GPay, PhonePe or Paytm, tap Scan QR and pick the saved image. Check the amount before you confirm.
+      </p>
     </div>
   )
 }

@@ -45,7 +45,7 @@ export function ResetPasswordPage() {
         <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">
           Your password has been changed. You can log in with the new one now.
         </p>
-        <Link to="/login" className="block text-center text-sm font-medium text-brand underline">
+        <Link to="/login?email=1" className="block text-center text-sm font-medium text-brand underline">
           Go to log in
         </Link>
       </AuthShell>
@@ -78,7 +78,7 @@ export function ResetPasswordPage() {
         </Button>
       </form>
       <p className="text-center text-sm text-slate-600">
-        <Link to="/login" className="font-medium text-brand underline">
+        <Link to="/login?email=1" className="font-medium text-brand underline">
           Back to log in
         </Link>
       </p>
