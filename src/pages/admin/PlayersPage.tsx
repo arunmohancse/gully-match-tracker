@@ -1,8 +1,7 @@
 import { MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { brand } from '@/config/brand'
-import { buildNotMemberMessage, buildWhatsAppChatUrl } from '@/utils/whatsapp'
+import { buildWhatsAppChatUrl } from '@/utils/whatsapp'
 import { CancelledBadge, ListBadge, PaymentBadge } from '@/components/RegistrationBadges'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -49,8 +48,8 @@ function History({ userId }: { userId: string }) {
 }
 
 /** Opens a WhatsApp chat with the player so the admin can see which groups they still share. Nothing is sent unless the admin presses Send there. */
-function WhatsAppButton({ player, label, text }: { player: PlayerSummary; label: string; text: string }) {
-  const url = player.phone ? buildWhatsAppChatUrl(player.phone, text) : null
+function WhatsAppButton({ player, label }: { player: PlayerSummary; label: string }) {
+  const url = player.phone ? buildWhatsAppChatUrl(player.phone) : null
   if (!url) return null
   return (
     <Button size="sm" variant="outline" asChild>
@@ -170,10 +169,10 @@ export function PlayersPage() {
                         <Button size="sm" variant="outline" onClick={() => startBlock(p)}>
                           Reject
                         </Button>
-                        <WhatsAppButton player={p} label="Check on WhatsApp" text={buildNotMemberMessage(p.full_name, brand.name)} />
+                        <WhatsAppButton player={p} label="Check on WhatsApp" />
                       </>
                     )}
-                    {p.id !== session?.user.id && p.status === 'ACTIVE' && <WhatsAppButton player={p} label="WhatsApp" text="" />}
+                    {p.id !== session?.user.id && p.status === 'ACTIVE' && <WhatsAppButton player={p} label="WhatsApp" />}
                     {p.id !== session?.user.id && p.status === 'BLOCKED' && (
                       <Button size="sm" disabled={setStatus.isPending} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
                         Unblock

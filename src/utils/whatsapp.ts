@@ -8,17 +8,11 @@ export function buildWhatsAppShareUrl(text: string): string {
   return `https://wa.me/?text=${encodeURIComponent(text)}`
 }
 
-/** wa.me link that opens a chat with a specific number. Returns null if the number is unusable. */
-export function buildWhatsAppChatUrl(phone: string, text: string): string | null {
+/** wa.me link that opens a chat with a specific number, with the text prefilled if given. Returns null if the number is unusable. */
+export function buildWhatsAppChatUrl(phone: string, text?: string): string | null {
   const digits = phone.replace(/\D/g, '')
   if (digits.length < 7 || digits.length > 15) return null
-  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`
-}
-
-/** Prefilled for the admin who is vetting a signup: sent only if the person turns out not to be in the community group. Plain text only. */
-export function buildNotMemberMessage(fullName: string, communityName: string): string {
-  const firstName = fullName.trim().split(/\s+/)[0] || 'there'
-  return `Hi ${firstName}, thanks for signing up. You need to be a member of the ${communityName} WhatsApp community to use this app, so we could not approve your account. Please contact an organiser to join the group and then sign up again.`
+  return text ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : `https://wa.me/${digits}`
 }
 
 export interface ReminderOptions {

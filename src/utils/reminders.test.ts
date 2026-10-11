@@ -61,6 +61,9 @@ describe('buildWhatsAppChatUrl', () => {
   it('uses only the digits of the number and encodes the text', () => {
     expect(buildWhatsAppChatUrl('+91 98765-43210', 'Hi there\nBye')).toBe('https://wa.me/919876543210?text=Hi%20there%0ABye')
   })
+  it('opens the bare chat when there is no text', () => {
+    expect(buildWhatsAppChatUrl('+91 98765-43210')).toBe('https://wa.me/919876543210')
+  })
   it('rejects unusable numbers', () => {
     expect(buildWhatsAppChatUrl('123', 'x')).toBeNull()
     expect(buildWhatsAppChatUrl('', 'x')).toBeNull()
