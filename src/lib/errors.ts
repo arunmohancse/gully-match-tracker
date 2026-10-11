@@ -32,6 +32,7 @@ const MESSAGES: Record<string, string> = {
   INVALID_STATUS: 'That is not a valid account status.',
   CANNOT_CHANGE_OWN_STATUS: "You can't do that to your own account. Ask another admin.",
   ACCOUNT_NOT_ACTIVE: 'Your account is not active. Wait for an admin to approve it, or contact the organiser.',
+  PHONE_REQUIRED: 'A phone number is required. This player has not added one yet.',
   WEAK_PASSWORD: 'Password must be at least 8 characters.',
   RESET_NOT_AVAILABLE: "Password reset isn't available for these details. Check your email and phone, or ask an admin to enable it.",
   'User is banned': 'This account has been blocked. Please contact the organiser.',

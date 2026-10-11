@@ -157,13 +157,17 @@ export function PlayersPage() {
                       {resetOpen(p) && <Badge className="bg-slate-100 text-slate-700">Reset link on</Badge>}
                     </div>
                     <div className="text-sm text-slate-600">
-                      {p.phone ?? 'No phone'} · {p.registration_count} registration{p.registration_count === 1 ? '' : 's'}
+                      {p.phone ?? (p.status === 'PENDING' ? <span className="font-medium text-amber-700">No phone yet</span> : 'No phone')} · {p.registration_count} registration
+                      {p.registration_count === 1 ? '' : 's'}
                     </div>
+                    {p.status === 'PENDING' && !p.phone && (
+                      <p className="mt-1 text-xs text-slate-500">They haven't added a WhatsApp number yet, so you can't check them on WhatsApp or approve them. They are asked for it the next time they open the app.</p>
+                    )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {p.id !== session?.user.id && p.status === 'PENDING' && (
                       <>
-                        <Button size="sm" disabled={setStatus.isPending} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
+                        <Button size="sm" disabled={setStatus.isPending || !p.phone} onClick={() => run(() => setStatus.mutateAsync({ userId: p.id, status: 'ACTIVE' }))}>
                           Approve
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => startBlock(p)}>

@@ -24,9 +24,9 @@ export function ProfilePage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     if (saving) return
-    const normalized = phone.trim() ? normalizePhone(phone) : null
+    const normalized = normalizePhone(phone)
     if (!fullName.trim()) return setMessage({ type: 'error', text: 'Please enter your name.' })
-    if (phone.trim() && !normalized) return setMessage({ type: 'error', text: 'Enter a valid phone number.' })
+    if (!normalized) return setMessage({ type: 'error', text: 'Enter a valid phone number (WhatsApp preferred).' })
 
     setSaving(true)
     setMessage(null)
