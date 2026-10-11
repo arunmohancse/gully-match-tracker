@@ -37,11 +37,12 @@ interface Props {
   onUnblock: (p: PlayerSummary) => void
   onChangeRole: (p: PlayerSummary) => void
   onSetPassword: (p: PlayerSummary) => void
+  onChangePhone: (p: PlayerSummary) => void
   onToggleReset: (p: PlayerSummary) => void
 }
 
 /** The less common actions for one player, tucked away so the list stays calm. A bottom sheet on phones, a dialog on larger screens. */
-export function ManagePlayerSheet({ player, resetOpen, busy, onClose, onBlock, onUnblock, onChangeRole, onSetPassword, onToggleReset }: Props) {
+export function ManagePlayerSheet({ player, resetOpen, busy, onClose, onBlock, onUnblock, onChangeRole, onSetPassword, onChangePhone, onToggleReset }: Props) {
   // Close first, then run the action (which may open its own confirmation dialog).
   const act = (fn: (p: PlayerSummary) => void) => () => {
     if (!player) return
@@ -59,6 +60,10 @@ export function ManagePlayerSheet({ player, resetOpen, busy, onClose, onBlock, o
 
           {player && (
             <>
+              <Group title="Phone">
+                <Item onClick={act(onChangePhone)}>Change phone number</Item>
+              </Group>
+
               <Group title="Password">
                 <Item onClick={act(onSetPassword)}>Set a temporary password</Item>
                 <Item onClick={act(onToggleReset)} disabled={busy}>

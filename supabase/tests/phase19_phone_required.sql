@@ -1,4 +1,5 @@
--- Phase 19 database tests (phone required for approval, phone cannot be cleared). Requires migrations 0001-0019.
+-- Phase 19 database tests (phone required for approval, phone cannot be cleared). Requires migrations 0001-0020.
+-- (Since 0020 players cannot write phone directly, so phone edits below are made as the table owner; the trigger still applies to everyone.)
 -- Paste into the Supabase SQL Editor and Run. Runs in a transaction that is ROLLED BACK, so no data is kept.
 -- Success: the final result shows "ALL PHASE 19 TESTS PASSED".
 
@@ -37,6 +38,15 @@ begin
   end;
 end $$;
 
+-- Runs a statement as the table owner and returns 'ok' or the error text
+create or replace function pg_temp.try_owner(p_sql text) returns text language plpgsql as $$
+begin
+  execute p_sql;
+  return 'ok';
+exception when others then
+  return sqlerrm;
+end $$;
+
 create or replace function pg_temp.status_of(p_uid uuid) returns text language sql as $$
   select status from public.profiles where id = p_uid;
 $$;
@@ -65,15 +75,15 @@ begin
   perform pg_temp.check_eq('can unblock without phone (existing account)', pg_temp.try(u[1], format('select * from public.admin_set_user_status(%L, ''ACTIVE'')', u[3])), 'ok');
   update public.profiles set status = 'PENDING' where id = u[3];
 
-  perform pg_temp.check_eq('user adds phone', pg_temp.try(u[3], format('update public.profiles set phone = ''+91000001903'' where id = %L', u[3])), 'ok');
+  perform pg_temp.check_eq('phone added', pg_temp.try_owner(format('update public.profiles set phone = ''+91000001903'' where id = %L', u[3])), 'ok');
   perform pg_temp.check_eq('can approve with phone', pg_temp.try(u[1], format('select * from public.admin_set_user_status(%L, ''ACTIVE'')', u[3])), 'ok');
   perform pg_temp.check_eq('approved', pg_temp.status_of(u[3]), 'ACTIVE');
   perform pg_temp.check_eq('approve with phone from signup', pg_temp.try(u[1], format('select * from public.admin_set_user_status(%L, ''ACTIVE'')', u[2])), 'ok');
 
   -- A saved phone can be changed, not cleared -------------------------------------------------------------------
-  perform pg_temp.check_eq('user changes phone', pg_temp.try(u[2], format('update public.profiles set phone = ''+91000001999'' where id = %L', u[2])), 'ok');
+  perform pg_temp.check_eq('phone changed by owner', pg_temp.try_owner(format('update public.profiles set phone = ''+91000001999'' where id = %L', u[2])), 'ok');
   perform pg_temp.check_eq('phone changed', (select phone from public.profiles where id = u[2]), '+91000001999');
-  perform pg_temp.check_eq('user cannot clear phone', pg_temp.try(u[2], format('update public.profiles set phone = null where id = %L', u[2])), 'PHONE_REQUIRED');
+  perform pg_temp.check_eq('phone cannot be cleared', pg_temp.try_owner(format('update public.profiles set phone = null where id = %L', u[2])), 'PHONE_REQUIRED');
   perform pg_temp.check_eq('phone kept', (select phone from public.profiles where id = u[2]), '+91000001999');
   perform pg_temp.check_eq('name change keeps phone', pg_temp.try(u[2], format('update public.profiles set full_name = ''Renamed'' where id = %L', u[2])), 'ok');
 end $$;

@@ -12,6 +12,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useDebounced } from '@/hooks/useDebounced'
 import { isResetOpen } from '@/utils/password'
 import { ManagePlayerSheet } from '@/components/ManagePlayerSheet'
+import { EditPhoneDialog } from '@/components/EditPhoneDialog'
+import { PhoneRequestsCard } from '@/components/PhoneRequestsCard'
 import { TempPasswordDialog } from '@/components/TempPasswordDialog'
 import { usePlayerCounts, usePlayerHistory, usePlayers, useSetPasswordReset, useSetRole, useSetStatus } from '@/hooks/usePayments'
 import { toFriendlyMessage } from '@/lib/errors'
@@ -78,6 +80,7 @@ export function PlayersPage() {
   const setPasswordReset = useSetPasswordReset()
   const [blocking, setBlocking] = useState<PlayerSummary | null>(null)
   const [tempFor, setTempFor] = useState<PlayerSummary | null>(null)
+  const [phoneFor, setPhoneFor] = useState<PlayerSummary | null>(null)
   const [managing, setManaging] = useState<PlayerSummary | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [blockError, setBlockError] = useState<string | null>(null)
@@ -118,6 +121,7 @@ export function PlayersPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Players</h1>
+      <PhoneRequestsCard />
       <Input aria-label="Search players" placeholder="Search by name or phone" value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter players">
         {(['ALL', 'PENDING', 'BLOCKED'] as const).map((f) => (
@@ -225,10 +229,12 @@ export function PlayersPage() {
           setRoleChange(p)
         }}
         onSetPassword={setTempFor}
+        onChangePhone={setPhoneFor}
         onToggleReset={(p) => run(() => setPasswordReset.mutateAsync({ userId: p.id, enabled: !resetOpen(p) }))}
       />
 
       <TempPasswordDialog key={tempFor?.id ?? 'none'} player={tempFor} onClose={() => setTempFor(null)} />
+      <EditPhoneDialog key={phoneFor?.id ?? 'none'} player={phoneFor} onClose={() => setPhoneFor(null)} />
 
       <ConfirmDialog
         open={!!blocking}

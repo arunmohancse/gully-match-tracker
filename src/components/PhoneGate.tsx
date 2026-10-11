@@ -11,7 +11,7 @@ import { normalizePhone } from '@/utils/phone'
 
 /** Shown once to accounts with no phone number (e.g. first Google sign-in). UX only; the phone is just a profile field. */
 export function PhoneGate() {
-  const { profile, session, setProfile } = useAuth()
+  const { profile, session, refreshProfile } = useAuth()
   const [phone, setPhone] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -24,7 +24,8 @@ export function PhoneGate() {
     setSaving(true)
     setError(null)
     try {
-      setProfile(await authService.updateProfile(session.user.id, { full_name: profile.full_name, phone: normalized }))
+      await authService.setInitialPhone(normalized)
+      await refreshProfile()
     } catch (err) {
       setError(toFriendlyMessage(err))
       setSaving(false)

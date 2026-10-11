@@ -102,6 +102,18 @@ export function useSetPasswordReset() {
   return usePlayerMutation((a: { userId: string; enabled: boolean }) => playerService.setPasswordReset(a.userId, a.enabled))
 }
 
+export function usePhoneRequests() {
+  return useQuery({ queryKey: ['players', 'phone-requests'], queryFn: () => playerService.phoneRequests() })
+}
+
+export function useDecidePhoneChange() {
+  return usePlayerMutation((a: { requestId: string; approve: boolean }) => playerService.decidePhoneChange(a.requestId, a.approve))
+}
+
+export function useSetUserPhone() {
+  return usePlayerMutation((a: { userId: string; phone: string }) => playerService.setUserPhone(a.userId, a.phone))
+}
+
 export function usePlayerHistory(userId: string | null) {
   return useQuery({ queryKey: ['players', 'history', userId], queryFn: () => playerService.history(userId!), enabled: !!userId })
 }

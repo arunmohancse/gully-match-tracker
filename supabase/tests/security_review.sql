@@ -6,10 +6,11 @@ do $$
 declare
   v_bad text;
   v_expected_anon text[] := array['get_match_counts', 'is_admin', 'reset_password_with_phone'];
-  v_expected_auth text[] := array['admin_list_players', 'admin_move_registration', 'admin_player_counts', 'admin_set_password_reset', 'admin_set_payment', 'admin_set_temp_password', 'admin_set_user_status',
-                                  'cancel_registration', 'complete_own_password_reset', 'finalize_match_shares', 'get_match_counts',
+  v_expected_auth text[] := array['admin_decide_phone_change', 'admin_list_phone_change_requests', 'admin_list_players', 'admin_move_registration', 'admin_player_counts',
+                                  'admin_set_password_reset', 'admin_set_payment', 'admin_set_temp_password', 'admin_set_user_phone', 'admin_set_user_status',
+                                  'cancel_phone_change', 'cancel_registration', 'complete_own_password_reset', 'finalize_match_shares', 'get_match_counts',
                                   'get_match_roster', 'is_admin', 'log_reminder_opened', 'match_financials', 'my_payment_block', 'register_for_match',
-                                  'reset_password_with_phone', 'set_user_role'];
+                                  'request_phone_change', 'reset_password_with_phone', 'set_initial_phone', 'set_user_role'];
 begin
   -- 1. Every table in public has Row Level Security enabled ------------------------------------------------
   select string_agg(c.relname, ', ') into v_bad
@@ -48,9 +49,14 @@ begin
   if has_column_privilege('authenticated', 'public.profiles', 'status', 'UPDATE') or has_column_privilege('authenticated', 'public.profiles', 'password_reset_until', 'UPDATE') then
     raise exception 'FAIL [users can update profiles.status or profiles.password_reset_until]';
   end if;
-  if not (has_column_privilege('authenticated', 'public.profiles', 'full_name', 'UPDATE')
-          and has_column_privilege('authenticated', 'public.profiles', 'phone', 'UPDATE')) then
-    raise exception 'FAIL [users cannot update their own name / phone]';
+  if not has_column_privilege('authenticated', 'public.profiles', 'full_name', 'UPDATE') then
+    raise exception 'FAIL [users cannot update their own name]';
+  end if;
+  if has_column_privilege('authenticated', 'public.profiles', 'phone', 'UPDATE') then
+    raise exception 'FAIL [users can update profiles.phone directly; changes must go through the phone functions (0020)]';
+  end if;
+  if has_any_column_privilege('authenticated', 'public.phone_change_requests', 'INSERT, UPDATE') then
+    raise exception 'FAIL [users can write phone_change_requests directly]';
   end if;
   if has_any_column_privilege('authenticated', 'public.registrations', 'INSERT, UPDATE') then
     raise exception 'FAIL [users can write registrations directly; all writes must go through functions]';

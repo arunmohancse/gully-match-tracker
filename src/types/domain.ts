@@ -119,6 +119,29 @@ export interface PlayerSummary {
   registration_count: number
 }
 
+export type PhoneChangeStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
+
+/** A player's own request to change their phone number. */
+export interface PhoneChangeRequest {
+  id: string
+  user_id: string
+  old_phone: string | null
+  new_phone: string
+  status: PhoneChangeStatus
+  created_at: string
+  decided_at: string | null
+}
+
+/** An open request as the admin sees it, with the player's name and current number. */
+export interface AdminPhoneRequest {
+  id: string
+  user_id: string
+  full_name: string
+  current_phone: string | null
+  new_phone: string
+  created_at: string
+}
+
 export interface RegistrationWithMatch extends Registration {
   match: Match
 }

@@ -22,7 +22,7 @@ export const AUDIT_CATEGORIES = {
   MATCHES: { label: 'Matches', actions: ['MATCH_CREATED', 'MATCH_UPDATED', 'MATCH_CANCELLED'] },
   EXPENSES: { label: 'Expenses', actions: ['EXPENSE_ADDED', 'EXPENSE_UPDATED', 'EXPENSE_DELETED'] },
   REMINDERS: { label: 'Reminders', actions: ['REMINDER_OPENED'] },
-  PEOPLE: { label: 'People and accounts', actions: ['ROLE_CHANGED', 'USER_STATUS_CHANGED', 'PASSWORD_SET_BY_ADMIN', 'PASSWORD_RESET_ENABLED', 'PASSWORD_RESET_DISABLED', 'PASSWORD_RESET_USED'] },
+  PEOPLE: { label: 'People and accounts', actions: ['ROLE_CHANGED', 'USER_STATUS_CHANGED', 'PASSWORD_SET_BY_ADMIN', 'PASSWORD_RESET_ENABLED', 'PASSWORD_RESET_DISABLED', 'PASSWORD_RESET_USED', 'PHONE_CHANGE_REQUESTED', 'PHONE_CHANGE_APPROVED', 'PHONE_CHANGE_REJECTED', 'PHONE_CHANGED_BY_ADMIN'] },
 } as const
 
 export type AuditCategory = keyof typeof AUDIT_CATEGORIES
@@ -87,6 +87,14 @@ export function describeAudit(entry: AuditEntry, names: AuditNames): string {
       return `${actor} turned off password reset for ${player}`
     case 'PASSWORD_RESET_USED':
       return `${player} reset their password`
+    case 'PHONE_CHANGE_REQUESTED':
+      return `${player} asked to change their phone number to ${str(m.to)}`
+    case 'PHONE_CHANGE_APPROVED':
+      return `${actor} approved ${player}'s new phone number (${str(m.from) || 'none'} → ${str(m.to)})`
+    case 'PHONE_CHANGE_REJECTED':
+      return `${actor} rejected ${player}'s request to change their phone number to ${str(m.to)}`
+    case 'PHONE_CHANGED_BY_ADMIN':
+      return `${actor} changed ${player}'s phone number (${str(m.from) || 'none'} → ${str(m.to)})`
     case 'SHARES_CALCULATED':
       return `${actor} calculated the shares${onMatch}: ${formatINR(Number(m.total_expenses ?? 0))} among ${Number(m.participants ?? 0)} players = ${formatINR(Number(m.share_amount ?? 0))} each`
     case 'EXPENSE_ADDED':

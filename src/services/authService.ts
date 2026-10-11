@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { AppError, toFriendlyMessage, unwrap } from '@/lib/errors'
-import type { Profile } from '@/types/domain'
+import type { PhoneChangeRequest, Profile } from '@/types/domain'
 
 export const authService = {
   async signUp(input: { email: string; password: string; fullName: string; phone: string }) {
@@ -42,9 +42,31 @@ export const authService = {
     return unwrap(await supabase.from('profiles').select('*').eq('id', userId).maybeSingle<Profile>())
   },
 
-  async updateProfile(userId: string, input: { full_name: string; phone: string | null }): Promise<Profile> {
+  /** Name only. The phone number can't be written directly: see setInitialPhone and requestPhoneChange. */
+  async updateProfile(userId: string, input: { full_name: string }): Promise<Profile> {
     const data = unwrap(await supabase.from('profiles').update(input).eq('id', userId).select('*').single<Profile>())
     if (!data) throw new AppError(toFriendlyMessage(null))
     return data
+  },
+
+  /** The first phone number, allowed only while the account has none. */
+  async setInitialPhone(phone: string) {
+    unwrap(await supabase.rpc('set_initial_phone', { p_phone: phone }))
+  },
+
+  /** Asks an admin to change the saved number. The current number stays until an admin approves. */
+  async requestPhoneChange(phone: string) {
+    unwrap(await supabase.rpc('request_phone_change', { p_phone: phone }))
+  },
+
+  async cancelPhoneChange() {
+    unwrap(await supabase.rpc('cancel_phone_change'))
+  },
+
+  /** The player's most recent change request (open, approved, rejected or withdrawn), if any. */
+  async latestPhoneRequest(userId: string): Promise<PhoneChangeRequest | null> {
+    return unwrap(
+      await supabase.from('phone_change_requests').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle<PhoneChangeRequest>(),
+    )
   },
 }

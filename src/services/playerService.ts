@@ -1,7 +1,7 @@
 import { MATCH_COLUMNS } from '@/lib/columns'
 import { unwrap } from '@/lib/errors'
 import { supabase } from '@/lib/supabase'
-import type { AccountStatus, PlayerSummary, RegistrationWithMatch, Role } from '@/types/domain'
+import type { AccountStatus, AdminPhoneRequest, PlayerSummary, RegistrationWithMatch, Role } from '@/types/domain'
 
 export const PLAYERS_PAGE_SIZE = 50
 
@@ -76,6 +76,21 @@ export const playerService = {
   /** Admin only. Switches the player's own "reset password" on (open for 24 hours) or off. */
   async setPasswordReset(userId: string, enabled: boolean): Promise<void> {
     unwrap(await supabase.rpc('admin_set_password_reset', { p_user_id: userId, p_enabled: enabled }))
+  },
+
+  /** Admin only. Open requests from players who want a different phone number, oldest first. */
+  async phoneRequests(): Promise<AdminPhoneRequest[]> {
+    return (unwrap(await supabase.rpc('admin_list_phone_change_requests')) ?? []) as AdminPhoneRequest[]
+  },
+
+  /** Admin only. Approving puts the new number on the player's profile. */
+  async decidePhoneChange(requestId: string, approve: boolean): Promise<void> {
+    unwrap(await supabase.rpc('admin_decide_phone_change', { p_request_id: requestId, p_approve: approve }))
+  },
+
+  /** Admin only. Sets a player's number directly and closes any open request from them. */
+  async setUserPhone(userId: string, phone: string): Promise<void> {
+    unwrap(await supabase.rpc('admin_set_user_phone', { p_user_id: userId, p_phone: phone }))
   },
 
   async history(userId: string): Promise<RegistrationWithMatch[]> {

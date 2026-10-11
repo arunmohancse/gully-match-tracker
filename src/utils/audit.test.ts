@@ -67,4 +67,11 @@ describe('AUDIT_CATEGORIES', () => {
     expect(describeAudit(entry({ action: 'PASSWORD_SET_BY_ADMIN', metadata: { user_id: 'u1' } }), names)).toBe('Admin Anu set a temporary password for Arun')
     expect(describeAudit(entry({ action: 'PASSWORD_RESET_USED', actor: null, metadata: { user_id: 'u1' } }), names)).toBe('Arun reset their password')
   })
+  it('describes phone number changes', () => {
+    const m = { user_id: 'u1', from: '+911', to: '+912' }
+    expect(describeAudit(entry({ action: 'PHONE_CHANGE_REQUESTED', metadata: m }), names)).toBe('Arun asked to change their phone number to +912')
+    expect(describeAudit(entry({ action: 'PHONE_CHANGE_APPROVED', metadata: m }), names)).toBe("Admin Anu approved Arun's new phone number (+911 → +912)")
+    expect(describeAudit(entry({ action: 'PHONE_CHANGE_REJECTED', metadata: m }), names)).toBe("Admin Anu rejected Arun's request to change their phone number to +912")
+    expect(describeAudit(entry({ action: 'PHONE_CHANGED_BY_ADMIN', metadata: m }), names)).toBe("Admin Anu changed Arun's phone number (+911 → +912)")
+  })
 })
