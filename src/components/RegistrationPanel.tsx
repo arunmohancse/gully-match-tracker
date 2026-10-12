@@ -139,13 +139,20 @@ export function RegistrationPanel({ match }: { match: Match }) {
           </Button>
         </>
       ) : (
-        <p className="text-sm text-slate-600">
-          {match.status === 'CANCELLED'
-            ? 'This match has been cancelled.'
-            : window === 'NOT_YET'
-              ? `Registration hasn't opened yet.${opensOnDay(match) ? ` It opens on ${opensOnDay(match)}.` : ''}`
-              : 'Registration is currently closed.'}
-        </p>
+        <>
+          <p className="text-sm text-slate-600">
+            {match.status === 'CANCELLED'
+              ? 'This match has been cancelled.'
+              : window === 'NOT_YET'
+                ? `Registration hasn't opened yet.${opensOnDay(match) ? ` It opens on ${opensOnDay(match)}.` : ''}`
+                : 'Registration is currently closed.'}
+          </p>
+          {match.status !== 'CANCELLED' && window === 'NOT_YET' && (
+            <Button size="lg" className="w-full" disabled>
+              Register
+            </Button>
+          )}
+        </>
       )}
       {error && (
         <p role="alert" className="text-sm text-red-600">

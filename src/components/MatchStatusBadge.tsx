@@ -13,9 +13,8 @@ const STYLES: Record<Match['status'], string> = {
   CANCELLED: 'bg-slate-200 text-slate-500 line-through',
 }
 
-/** A published match whose registration has not opened yet shows "Opens <day>" instead of "Registration open". */
+/** A published match whose registration has not opened yet shows "Registration not open yet" instead of "Registration open". The opening day is shown inside the match. */
 export function MatchStatusBadge({ match }: { match: Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'> }) {
-  const opensOn = opensOnDay(match)
-  if (opensOn) return <Badge className="bg-sky-100 text-sky-800">Opens {opensOn}</Badge>
+  if (opensOnDay(match)) return <Badge className={STYLES.UPCOMING}>{STATUS_LABEL.UPCOMING}</Badge>
   return <Badge className={STYLES[match.status]}>{STATUS_LABEL[match.status]}</Badge>
 }
