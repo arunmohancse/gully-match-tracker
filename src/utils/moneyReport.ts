@@ -1,5 +1,6 @@
 import type { Match, MatchFinancials } from '@/types/domain'
 import { isShared } from './cost'
+import { isUnopened } from './matchStatus'
 
 export interface MoneyReportRow {
   match: Match
@@ -31,7 +32,7 @@ export function moneyReport(matches: Match[], financials: MatchFinancials[], fro
   const out: MoneyReport = { collected: 0, expenses: 0, balance: 0, matches: 0, notCalculated: 0, rows: [] }
 
   for (const m of matches) {
-    if (m.status === 'DRAFT' || m.status === 'CANCELLED') continue
+    if (isUnopened(m.status) || m.status === 'CANCELLED') continue
     if ((from && m.match_date < from) || (to && m.match_date > to)) continue
     const f = byId.get(m.id)
     if (!f) continue

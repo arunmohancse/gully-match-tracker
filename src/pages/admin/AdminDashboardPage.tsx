@@ -9,12 +9,13 @@ import { useFinancials } from '@/hooks/usePayments'
 import { useMatches } from '@/hooks/useMatches'
 import { daysAgoISO, todayISO } from '@/utils/dates'
 import { formatINR } from '@/utils/money'
+import { isUnopened } from '@/utils/matchStatus'
 import { moneySummary } from '@/utils/moneySummary'
 
 /** Money still to collect across every match, plus how the last 30 days went. */
 function MoneyOverview() {
   const { data: matches } = useMatches('all')
-  const live = (matches ?? []).filter((m) => m.status !== 'DRAFT' && m.status !== 'CANCELLED')
+  const live = (matches ?? []).filter((m) => !isUnopened(m.status) && m.status !== 'CANCELLED')
   const { data: financials } = useFinancials(
     live.map((m) => m.id),
     live.length > 0,

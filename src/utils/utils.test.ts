@@ -65,15 +65,15 @@ describe('parseMoney', () => {
 })
 
 describe('matchStatus transitions', () => {
-  it('lets a draft be opened or cancelled', () => {
-    expect(availableStatusActions('DRAFT').map((a) => a.to)).toEqual(['OPEN', 'CANCELLED'])
+  it('lets a draft be opened, published or cancelled', () => {
+    expect(availableStatusActions('DRAFT').map((a) => a.to)).toEqual(['OPEN', 'UPCOMING', 'CANCELLED'])
   })
   it('treats COMPLETED and CANCELLED as terminal', () => {
     expect(availableStatusActions('COMPLETED')).toEqual([])
     expect(availableStatusActions('CANCELLED')).toEqual([])
   })
   it('never offers FULL as a manual target', () => {
-    for (const s of ['DRAFT', 'OPEN', 'FULL', 'CLOSED'] as const) {
+    for (const s of ['DRAFT', 'UPCOMING', 'OPEN', 'FULL', 'CLOSED'] as const) {
       expect(availableStatusActions(s).some((a) => a.to === 'FULL')).toBe(false)
     }
   })
@@ -81,7 +81,11 @@ describe('matchStatus transitions', () => {
 
 describe('admin page actions', () => {
   it('picks the usual next step for each status, and none for a finished match', () => {
-    expect(nextStepAction('DRAFT')?.to).toBe('OPEN')
+    expect(nextStepAction('DRAFT')?.to).toBe('UPCOMING')
+    expect(nextStepAction('DRAFT')?.label).toBe('Publish match')
+    expect(nextStepAction('DRAFT', true)?.to).toBe('OPEN') // a future opening day: live now, the database holds registration back
+    expect(nextStepAction('DRAFT', true)?.label).toBe('Publish match')
+    expect(nextStepAction('UPCOMING')?.to).toBe('OPEN')
     expect(nextStepAction('OPEN')?.to).toBe('CLOSED')
     expect(nextStepAction('FULL')?.to).toBe('CLOSED')
     expect(nextStepAction('CLOSED')?.to).toBe('COMPLETED')
@@ -89,13 +93,15 @@ describe('admin page actions', () => {
     expect(nextStepAction('CANCELLED')).toBeNull()
   })
   it('keeps the other changes as quiet links and cancelling out of them', () => {
-    expect(secondaryStatusActions('DRAFT')).toEqual([])
+    expect(secondaryStatusActions('DRAFT').map((a) => [a.to, a.label])).toEqual([['OPEN', 'Open registration now']])
+    expect(secondaryStatusActions('DRAFT', true)).toEqual([]) // already published by the big button
+    expect(secondaryStatusActions('UPCOMING').map((a) => a.to)).toEqual(['DRAFT'])
     expect(secondaryStatusActions('OPEN').map((a) => a.to)).toEqual(['COMPLETED'])
     expect(secondaryStatusActions('CLOSED').map((a) => [a.to, a.label])).toEqual([['OPEN', 'Reopen registration']])
     expect(secondaryStatusActions('COMPLETED')).toEqual([])
   })
   it('offers cancelling only while a match can still be cancelled, never twice', () => {
-    for (const s of ['DRAFT', 'OPEN', 'FULL', 'CLOSED'] as const) {
+    for (const s of ['DRAFT', 'UPCOMING', 'OPEN', 'FULL', 'CLOSED'] as const) {
       expect(cancelAction(s)?.to).toBe('CANCELLED')
       const all = [nextStepAction(s), ...secondaryStatusActions(s), cancelAction(s)].map((a) => a?.to)
       expect(new Set(all).size).toBe(all.length) // every status change is reachable from exactly one place

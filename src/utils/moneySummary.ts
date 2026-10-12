@@ -1,6 +1,7 @@
 import type { Match, MatchFinancials } from '@/types/domain'
 import { isShared } from './cost'
 import { paymentStatus } from './paymentsList'
+import { isUnopened } from './matchStatus'
 
 export interface MoneySummary {
   /** Still owed by unpaid players, across every match. */
@@ -24,7 +25,7 @@ export function moneySummary(matches: Match[], financials: MatchFinancials[], to
   const out: MoneySummary = { pending: 0, followUpCount: 0, refundsDue: 0, recent: { collected: 0, expenses: 0, balance: 0, matches: 0 } }
 
   for (const m of matches) {
-    if (m.status === 'DRAFT' || m.status === 'CANCELLED') continue
+    if (isUnopened(m.status) || m.status === 'CANCELLED') continue
     const f = byId.get(m.id)
     if (!f) continue
 

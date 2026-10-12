@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { AppError, isNetworkError, toFriendlyMessage } from '@/lib/errors'
 import type { Match, RegistrationWithMatch } from '@/types/domain'
-import { listLabel, registrationWindow, splitRegistrations } from './registration'
+import { listLabel, opensOnDay, registrationWindow, splitRegistrations } from './registration'
 
 const base = { status: 'OPEN' as Match['status'], registration_opens_at: null, registration_closes_at: null }
 const now = new Date('2026-10-10T12:00:00Z')
@@ -19,6 +19,25 @@ describe('registrationWindow', () => {
   it('respects opening and closing times', () => {
     expect(registrationWindow({ ...base, registration_opens_at: '2026-10-11T00:00:00Z' }, now)).toBe('NOT_YET')
     expect(registrationWindow({ ...base, registration_closes_at: '2026-10-10T11:00:00Z' }, now)).toBe('CLOSED')
+  })
+})
+
+describe('an UPCOMING match', () => {
+  it('is not open yet, with or without an opening day, and names no day', () => {
+    expect(registrationWindow({ ...base, status: 'UPCOMING' }, now)).toBe('NOT_YET')
+    expect(registrationWindow({ ...base, status: 'UPCOMING', registration_opens_at: '2026-10-01T00:00:00Z' }, now)).toBe('NOT_YET')
+    expect(opensOnDay({ ...base, status: 'UPCOMING', registration_opens_at: '2026-10-20T12:00:00Z' }, now)).toBeNull()
+  })
+})
+
+describe('opensOnDay', () => {
+  it('names the opening day while a published match is waiting for it', () => {
+    expect(opensOnDay({ ...base, registration_opens_at: '2026-10-20T12:00:00Z' }, now)).toBe('20 Oct 2026')
+  })
+  it('is null once registration is open, has no opening day, or the match is not published', () => {
+    expect(opensOnDay(base, now)).toBeNull()
+    expect(opensOnDay({ ...base, registration_opens_at: '2026-10-09T00:00:00Z' }, now)).toBeNull()
+    expect(opensOnDay({ ...base, status: 'DRAFT', registration_opens_at: '2026-10-20T12:00:00Z' }, now)).toBeNull()
   })
 })
 

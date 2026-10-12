@@ -10,6 +10,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import type { Match, MatchFinancials } from '@/types/domain'
 import { formatShortDate, todayISO } from '@/utils/dates'
+import { isUnopened } from '@/utils/matchStatus'
 import { filterPaymentMatches, paymentStatus, type DateFilter } from '@/utils/paymentsList'
 
 const FILTERS: { key: DateFilter; label: string }[] = [
@@ -43,7 +44,7 @@ export function PaymentsPage() {
   const [when, setWhen] = useState<DateFilter>('ALL')
   const today = todayISO()
 
-  const published = (matches ?? []).filter((m) => m.status !== 'DRAFT' && m.status !== 'CANCELLED')
+  const published = (matches ?? []).filter((m) => !isUnopened(m.status) && m.status !== 'CANCELLED')
   const { data: financials } = useFinancials(published.map((m) => m.id), published.length > 0)
   const byId = new Map((financials ?? []).map((f) => [f.match_id, f]))
 

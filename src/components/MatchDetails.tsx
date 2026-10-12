@@ -30,7 +30,7 @@ export function MatchDetails({ match }: { match: Match }) {
       <div className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl font-bold">{match.title}</h1>
-          <MatchStatusBadge status={match.status} />
+          <MatchStatusBadge match={match} />
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">

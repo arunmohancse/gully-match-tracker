@@ -10,6 +10,7 @@ import { useMatches } from '@/hooks/useMatches'
 import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { daysAgoISO, formatShortDate, todayISO } from '@/utils/dates'
+import { isUnopened } from '@/utils/matchStatus'
 import { formatINR } from '@/utils/money'
 import { moneyReport } from '@/utils/moneyReport'
 
@@ -29,7 +30,7 @@ export function MoneyReportPage() {
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
 
-  const live = useMemo(() => (matches ?? []).filter((m) => m.status !== 'DRAFT' && m.status !== 'CANCELLED'), [matches])
+  const live = useMemo(() => (matches ?? []).filter((m) => !isUnopened(m.status) && m.status !== 'CANCELLED'), [matches])
   const { data: financials, isLoading: loadingMoney } = useFinancials(live.map((m) => m.id), live.length > 0)
 
   if (isLoading) return <p className="text-slate-500">Loading matches...</p>

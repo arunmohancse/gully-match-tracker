@@ -15,7 +15,7 @@ export interface Profile {
   updated_at: string
 }
 
-export type MatchStatus = 'DRAFT' | 'OPEN' | 'FULL' | 'CLOSED' | 'COMPLETED' | 'CANCELLED'
+export type MatchStatus = 'DRAFT' | 'UPCOMING' | 'OPEN' | 'FULL' | 'CLOSED' | 'COMPLETED' | 'CANCELLED'
 
 /** FIXED_FEE: a set fee per player. SHARED_COST: no fee up front; expenses are split equally after the match. */
 export type CostModel = 'FIXED_FEE' | 'SHARED_COST'

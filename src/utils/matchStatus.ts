@@ -2,6 +2,7 @@ import type { MatchStatus } from '@/types/domain'
 
 export const STATUS_LABEL: Record<MatchStatus, string> = {
   DRAFT: 'Draft',
+  UPCOMING: 'Registration not open yet',
   OPEN: 'Registration open',
   FULL: 'Full',
   CLOSED: 'Registration closed',
@@ -22,6 +23,19 @@ const OPEN: StatusAction = {
   label: 'Open registration',
   confirmTitle: 'Open registration?',
   confirmBody: 'Players will be able to see this match and register.',
+}
+/** Show the match to players with "Registration not open yet"; an admin opens registration later. */
+const ANNOUNCE: StatusAction = {
+  to: 'UPCOMING',
+  label: 'Publish match',
+  confirmTitle: 'Publish this match?',
+  confirmBody: 'Players will see this match marked "Registration not open yet". They can register once you open registration.',
+}
+const UNPUBLISH: StatusAction = {
+  to: 'DRAFT',
+  label: 'Back to draft',
+  confirmTitle: 'Move back to draft?',
+  confirmBody: 'Players will no longer see this match until you publish it again.',
 }
 const CLOSED: StatusAction = {
   to: 'CLOSED',
@@ -45,7 +59,8 @@ const CANCELLED: StatusAction = {
 
 // FULL is managed automatically from Phase 3 on; admins never set it directly.
 const TRANSITIONS: Record<MatchStatus, StatusAction[]> = {
-  DRAFT: [OPEN, CANCELLED],
+  DRAFT: [OPEN, ANNOUNCE, CANCELLED],
+  UPCOMING: [OPEN, UNPUBLISH, CANCELLED],
   OPEN: [CLOSED, COMPLETED, CANCELLED],
   FULL: [CLOSED, COMPLETED, CANCELLED],
   CLOSED: [OPEN, COMPLETED, CANCELLED],
@@ -57,23 +72,52 @@ export function availableStatusActions(status: MatchStatus): StatusAction[] {
   return TRANSITIONS[status]
 }
 
-/** The one big button on the admin page: the usual next step. Nothing for finished matches. */
-export function nextStepAction(status: MatchStatus): StatusAction | null {
-  if (status === 'DRAFT') return OPEN
+/**
+ * Same status change as OPEN, worded for a match whose registration opening day is still ahead:
+ * it goes live now and the database holds registration back until that day.
+ */
+const PUBLISH_DATED: StatusAction = {
+  ...OPEN,
+  label: 'Publish match',
+  confirmTitle: 'Publish this match?',
+  confirmBody: 'Players will see this match now, but they can only register from the registration opening day.',
+}
+
+/**
+ * The one big button on the admin page: the usual next step. Nothing for finished matches.
+ * `opensLater` is true when the registration opening day is still in the future: a draft is then published and
+ * opens by itself on that day. Without a date a draft is published as UPCOMING and an admin opens it by hand.
+ */
+export function nextStepAction(status: MatchStatus, opensLater = false): StatusAction | null {
+  if (status === 'DRAFT') return opensLater ? PUBLISH_DATED : ANNOUNCE
+  if (status === 'UPCOMING') return OPEN
   if (status === 'OPEN' || status === 'FULL') return CLOSED
   if (status === 'CLOSED') return COMPLETED
   return null
 }
 
-/** The other, less common status changes (shown as quiet links). Cancelling is separate, in the danger zone. */
-export function secondaryStatusActions(status: MatchStatus): StatusAction[] {
-  const next = nextStepAction(status)
+/**
+ * The other, less common status changes (shown as quiet links). Cancelling is separate, in the danger zone.
+ * A draft with a future opening day already publishes through the big button, so UPCOMING is not offered again.
+ */
+export function secondaryStatusActions(status: MatchStatus, opensLater = false): StatusAction[] {
+  const next = nextStepAction(status, opensLater)
   return availableStatusActions(status)
-    .filter((a) => a.to !== next?.to && !a.destructive)
-    .map((a) => (a.to === 'OPEN' && status === 'CLOSED' ? { ...a, label: 'Reopen registration' } : a))
+    .filter((a) => a.to !== next?.to && !a.destructive && !(status === 'DRAFT' && opensLater && a.to === 'UPCOMING'))
+    .map((a) => {
+      if (a.to !== 'OPEN') return a
+      if (status === 'CLOSED') return { ...a, label: 'Reopen registration' }
+      if (status === 'DRAFT') return { ...a, label: 'Open registration now' }
+      return a
+    })
 }
 
 /** Cancelling the match, when it is still possible. */
 export function cancelAction(status: MatchStatus): StatusAction | null {
   return availableStatusActions(status).find((a) => a.destructive) ?? null
+}
+
+/** A draft or an announced match: nobody can have registered or paid yet, so it stays out of money and dues figures. */
+export function isUnopened(status: MatchStatus): boolean {
+  return status === 'DRAFT' || status === 'UPCOMING'
 }

@@ -13,7 +13,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import type { Match } from '@/types/domain'
 import { formatShortDate } from '@/utils/dates'
 import { formatINR } from '@/utils/money'
-import { registrationWindow } from '@/utils/registration'
+import { opensOnDay, registrationWindow } from '@/utils/registration'
 
 /** The signed-in player's registration state for a match, plus the Register action. */
 export function RegistrationPanel({ match }: { match: Match }) {
@@ -143,7 +143,7 @@ export function RegistrationPanel({ match }: { match: Match }) {
           {match.status === 'CANCELLED'
             ? 'This match has been cancelled.'
             : window === 'NOT_YET'
-              ? "Registration hasn't opened yet."
+              ? `Registration hasn't opened yet.${opensOnDay(match) ? ` It opens on ${opensOnDay(match)}.` : ''}`
               : 'Registration is currently closed.'}
         </p>
       )}

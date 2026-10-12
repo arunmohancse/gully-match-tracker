@@ -15,7 +15,8 @@ import { Card } from '@/components/ui/card'
 import { useChangeMatchStatus, useMatch } from '@/hooks/useMatches'
 import { toFriendlyMessage } from '@/lib/errors'
 import { LinkButton } from '@/components/ui/link-button'
-import { cancelAction, nextStepAction, secondaryStatusActions, type StatusAction } from '@/utils/matchStatus'
+import { opensLater } from '@/utils/registration'
+import { cancelAction, isUnopened, nextStepAction, secondaryStatusActions, type StatusAction } from '@/utils/matchStatus'
 
 export function AdminMatchPage() {
   const { id } = useParams()
@@ -45,8 +46,10 @@ export function AdminMatchPage() {
     }
   }
 
-  const next = nextStepAction(match.status)
-  const others = secondaryStatusActions(match.status)
+  const publishFirst = opensLater(match)
+  const unopened = isUnopened(match.status) // nobody can have registered or paid yet
+  const next = nextStepAction(match.status, publishFirst)
+  const others = secondaryStatusActions(match.status, publishFirst)
   const cancel = cancelAction(match.status)
   const canEdit = match.status !== 'COMPLETED' && match.status !== 'CANCELLED'
 
@@ -72,7 +75,7 @@ export function AdminMatchPage() {
         </div>
         {/* One clear next step. A finished match has none, so the useful thing to do next is copy it. */}
         {next ? (
-          <Button className="w-full" variant={next.to === 'OPEN' ? 'default' : 'outline'} onClick={() => ask(next)}>
+          <Button className="w-full" variant={next.to === 'OPEN' || next.to === 'UPCOMING' ? 'default' : 'outline'} onClick={() => ask(next)}>
             {next.label}
           </Button>
         ) : (
@@ -94,7 +97,16 @@ export function AdminMatchPage() {
             ))}
           </div>
         )}
-        {match.status === 'DRAFT' && <p className="text-sm text-slate-500">Draft matches are visible only to admins until you open registration.</p>}
+        {match.status === 'DRAFT' && (
+          <p className="text-sm text-slate-500">
+            {publishFirst
+              ? 'Draft matches are visible only to admins. Publish it to show it to players now; registration opens by itself on the registration opening day.'
+              : 'Draft matches are visible only to admins. Publish it to show it to players as "Registration not open yet", or set a future registration opening day in Edit and it will open by itself that day.'}
+          </p>
+        )}
+        {match.status === 'UPCOMING' && (
+          <p className="text-sm text-slate-500">Players can see this match but cannot register yet. Press Open registration when you are ready.</p>
+        )}
       </Card>
 
       {match.status !== 'DRAFT' && (
@@ -114,12 +126,12 @@ export function AdminMatchPage() {
       {/* Admins play too: same register / cancel panel that players see. */}
       {match.status !== 'DRAFT' && <RegistrationPanel match={match} />}
 
-      {match.status !== 'DRAFT' && <PaymentSummary matchId={match.id} />}
+      {!unopened && <PaymentSummary matchId={match.id} />}
       <ExpensesPanel matchId={match.id} />
-      {match.status !== 'DRAFT' && <SettleUpPanel match={match} />}
-      {match.status !== 'DRAFT' && <AdminRegistrations match={match} />}
+      {!unopened && <SettleUpPanel match={match} />}
+      {!unopened && <AdminRegistrations match={match} />}
 
-      {match.status !== 'DRAFT' && (
+      {!unopened && (
         <Button asChild variant="outline" className="w-full sm:w-auto">
           <Link to={`/admin/payments/${match.id}`}>Open payments and reminders</Link>
         </Button>

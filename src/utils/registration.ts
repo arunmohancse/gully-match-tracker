@@ -1,4 +1,5 @@
 import type { ListType, Match, RegistrationWithMatch } from '@/types/domain'
+import { formatShortDate, toLocalInput } from './dates'
 
 export type RegistrationWindow = 'OPEN' | 'NOT_YET' | 'CLOSED'
 
@@ -10,10 +11,28 @@ export function registrationWindow(
   match: Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'>,
   now: Date = new Date(),
 ): RegistrationWindow {
+  if (match.status === 'UPCOMING') return 'NOT_YET'
   if (match.status !== 'OPEN' && match.status !== 'FULL') return 'CLOSED'
   if (match.registration_opens_at && now < new Date(match.registration_opens_at)) return 'NOT_YET'
   if (match.registration_closes_at && now >= new Date(match.registration_closes_at)) return 'CLOSED'
   return 'OPEN'
+}
+
+/** True when the registration opening day is still ahead, whatever the match status (a draft included). */
+export function opensLater(match: Pick<Match, 'registration_opens_at'>, now: Date = new Date()): boolean {
+  return !!match.registration_opens_at && now < new Date(match.registration_opens_at)
+}
+
+/**
+ * The day registration opens, e.g. "20 Oct 2026", while a published match is still waiting for it. Otherwise null.
+ * An admin publishes a match with a future opening day; the database refuses early registrations until then.
+ */
+export function opensOnDay(
+  match: Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'>,
+  now: Date = new Date(),
+): string | null {
+  if (match.status === 'UPCOMING' || registrationWindow(match, now) !== 'NOT_YET' || !match.registration_opens_at) return null
+  return formatShortDate(toLocalInput(match.registration_opens_at).slice(0, 10))
 }
 
 /** Splits a player's registrations into upcoming active ones and history. */

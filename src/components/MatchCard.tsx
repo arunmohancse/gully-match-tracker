@@ -28,7 +28,7 @@ export function MatchCard({
         <Link to={to} className="text-lg font-semibold hover:underline">
           {match.title}
         </Link>
-        <MatchStatusBadge status={match.status} />
+        <MatchStatusBadge match={match} />
       </div>
       <dl className="space-y-1 text-sm text-slate-600">
         <div className="flex items-center gap-2">

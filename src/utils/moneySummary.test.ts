@@ -39,7 +39,7 @@ describe('moneySummary', () => {
     )
     expect(s.recent).toEqual({ collected: 0, expenses: 0, balance: 0, matches: 0 })
   })
-  it('skips draft and cancelled matches and sums refunds due', () => {
+  it('skips draft, upcoming and cancelled matches and sums refunds due', () => {
     const s = moneySummary(
       [m('d', '2026-10-10', { status: 'DRAFT' }), m('c', '2026-10-10', { status: 'CANCELLED' }), m('ok', '2026-10-10')],
       [f('d', { pending: 999 }), f('c', { pending: 999 }), f('ok', { refunds_due: 150 })],

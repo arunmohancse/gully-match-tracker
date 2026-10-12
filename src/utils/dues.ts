@@ -1,5 +1,6 @@
 import type { RegistrationWithMatch } from '@/types/domain'
 import { amountDue } from './cost'
+import { isUnopened } from './matchStatus'
 
 export interface Due {
   registration: RegistrationWithMatch
@@ -13,7 +14,7 @@ export interface Due {
  */
 export function myDues(registrations: RegistrationWithMatch[]): { dues: Due[]; total: number } {
   const dues = registrations
-    .filter((r) => r.status === 'ACTIVE' && r.list_type === 'MAIN_LIST' && r.payment_status === 'UNPAID' && r.match.status !== 'CANCELLED' && r.match.status !== 'DRAFT')
+    .filter((r) => r.status === 'ACTIVE' && r.list_type === 'MAIN_LIST' && r.payment_status === 'UNPAID' && r.match.status !== 'CANCELLED' && !isUnopened(r.match.status))
     .flatMap((r) => {
       const amount = amountDue(r.match, r)
       return amount !== null && amount > 0 ? [{ registration: r, amount }] : []
