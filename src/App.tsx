@@ -7,6 +7,7 @@ import { AppLayout } from '@/layouts/AppLayout'
 import { ViewerLayout } from '@/layouts/ViewerLayout'
 import { queryClient } from '@/lib/queryClient'
 import { AboutPage } from '@/pages/AboutPage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage'
@@ -48,6 +49,7 @@ export default function App() {
               <Route path="privacy" element={<PrivacyPage />} />
               <Route path="play" element={<PlayPage />} />
               <Route path="matches/:id" element={<MatchDetailPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
 
             <Route element={<RequireAuth />}>
