@@ -195,9 +195,9 @@ describe('buildAnnouncement', () => {
     expect(text).toContain('Registration is now open.')
     expect(text).toContain('Register here:\nhttps://x.test/matches/m1')
   })
-  it('says the cost is shared for shared-cost matches', () => {
+  it('has no cost line for shared-cost matches', () => {
     const text = buildAnnouncement({ ...match, cost_model: 'SHARED_COST', registration_fee: 0 }, 'https://x.test/matches/m1')
-    expect(text).toContain('Cost: shared equally among players after the match')
+    expect(text).not.toContain('Cost')
     expect(text).not.toContain('Match Fee')
   })
   it('leaves the map link out so WhatsApp previews the site link, not the map', () => {
