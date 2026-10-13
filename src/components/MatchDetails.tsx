@@ -1,4 +1,6 @@
-import { CalendarDays, Clock, MapPin, Navigation, Users, Wallet } from 'lucide-react'
+import { CalendarDays, Clock, MapPin, Navigation, Pencil, Users, Wallet } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { MatchStatusBadge } from '@/components/MatchStatusBadge'
 import { matchService } from '@/services/matchService'
@@ -20,7 +22,7 @@ function Row({ icon: Icon, label, children }: { icon: typeof Clock; label: strin
 }
 
 /** Announcement-style match information, shared by player, public and admin pages. */
-export function MatchDetails({ match }: { match: Match }) {
+export function MatchDetails({ match, editTo }: { match: Match; editTo?: string }) {
   const imageUrl = matchService.imageUrl(match.image_path)
   const time = match.end_time ? `${formatTime(match.start_time)} - ${formatTime(match.end_time)}` : formatTime(match.start_time)
 
@@ -30,7 +32,16 @@ export function MatchDetails({ match }: { match: Match }) {
       <div className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-2xl font-bold">{match.title}</h1>
-          <MatchStatusBadge match={match} />
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <MatchStatusBadge match={match} />
+            {editTo && (
+              <Button asChild variant="outline" size="sm">
+                <Link to={editTo}>
+                  <Pencil className="size-4" aria-hidden /> Edit details
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">

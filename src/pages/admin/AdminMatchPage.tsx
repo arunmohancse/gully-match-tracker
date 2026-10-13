@@ -1,4 +1,4 @@
-import { Copy, Pencil } from 'lucide-react'
+import { Copy } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AdminRegistrations } from '@/components/AdminRegistrations'
@@ -60,19 +60,10 @@ export function AdminMatchPage() {
 
   return (
     <div className="space-y-4">
-      <MatchDetails match={match} />
+      <MatchDetails match={match} editTo={canEdit ? `/admin/matches/${match.id}/edit` : undefined} />
 
       <Card className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="font-semibold">Manage</h2>
-          {canEdit && (
-            <Button asChild variant="ghost" className="size-11 p-0" title="Edit match">
-              <Link to={`/admin/matches/${match.id}/edit`} aria-label="Edit match">
-                <Pencil className="size-5" aria-hidden />
-              </Link>
-            </Button>
-          )}
-        </div>
+        <h2 className="font-semibold">Manage</h2>
         {/* One clear next step. A finished match has none, so the useful thing to do next is copy it. */}
         {next ? (
           <Button className="w-full" variant={next.to === 'OPEN' || next.to === 'UPCOMING' ? 'default' : 'outline'} onClick={() => ask(next)}>
