@@ -5,6 +5,7 @@ import type { Match, MatchInput, MatchStatus } from '@/types/domain'
 import { todayISO } from '@/utils/dates'
 
 const IMAGE_BUCKET = 'match-images'
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export type MatchScope = 'upcoming' | 'past' | 'all'
 
@@ -19,6 +20,8 @@ export const matchService = {
   },
 
   async get(id: string): Promise<Match | null> {
+    // A hand-edited link isn't a valid id, which the database rejects as an error. It is simply "not found".
+    if (!UUID_PATTERN.test(id)) return null
     return unwrap(await supabase.from('matches').select(MATCH_COLUMNS).eq('id', id).maybeSingle()) as unknown as Match | null
   },
 
