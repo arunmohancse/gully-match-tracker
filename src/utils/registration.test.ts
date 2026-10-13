@@ -31,8 +31,9 @@ describe('an UPCOMING match', () => {
 })
 
 describe('opensOnDay', () => {
-  it('names the opening day while a published match is waiting for it', () => {
-    expect(opensOnDay({ ...base, registration_opens_at: '2026-10-20T12:00:00Z' }, now)).toBe('20 Oct 2026 (Tuesday)')
+  it('names the opening day and time while a published match is waiting for it', () => {
+    const opensAt = new Date(2026, 9, 20, 9, 30).toISOString() // local time, so the test is timezone-independent
+    expect(opensOnDay({ ...base, registration_opens_at: opensAt }, now)).toBe('20 Oct 2026 (Tuesday) at 9:30 AM')
   })
   it('is null once registration is open, has no opening day, or the match is not published', () => {
     expect(opensOnDay(base, now)).toBeNull()

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Match } from '@/types/domain'
 import { buildAnnouncement } from './announcement'
 import { addDaysISO, formatMatchDate, formatShortDate, formatTime, fromLocalInput, todayISO, toLocalInput } from './dates'
-import { copyMatchToForm, EMPTY_FORM, formToInput, validateMatchForm } from './matchForm'
+import { copyMatchToForm, EMPTY_FORM, formToInput, matchToForm, validateMatchForm } from './matchForm'
 import { availableStatusActions, cancelAction, nextStepAction, secondaryStatusActions } from './matchStatus'
 import { formatINR, parseMoney } from './money'
 
@@ -137,6 +137,15 @@ describe('matchForm', () => {
     const moved = formToInput({ ...valid, opensAt: '', closesAt: '2026-10-18' }, null, { registration_opens_at: null, registration_closes_at: saved } as Match)
     expect(toLocalInput(moved.registration_closes_at)).toBe('2026-10-18T23:59')
   })
+  it('the opening time is optional, needs an opening day, and round-trips through the form', () => {
+    const timed = formToInput({ ...valid, opensAt: '2026-10-14', opensTime: '09:30' }, null)
+    expect(toLocalInput(timed.registration_opens_at)).toBe('2026-10-14T09:30')
+    expect(validateMatchForm({ ...valid, opensTime: '09:30' }).opensTime).toBeDefined()
+    expect(validateMatchForm({ ...valid, opensAt: '2026-10-14', opensTime: '09:30' }).opensTime).toBeUndefined()
+    const back = matchToForm({ ...match, registration_opens_at: timed.registration_opens_at } as Match)
+    expect(back).toMatchObject({ opensAt: '2026-10-14', opensTime: '09:30' })
+    expect(matchToForm({ ...match, registration_opens_at: fromLocalInput('2026-10-14T00:00') } as Match).opensTime).toBe('')
+  })
   it('converts blanks to null and numbers to numbers', () => {
     const input = formToInput({ ...valid, costModel: 'FIXED_FEE', maxPlayers: '20', registrationFee: '150' }, null)
     expect(input).toMatchObject({ description: null, end_time: null, max_players: 20, registration_fee: 150, cost_model: 'FIXED_FEE', rules: null })
@@ -191,10 +200,10 @@ describe('buildAnnouncement', () => {
     expect(text).toContain('Cost: shared equally among players after the match')
     expect(text).not.toContain('Match Fee')
   })
-  it('adds a Location line only when the match has a map link', () => {
-    expect(buildAnnouncement(match, 'https://x.test/matches/m1')).not.toContain('Location')
+  it('leaves the map link out so WhatsApp previews the site link, not the map', () => {
     const text = buildAnnouncement({ ...match, map_url: 'https://maps.app.goo.gl/abc123' }, 'https://x.test/matches/m1')
-    expect(text).toContain('Venue: Velocity Turf\nLocation: https://maps.app.goo.gl/abc123')
+    expect(text).not.toContain('Location')
+    expect(text).not.toContain('maps.app.goo.gl')
   })
   it('omits the fee line when the match is free', () => {
     const text = buildAnnouncement({ ...match, registration_fee: 0 }, 'https://x.test/matches/m1')

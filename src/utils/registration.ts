@@ -1,5 +1,5 @@
 import type { ListType, Match, RegistrationWithMatch } from '@/types/domain'
-import { formatShortDate, formatWeekday, toLocalInput } from './dates'
+import { formatClock, formatShortDate, formatWeekday, toLocalInput } from './dates'
 
 export type RegistrationWindow = 'OPEN' | 'NOT_YET' | 'CLOSED'
 
@@ -33,7 +33,7 @@ export function opensOnDay(
 ): string | null {
   if (match.status === 'UPCOMING' || registrationWindow(match, now) !== 'NOT_YET' || !match.registration_opens_at) return null
   const day = toLocalInput(match.registration_opens_at).slice(0, 10)
-  return `${formatShortDate(day)} (${formatWeekday(day)})`
+  return `${formatShortDate(day)} (${formatWeekday(day)}) at ${formatClock(match.registration_opens_at)}`
 }
 
 /** Splits a player's registrations into upcoming active ones and history. */

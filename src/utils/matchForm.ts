@@ -2,7 +2,7 @@ import type { CostModel, Match, MatchInput } from '@/types/domain'
 import { addDaysISO, fromLocalInput, toLocalInput } from './dates'
 import { isGoogleMapsUrl } from './mapLink'
 
-/** Registration dates are picked as a day only: it opens at the start of that day and closes at the end of it. */
+/** Registration closes at the end of the picked day. It opens at the picked time on its day, or the start of the day when no time is picked. */
 const OPENS_TIME = '00:00'
 const CLOSES_TIME = '23:59'
 
@@ -18,6 +18,7 @@ export interface MatchFormValues {
   costModel: CostModel
   registrationFee: string
   opensAt: string
+  opensTime: string
   closesAt: string
   rules: string
 }
@@ -36,6 +37,7 @@ export const EMPTY_FORM: MatchFormValues = {
   costModel: 'SHARED_COST',
   registrationFee: '0',
   opensAt: '',
+  opensTime: '',
   closesAt: '',
   rules: '',
 }
@@ -53,6 +55,7 @@ export function matchToForm(m: Match): MatchFormValues {
     costModel: m.cost_model ?? 'FIXED_FEE',
     registrationFee: String(m.registration_fee),
     opensAt: toLocalInput(m.registration_opens_at).slice(0, 10),
+    opensTime: toLocalInput(m.registration_opens_at).slice(11) === OPENS_TIME ? '' : toLocalInput(m.registration_opens_at).slice(11),
     closesAt: toLocalInput(m.registration_closes_at).slice(0, 10),
     rules: m.rules ?? '',
   }
@@ -63,7 +66,7 @@ export function matchToForm(m: Match): MatchFormValues {
  * (matches are usually weekly), and the registration open/close days are cleared because they belonged to the old match.
  */
 export function copyMatchToForm(m: Match): MatchFormValues {
-  return { ...matchToForm(m), matchDate: addDaysISO(m.match_date, 7), opensAt: '', closesAt: '' }
+  return { ...matchToForm(m), matchDate: addDaysISO(m.match_date, 7), opensAt: '', opensTime: '', closesAt: '' }
 }
 
 export function validateMatchForm(v: MatchFormValues): MatchFormErrors {
@@ -84,6 +87,7 @@ export function validateMatchForm(v: MatchFormValues): MatchFormErrors {
     if (!v.registrationFee.trim() || Number.isNaN(fee) || fee < 0) e.registrationFee = 'Enter 0 or more.'
   }
 
+  if (v.opensTime && !v.opensAt) e.opensTime = 'Pick the opening day first.'
   if (v.opensAt && v.closesAt && v.closesAt < v.opensAt) {
     e.closesAt = 'The closing date cannot be before the opening date.'
   }
@@ -97,6 +101,13 @@ export function validateMatchForm(v: MatchFormValues): MatchFormErrors {
 function dayToTimestamp(day: string, time: string, existing: string | null | undefined): string | null {
   if (!day) return null
   if (existing && toLocalInput(existing).slice(0, 10) === day) return existing
+  return fromLocalInput(`${day}T${time}`)
+}
+
+/** Opening day and time -> timestamp. An unchanged day and time keep the match's existing timestamp (which may carry seconds). */
+function opensToTimestamp(day: string, time: string, existing: string | null | undefined): string | null {
+  if (!day) return null
+  if (existing && toLocalInput(existing) === `${day}T${time}`) return existing
   return fromLocalInput(`${day}T${time}`)
 }
 
@@ -114,7 +125,7 @@ export function formToInput(v: MatchFormValues, imagePath: string | null, origin
     max_players: Number(v.maxPlayers),
     registration_fee: v.costModel === 'SHARED_COST' ? 0 : Number(v.registrationFee),
     cost_model: v.costModel,
-    registration_opens_at: dayToTimestamp(v.opensAt, OPENS_TIME, original?.registration_opens_at),
+    registration_opens_at: opensToTimestamp(v.opensAt, v.opensTime || OPENS_TIME, original?.registration_opens_at),
     registration_closes_at: dayToTimestamp(v.closesAt, CLOSES_TIME, original?.registration_closes_at),
     rules: blankToNull(v.rules),
     image_path: imagePath,

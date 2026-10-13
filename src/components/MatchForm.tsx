@@ -95,11 +95,14 @@ export function MatchForm({ match, defaults, submitting, error, submitLabel, sub
         <Field label="Registration opens on (optional)" htmlFor="opensAt" error={errors.opensAt}>
           <Input id="opensAt" type="date" value={values.opensAt} onChange={set('opensAt')} />
         </Field>
+        <Field label="Opening time (optional)" htmlFor="opensTime" error={errors.opensTime}>
+          <TimeSelect id="opensTime" optional value={values.opensTime} onChange={(v) => setValues({ ...values, opensTime: v })} />
+        </Field>
         <Field label="Registration closes on (optional)" htmlFor="closesAt" error={errors.closesAt}>
           <Input id="closesAt" type="date" value={values.closesAt} onChange={set('closesAt')} />
         </Field>
       </div>
-      <p className="-mt-2 text-sm text-slate-500">Registration opens at the start of the opening day and closes at the end of the closing day. Leave blank for no limit.</p>
+      <p className="-mt-2 text-sm text-slate-500">Registration opens at the opening time (the start of the day if left blank) and closes at the end of the closing day. Leave the days blank for no limit.</p>
 
       <Field label="Rules & instructions" htmlFor="rules">
         <Textarea id="rules" value={values.rules} onChange={set('rules')} />
