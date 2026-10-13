@@ -144,7 +144,9 @@ export function RegistrationPanel({ match }: { match: Match }) {
             {match.status === 'CANCELLED'
               ? 'This match has been cancelled.'
               : window === 'NOT_YET'
-                ? `Registration hasn't opened yet.${opensOnDay(match) ? ` It opens on ${opensOnDay(match)}.` : ''}`
+                ? opensOnDay(match)
+                  ? `Registration opens on ${opensOnDay(match)}.`
+                  : "Registration hasn't opened yet."
                 : 'Registration is currently closed.'}
           </p>
           {match.status !== 'CANCELLED' && window === 'NOT_YET' && (
