@@ -17,6 +17,12 @@ export function formatShortDate(iso: string): string {
   return `${d} ${MONTHS[m - 1].slice(0, 3)} ${y}`
 }
 
+/** "2026-10-14" -> "Wednesday" */
+export function formatWeekday(iso: string): string {
+  const { y, m, d } = parseDate(iso)
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long' })
+}
+
 /** "06:00:00" -> "6:00 AM" */
 export function formatTime(time: string): string {
   const [h, m] = time.split(':').map(Number)
