@@ -62,13 +62,16 @@ export function MatchCard({
           <span className={financials.balance < 0 ? 'font-medium text-red-700' : 'font-medium text-green-700'}>{formatINR(financials.balance)}</span>
         </p>
       )}
-      <div className="flex items-center justify-between gap-2 text-sm">
-        <span className="text-slate-600">
-          {counts ? `${counts.main_count} / ${match.max_players} registered` : `Max ${match.max_players} players`}
-          {counts && counts.waiting_count > 0 && ` · ${counts.waiting_count} waiting`}
-          {isShared(match) ? ' · Cost shared' : match.registration_fee > 0 && ` · ${formatINR(match.registration_fee)}`}
-        </span>
-        {action}
+      {/* The text wraps and the action keeps its full width, so a long line (waiting list, shared cost) never squeezes the button. */}
+      <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-2 text-sm">
+        <div className="min-w-0 flex-1 basis-40 space-y-0.5 text-slate-600">
+          <p>
+            {counts ? `${counts.main_count} / ${match.max_players} registered` : `Max ${match.max_players} players`}
+            {counts && counts.waiting_count > 0 && ` · ${counts.waiting_count} waiting`}
+          </p>
+          {isShared(match) ? <p>Cost shared</p> : match.registration_fee > 0 && <p>Fee {formatINR(match.registration_fee)}</p>}
+        </div>
+        {action && <div className="shrink-0 whitespace-nowrap">{action}</div>}
       </div>
     </Card>
   )
