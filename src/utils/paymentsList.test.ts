@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { MatchFinancials } from '@/types/domain'
-import { filterPaymentMatches, paymentStatus } from './paymentsList'
+import { countByFilter, emptyListMessage, filterPaymentMatches, otherMatchesHeading, paymentStatus, pendingSummary } from './paymentsList'
 
 const fin = (over: Partial<MatchFinancials> = {}): MatchFinancials => ({
   match_id: 'm', cost_model: 'FIXED_FEE', registration_fee: 100, main_count: 10, waiting_count: 0, paid_count: 10, unpaid_count: 0, waived_count: 0,
@@ -14,7 +14,7 @@ const TODAY = '2026-10-09'
 describe('paymentStatus', () => {
   it('flags unpaid players with the amount pending', () => {
     const s = paymentStatus(fixed, fin({ unpaid_count: 3, pending: 300 }), TODAY)
-    expect(s).toEqual({ needsFollowUp: true, text: '3 unpaid · ₹300 pending', tone: 'warn' })
+    expect(s).toEqual({ needsFollowUp: true, text: '3 unpaid', detail: '₹300 pending', tone: 'warn' })
   })
   it('flags refunds before anything else', () => {
     expect(paymentStatus(fixed, fin({ refunds_due: 100, unpaid_count: 2, pending: 200 }), TODAY).text).toMatch(/^Refunds due/)
@@ -45,5 +45,39 @@ describe('filterPaymentMatches', () => {
     expect(filterPaymentMatches(list, 'gully', 'ALL', TODAY, text)).toHaveLength(1)
     expect(filterPaymentMatches(list, '4 oct', 'ALL', TODAY, text)).toHaveLength(1)
     expect(filterPaymentMatches(list, '2026-09', 'ALL', TODAY, text)).toHaveLength(1)
+  })
+})
+
+describe('payments list helpers', () => {
+  const list = [
+    { title: 'Sunday Gully', match_date: '2026-10-04' },
+    { title: 'Diwali Cup', match_date: '2026-11-01' },
+    { title: 'Morning nets', match_date: '2026-09-20' },
+  ]
+  it('counts matches per filter for the current search', () => {
+    expect(countByFilter(list, '', TODAY, (i) => i)).toEqual({ ALL: 3, UPCOMING: 1, PAST: 2 })
+    expect(countByFilter(list, 'gully', TODAY, (i) => i)).toEqual({ ALL: 1, UPCOMING: 0, PAST: 1 })
+  })
+  it('names the other-matches group after the filter', () => {
+    expect(otherMatchesHeading('PAST', true)).toBe('Past matches')
+    expect(otherMatchesHeading('UPCOMING', false)).toBe('Upcoming matches')
+    expect(otherMatchesHeading('ALL', true)).toBe('Other matches')
+    expect(otherMatchesHeading('ALL', false)).toBe('All matches')
+  })
+  it('explains an empty list', () => {
+    expect(emptyListMessage('PAST', '')).toBe('No past matches yet.')
+    expect(emptyListMessage('UPCOMING', '')).toBe('No upcoming matches yet.')
+    expect(emptyListMessage('ALL', '')).toBe('No matches found.')
+    expect(emptyListMessage('PAST', ' cup ')).toBe('No past matches match "cup".')
+  })
+  it('sums the pending money of matches that need follow-up', () => {
+    const warn = { needsFollowUp: true, text: '', tone: 'warn' as const }
+    const ok = { needsFollowUp: false, text: '', tone: 'good' as const }
+    expect(pendingSummary([
+      { status: warn, financials: fin({ pending: 300 }) },
+      { status: warn, financials: fin({ pending: 150 }) },
+      { status: ok, financials: fin({ pending: 0 }) },
+      { status: warn, financials: undefined },
+    ])).toEqual({ total: 450, matches: 2 })
   })
 })
