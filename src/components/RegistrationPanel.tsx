@@ -18,7 +18,7 @@ import { opensOnDay, registrationWindow } from '@/utils/registration'
 /** The signed-in player's registration state for a match, plus the Register action. */
 export function RegistrationPanel({ match }: { match: Match }) {
   const { data: mine, isLoading, error: loadError } = useMyRegistration(match.id)
-  const { data: paymentBlock } = usePaymentBlock()
+  const { data: paymentBlock } = usePaymentBlock(match.id)
   const { isAdmin } = useAuth()
   const register = useRegister(match.id)
   const cancel = useCancelRegistration()
@@ -126,8 +126,8 @@ export function RegistrationPanel({ match }: { match: Match }) {
               <p className="font-semibold">Registration is paused until your payment is cleared</p>
               <p>
                 You have {formatINR(paymentBlock.overdue_total)} overdue
-                {paymentBlock.oldest_title ? ` (${paymentBlock.oldest_title}, ${formatShortDate(paymentBlock.oldest_date!)})` : ''}. Payments older than {paymentBlock.grace_days} days
-                must be cleared before you register again. Already paid? The organiser will mark it as paid, then you can register.
+                {paymentBlock.oldest_title ? ` (${paymentBlock.oldest_title}, ${formatShortDate(paymentBlock.oldest_date!)})` : ''}. Payments for matches {paymentBlock.grace_days} or more days before this one
+                must be cleared before you register. Already paid? The organiser will mark it as paid, then you can register.
               </p>
               <Link to={isAdmin ? '/admin' : '/'} className="font-medium underline">
                 See what you owe and pay

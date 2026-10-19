@@ -21,12 +21,12 @@ export function useMyRegistrations() {
   })
 }
 
-/** Overdue payments that stop the player registering. Shares the 'registrations' key prefix, so payment changes refresh it. */
-export function usePaymentBlock() {
+/** Overdue payments that stop the player registering for this match. Shares the 'registrations' key prefix, so payment changes refresh it. */
+export function usePaymentBlock(matchId: string) {
   const userId = useAuth().session?.user.id
   return useQuery({
-    queryKey: ['registrations', 'payment-block', userId],
-    queryFn: () => registrationService.paymentBlock(),
+    queryKey: ['registrations', 'payment-block', userId, matchId],
+    queryFn: () => registrationService.paymentBlock(matchId),
     enabled: !!userId,
   })
 }

@@ -37,9 +37,9 @@ export const registrationService = {
     return rows ?? []
   },
 
-  /** The caller's overdue payments (older than the grace period). When there are any, the server refuses new registrations. */
-  async paymentBlock(): Promise<PaymentBlock> {
-    const row = (unwrap(await supabase.rpc('my_payment_block')) as PaymentBlock[] | null)?.[0]
+  /** The caller's dues that are overdue as of the given match (owed for a match grace_days or more before it). When there are any, the server refuses the registration. */
+  async paymentBlock(matchId: string): Promise<PaymentBlock> {
+    const row = (unwrap(await supabase.rpc('my_payment_block', { p_match_id: matchId })) as PaymentBlock[] | null)?.[0]
     return row ?? { overdue_count: 0, overdue_total: 0, oldest_title: null, oldest_date: null, grace_days: 3 }
   },
 
