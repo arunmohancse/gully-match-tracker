@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { usePaymentSettings } from '@/hooks/useCommunity'
 import { formatINR } from '@/utils/money'
+import { copyText } from '@/utils/clipboard'
 import { buildUpiUri } from '@/utils/upi'
 import { downloadImage, makeUpiQrImage } from '@/utils/upiImage'
 
@@ -55,12 +56,12 @@ export function UpiPay({ communityId, amount, note }: { communityId: string; amo
   }
 
   async function copyId() {
-    try {
-      await navigator.clipboard.writeText(upiId)
+    if (await copyText(upiId)) {
+      setMessage(null)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
-      setMessage(`Could not copy automatically. UPI ID: ${upiId}`)
+    } else {
+      setMessage('Could not copy automatically. Touch and hold the UPI ID above to copy it.')
     }
   }
 
@@ -78,6 +79,9 @@ export function UpiPay({ communityId, amount, note }: { communityId: string; amo
           {copied ? 'Copied' : 'Copy UPI ID'}
         </Button>
       </div>
+      <p className="text-sm text-slate-700">
+        UPI ID: <span className="select-all font-mono font-semibold break-all">{upiId}</span>
+      </p>
       {showQr && <QrPicture uri={uri} />}
       {message && (
         <p role="status" className="text-sm text-slate-700">
