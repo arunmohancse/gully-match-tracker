@@ -13,6 +13,7 @@ import { amountPerPlayer, buildPaymentRequest, buildPendingList, pendingPlayers 
 import { buildUpiUri, paymentInstructionsText } from '@/utils/upi'
 import { makeUpiQrImage, shareOrDownloadImage } from '@/utils/upiImage'
 import { buildWhatsAppShareUrl } from '@/utils/whatsapp'
+import { copyText } from '@/utils/clipboard'
 
 interface QrShare {
   upiId: string
@@ -30,11 +31,10 @@ function ShareBlock({ title, hint, message, qr }: { title: string; hint: string;
   async function copy() {
     if (!message) return
     setCopyError(null)
-    try {
-      await navigator.clipboard.writeText(message)
+    if (await copyText(message)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
+    } else {
       setCopyError('Could not copy automatically. Select the text and copy it manually.')
     }
   }

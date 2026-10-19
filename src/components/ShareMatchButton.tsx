@@ -6,6 +6,7 @@ import { matchShareUrl } from '@/lib/config'
 import type { Match } from '@/types/domain'
 import { buildAnnouncement } from '@/utils/announcement'
 import { buildWhatsAppShareUrl } from '@/utils/whatsapp'
+import { copyText } from '@/utils/clipboard'
 
 type Copied = 'link' | 'text' | null
 
@@ -17,11 +18,10 @@ export function ShareMatchButton({ match }: { match: Match }) {
 
   async function copy(kind: Exclude<Copied, null>, text: string) {
     setError(null)
-    try {
-      await navigator.clipboard.writeText(text)
+    if (await copyText(text)) {
       setCopied(kind)
       setTimeout(() => setCopied(null), 2000)
-    } catch {
+    } else {
       setError('Could not copy automatically. Please copy it manually: ' + url)
     }
   }

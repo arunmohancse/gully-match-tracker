@@ -6,6 +6,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import type { PlayerSummary } from '@/types/domain'
 import { generateTempPassword } from '@/utils/password'
 import { buildWhatsAppChatUrl } from '@/utils/whatsapp'
+import { copyText } from '@/utils/clipboard'
 
 /** Admin sets a temporary password, then shares it. The password is shown only here, once. */
 export function TempPasswordDialog({ player, onClose }: { player: PlayerSummary | null; onClose: () => void }) {
@@ -58,12 +59,7 @@ export function TempPasswordDialog({ player, onClose }: { player: PlayerSummary 
               <Button
                 variant="outline"
                 onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(password)
-                    setCopied(true)
-                  } catch {
-                    setCopied(false)
-                  }
+                  setCopied(await copyText(password))
                 }}
               >
                 {copied ? 'Copied' : 'Copy password'}

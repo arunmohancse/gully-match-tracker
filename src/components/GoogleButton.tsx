@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
 import { isInAppBrowser } from '@/utils/inAppBrowser'
+import { copyText } from '@/utils/clipboard'
 
 function GoogleLogo() {
   return (
@@ -34,11 +35,10 @@ export function GoogleButton() {
   }
 
   async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
+    if (await copyText(window.location.href)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
+    } else {
       setError('Could not copy the link. Open this page in Chrome or Safari instead.')
     }
   }

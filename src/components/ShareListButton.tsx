@@ -8,6 +8,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import type { Match } from '@/types/domain'
 import { buildPlayerListMessage } from '@/utils/playerList'
 import { buildWhatsAppShareUrl } from '@/utils/whatsapp'
+import { copyText } from '@/utils/clipboard'
 
 /** Admin: send the current main list and waiting list to a WhatsApp group (you pick the group in WhatsApp). */
 export function ShareListButton({ match }: { match: Match }) {
@@ -28,11 +29,10 @@ export function ShareListButton({ match }: { match: Match }) {
 
   async function copy() {
     setCopyError(null)
-    try {
-      await navigator.clipboard.writeText(message)
+    if (await copyText(message)) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {
+    } else {
       setCopyError('Could not copy automatically. Select the text above and copy it manually.')
     }
   }
