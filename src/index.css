@@ -8,8 +8,8 @@
   --color-brand-foreground: #ffffff;
   --color-stumps: #f2c94c;
   /* Body text, and the tall scoreboard-style face for page titles, dates and amounts (font-display). */
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Barlow Condensed", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 /*
