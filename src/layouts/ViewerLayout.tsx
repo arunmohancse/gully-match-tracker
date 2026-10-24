@@ -1,14 +1,13 @@
 import { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { BrandLockup } from '@/components/BrandLockup'
-import { InstagramLink } from '@/components/InstagramLink'
+import { SocialLinks } from '@/components/SocialLinks'
 import { PartOfParent } from '@/components/ParentBrand'
 import { FullPageSpinner } from '@/components/RouteGuards'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 import { AppLayout } from './AppLayout'
 import { CricketLoader } from '@/components/CricketLoader'
-import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 /** For pages that work both logged in (full app shell) and logged out (minimal shell), e.g. shared match links. */
 export function ViewerLayout() {
@@ -37,9 +36,8 @@ export function ViewerLayout() {
           <Outlet />
         </Suspense>
       </main>
-      <footer className="space-y-2 border-t border-line bg-surface py-4 text-center">
-        <CommunityLink />
-        <InstagramLink />
+      <footer className="space-y-3 border-t border-line px-4 py-6 text-center">
+        <SocialLinks className="mx-auto max-w-sm" />
         <PartOfParent />
       </footer>
     </div>

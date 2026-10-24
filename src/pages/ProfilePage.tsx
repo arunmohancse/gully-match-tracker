@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
+import { SocialLinks } from '@/components/SocialLinks'
 import { AppearanceCard } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,7 +14,6 @@ import { authService } from '@/services/authService'
 import { initials } from '@/utils/initials'
 import { isResetOpen, validateNewPassword } from '@/utils/password'
 import { normalizePhone } from '@/utils/phone'
-import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 export function ProfilePage() {
   const { profile, session, setProfile, refreshProfile, isAdmin } = useAuth()
@@ -73,13 +72,14 @@ export function ProfilePage() {
         </form>
       </Card>
       <PhoneCard userId={session.user.id} phone={profile.phone} onChanged={refreshProfile} />
-      <div className="space-y-2 pt-4 text-center md:hidden">
-        <Link to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
-          About us
-        </Link>
-        <CommunityLink />
-        <InstagramLink />
-        <PartOfParent />
+      <div className="space-y-2 md:hidden">
+        <SocialLinks />
+        <div className="flex flex-col items-center gap-1 text-center">
+          <Link to="/about" className="inline-flex min-h-11 items-center px-4 text-sm font-bold text-brand hover:underline">
+            About us
+          </Link>
+          <PartOfParent />
+        </div>
       </div>
       {isResetOpen(profile.password_reset_until) && <ChangePasswordCard onChanged={refreshProfile} />}
     </div>

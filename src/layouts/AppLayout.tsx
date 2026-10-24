@@ -2,7 +2,7 @@ import { CalendarDays, CreditCard, LayoutDashboard, ListChecks, LogOut, User, Us
 import { Suspense, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { BrandLockup } from '@/components/BrandLockup'
-import { InstagramLink } from '@/components/InstagramLink'
+import { SocialLinksCompact } from '@/components/SocialLinks'
 import { PartOfParent } from '@/components/ParentBrand'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,6 @@ import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { authService } from '@/services/authService'
 import { CricketLoader } from '@/components/CricketLoader'
-import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 const USER_NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -71,12 +70,11 @@ export function AppLayout() {
           ))}
         </nav>
         <div className="space-y-2 border-t border-line pt-3 text-sm">
-          <div className="space-y-1.5 pb-1 text-center">
-            <NavLink to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
+          <SocialLinksCompact />
+          <div className="space-y-1 pb-1 text-center">
+            <NavLink to="/about" className="inline-flex min-h-9 items-center px-3 text-xs font-semibold text-subtle hover:text-brand hover:underline">
               About us
             </NavLink>
-            <CommunityLink label="WhatsApp community" />
-            <InstagramLink label="Instagram" />
             <PartOfParent />
           </div>
           <div className="truncate text-muted">
