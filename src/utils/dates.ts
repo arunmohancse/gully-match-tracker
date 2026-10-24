@@ -82,3 +82,14 @@ export function toLocalInput(iso: string | null): string {
 export function fromLocalInput(value: string): string | null {
   return value ? new Date(value).toISOString() : null
 }
+
+/** Game length from two "HH:MM" times: "2 hour game", "1 hr 30 min game". Null when either is missing or the end is not later. */
+export function durationLabel(start: string, end: string): string | null {
+  if (!start || !end || end <= start) return null
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
+  const mins = toMin(end) - toMin(start)
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  if (!m) return `${h} hour game`
+  return h ? `${h} hr ${m} min game` : `${m} min game`
+}

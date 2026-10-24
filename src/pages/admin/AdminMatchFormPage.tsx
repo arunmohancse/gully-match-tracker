@@ -4,7 +4,6 @@ import { MatchForm } from '@/components/MatchForm'
 import { useMatch, useMatches, useSaveMatch } from '@/hooks/useMatches'
 import { toFriendlyMessage } from '@/lib/errors'
 import { copyMatchToForm, formToInput, type MatchFormValues } from '@/utils/matchForm'
-import { PageHeader } from '@/components/PageHeader'
 import { CricketLoader } from '@/components/CricketLoader'
 
 /** Handles /admin/matches/new, /admin/matches/new?copy=<match id> and /admin/matches/:id/edit. */
@@ -49,22 +48,23 @@ export function AdminMatchFormPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <PageHeader title={isEdit ? 'Edit match' : source ? 'Copy match' : 'New match'} />
-      {source && (
-        <p className="text-sm text-muted">
-          Copied from <span className="font-medium">{source.title}</span>. Check the title and date, then create it. Players and payments are not copied.
-        </p>
-      )}
-      <MatchForm
-        match={match ?? undefined}
-        defaults={defaults}
-        submitting={save.isPending}
-        error={error}
-        submitLabel={isEdit ? 'Save changes' : 'Create match'}
-        submittingLabel={isEdit ? 'Saving...' : 'Creating...'}
-        onSubmit={onSubmit}
-      />
-    </div>
+    <MatchForm
+      match={match ?? undefined}
+      defaults={defaults}
+      heading={isEdit ? 'Edit match' : source ? 'Copy match' : 'New match'}
+      backTo={isEdit && id ? `/admin/matches/${id}` : '/admin/matches'}
+      notice={
+        source && (
+          <p className="rounded-2xl border border-info-soft bg-info-soft px-4 py-3 text-sm text-info">
+            Copied from <span className="font-bold">{source.title}</span>. Check the title and date, then create it. Players and payments are not copied.
+          </p>
+        )
+      }
+      submitting={save.isPending}
+      error={error}
+      submitLabel={isEdit ? 'Save changes' : 'Create match'}
+      submittingLabel={isEdit ? 'Saving...' : 'Creating...'}
+      onSubmit={onSubmit}
+    />
   )
 }
