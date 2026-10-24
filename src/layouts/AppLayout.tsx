@@ -11,6 +11,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { authService } from '@/services/authService'
 import { CricketLoader } from '@/components/CricketLoader'
+import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 const USER_NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -74,6 +75,7 @@ export function AppLayout() {
             <NavLink to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
               About us
             </NavLink>
+            <CommunityLink label="WhatsApp community" />
             <InstagramLink label="Instagram" />
             <PartOfParent />
           </div>

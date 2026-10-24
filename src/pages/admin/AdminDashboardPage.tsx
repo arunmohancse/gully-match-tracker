@@ -14,6 +14,7 @@ import { daysAgoISO, formatWeekday, formatShortDate, todayISO } from '@/utils/da
 import { formatINR } from '@/utils/money'
 import { isUnopened } from '@/utils/matchStatus'
 import { moneySummary } from '@/utils/moneySummary'
+import { JoinCommunityCard } from '@/components/WhatsAppCommunity'
 
 function Stat({ label, value, tone }: { label: string; value: string; tone?: 'bad' }) {
   return (
@@ -100,6 +101,8 @@ export function AdminDashboardPage() {
       <MyDuesCard />
 
       <NextMatchHero basePath="/admin/matches" actionLabel="Manage match" />
+
+      <JoinCommunityCard dismissible />
 
       <MoneyOverview />
 

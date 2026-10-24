@@ -205,6 +205,14 @@ describe('buildAnnouncement', () => {
     expect(text).not.toContain('Location')
     expect(text).not.toContain('maps.app.goo.gl')
   })
+  it('ends with the WhatsApp community invite, after the match link so WhatsApp still previews the match', () => {
+    const text = buildAnnouncement(match, 'https://x.test/matches/m1', 'https://chat.whatsapp.com/abc')
+    expect(text.endsWith('Join our WhatsApp community:\nhttps://chat.whatsapp.com/abc')).toBe(true)
+    expect(text.indexOf('https://x.test/matches/m1')).toBeLessThan(text.indexOf('https://chat.whatsapp.com/abc'))
+  })
+  it('leaves the community line out when no community link is set', () => {
+    expect(buildAnnouncement(match, 'https://x.test/matches/m1', '')).not.toContain('community')
+  })
   it('omits the fee line when the match is free', () => {
     const text = buildAnnouncement({ ...match, registration_fee: 0 }, 'https://x.test/matches/m1')
     expect(text).not.toContain('Match Fee')

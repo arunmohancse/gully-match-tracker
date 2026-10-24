@@ -1,3 +1,4 @@
+import { brand } from '@/config/brand'
 import type { Match } from '@/types/domain'
 import { formatMatchDate, formatTime } from './dates'
 import { isShared } from './cost'
@@ -14,8 +15,11 @@ const REGISTRATION_LINE: Record<Match['status'], string> = {
   CANCELLED: 'This match has been cancelled.',
 }
 
-/** Shareable plain-text announcement (e.g. for WhatsApp). */
-export function buildAnnouncement(match: Match, url: string): string {
+/**
+ * Shareable plain-text announcement (e.g. for WhatsApp). The match link comes first so WhatsApp previews it;
+ * the community invite goes last.
+ */
+export function buildAnnouncement(match: Match, url: string, communityUrl: string = brand.whatsappCommunity): string {
   const opensOn = opensOnDay(match)
   const time = match.end_time ? `${formatTime(match.start_time)} - ${formatTime(match.end_time)}` : formatTime(match.start_time)
   return [
@@ -31,5 +35,6 @@ export function buildAnnouncement(match: Match, url: string): string {
     opensOn ? `Registration opens on ${opensOn}.` : REGISTRATION_LINE[match.status],
     'Register here:',
     url,
+    ...(communityUrl ? ['', 'New here? Join our WhatsApp community:', communityUrl] : []),
   ].join('\n')
 }
