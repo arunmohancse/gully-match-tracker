@@ -36,7 +36,11 @@ export function Optional() {
 
 const DAYS_SHOWN = 14
 
-/** Tap a day from the next two weeks, or open the calendar for any other. A picked day outside the strip shows first. */
+/**
+ * Tap a day from the next two weeks (a strip that scrolls sideways), or open the calendar for any other. The calendar
+ * tile is pinned outside the strip so it is always in view, on a phone and on desktop where the strip has no swipe.
+ * A picked day outside the strip shows first.
+ */
 export function DateStrip({ value, onChange, labelledBy }: { value: string; onChange: (iso: string) => void; labelledBy: string }) {
   const pickerRef = useRef<HTMLInputElement>(null)
   const today = todayISO()
@@ -44,30 +48,32 @@ export function DateStrip({ value, onChange, labelledBy }: { value: string; onCh
   if (value && !days.includes(value)) days.unshift(value)
 
   return (
-    <div role="radiogroup" aria-labelledby={labelledBy} className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-      {days.map((iso) => {
-        const { day, weekday, month } = dateBlockParts(iso)
-        const selected = iso === value
-        return (
-          <button
-            key={iso}
-            type="button"
-            role="radio"
-            aria-checked={selected}
-            aria-label={`${weekday} ${Number(day)} ${month}${iso === today ? ', today' : ''}`}
-            onClick={() => onChange(iso)}
-            className={cn(
-              'flex h-[74px] w-14 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-2xl border leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-              selected ? 'border-brand bg-brand text-brand-foreground' : 'border-line bg-surface-2 hover:border-line-strong',
-            )}
-          >
-            <span className={cn('text-[11px] font-extrabold', !selected && 'text-muted')}>{iso === today ? 'TODAY' : weekday}</span>
-            <span className="font-display text-[26px] font-bold">{Number(day)}</span>
-            <span className={cn('text-[10px] font-bold tracking-wider', !selected && 'text-subtle')}>{month}</span>
-          </button>
-        )
-      })}
-      <span className="relative flex h-[74px] w-14 shrink-0 items-center justify-center rounded-2xl border border-dashed border-line-strong text-brand focus-within:outline-2 focus-within:outline-brand">
+    <div className="flex gap-2">
+      <div role="radiogroup" aria-labelledby={labelledBy} className="flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:pb-2 md:[scrollbar-width:thin]">
+        {days.map((iso) => {
+          const { day, weekday, month } = dateBlockParts(iso)
+          const selected = iso === value
+          return (
+            <button
+              key={iso}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              aria-label={`${weekday} ${Number(day)} ${month}${iso === today ? ', today' : ''}`}
+              onClick={() => onChange(iso)}
+              className={cn(
+                'flex h-[74px] w-14 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-2xl border leading-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+                selected ? 'border-brand bg-brand text-brand-foreground' : 'border-line bg-surface-2 hover:border-line-strong',
+              )}
+            >
+              <span className={cn('text-[11px] font-extrabold', !selected && 'text-muted')}>{iso === today ? 'TODAY' : weekday}</span>
+              <span className="font-display text-[26px] font-bold">{Number(day)}</span>
+              <span className={cn('text-[10px] font-bold tracking-wider', !selected && 'text-subtle')}>{month}</span>
+            </button>
+          )
+        })}
+      </div>
+      <span title="Pick another date" className="relative flex h-[74px] w-14 shrink-0 items-center justify-center rounded-2xl border border-dashed border-line-strong text-brand focus-within:outline-2 focus-within:outline-brand">
         <CalendarPlus className="size-[22px]" aria-hidden />
         <input
           ref={pickerRef}
