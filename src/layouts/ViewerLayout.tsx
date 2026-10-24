@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 import { AppLayout } from './AppLayout'
 import { CricketLoader } from '@/components/CricketLoader'
+import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 /** For pages that work both logged in (full app shell) and logged out (minimal shell), e.g. shared match links. */
 export function ViewerLayout() {
@@ -37,6 +38,7 @@ export function ViewerLayout() {
         </Suspense>
       </main>
       <footer className="space-y-2 border-t border-line bg-surface py-4 text-center">
+        <CommunityLink />
         <InstagramLink />
         <PartOfParent />
       </footer>

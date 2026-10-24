@@ -4,6 +4,7 @@ import { InstagramLink } from '@/components/InstagramLink'
 import { ParentLogo } from '@/components/ParentBrand'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { brand } from '@/config/brand'
+import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 /** Login / sign-up / reset: the club on the striped pitch up top, the form on a card that overlaps it. */
 export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
@@ -26,7 +27,8 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
         <div className="mx-auto max-w-sm space-y-4">
           <h1 className="font-display text-3xl font-bold leading-none">{title}</h1>
           {children}
-          <div className="pt-2 text-center">
+          <div className="flex flex-col items-center gap-2 pt-2">
+            <CommunityLink />
             <InstagramLink />
           </div>
         </div>

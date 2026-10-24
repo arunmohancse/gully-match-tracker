@@ -22,6 +22,9 @@ describe('brand config', () => {
   it('has a valid Instagram link when a handle is set', () => {
     if (brand.instagram.handle) expect(brand.instagram.url).toBe(`https://www.instagram.com/${brand.instagram.handle}/`)
   })
+  it('the WhatsApp community, when set, is a chat.whatsapp.com invite link without share tracking', () => {
+    if (brand.whatsappCommunity) expect(brand.whatsappCommunity).toMatch(/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+$/)
+  })
   it('logoSrc, when set, is an absolute path to a file served from /public', () => {
     if (brand.logoSrc) expect(brand.logoSrc.startsWith('/')).toBe(true)
   })

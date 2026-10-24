@@ -14,6 +14,7 @@ import { authService } from '@/services/authService'
 import { initials } from '@/utils/initials'
 import { isResetOpen, validateNewPassword } from '@/utils/password'
 import { normalizePhone } from '@/utils/phone'
+import { CommunityLink } from '@/components/WhatsAppCommunity'
 
 export function ProfilePage() {
   const { profile, session, setProfile, refreshProfile, isAdmin } = useAuth()
@@ -76,6 +77,7 @@ export function ProfilePage() {
         <Link to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
           About us
         </Link>
+        <CommunityLink />
         <InstagramLink />
         <PartOfParent />
       </div>

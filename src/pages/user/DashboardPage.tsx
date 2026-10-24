@@ -9,6 +9,7 @@ import { useMatches } from '@/hooks/useMatches'
 import { useMyRegistrations } from '@/hooks/useRegistrations'
 import { formatShortDate, formatWeekday, todayISO } from '@/utils/dates'
 import { splitRegistrations } from '@/utils/registration'
+import { JoinCommunityCard } from '@/components/WhatsAppCommunity'
 
 export function DashboardPage() {
   const { profile } = useAuth()
@@ -25,6 +26,8 @@ export function DashboardPage() {
       <MyDuesCard />
 
       <NextMatchHero basePath="/matches" actionLabel="View match" />
+
+      <JoinCommunityCard dismissible />
 
       {upcoming.length > 0 && (
         <section className="space-y-3">

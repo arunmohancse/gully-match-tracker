@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { brand } from '@/config/brand'
 import { about } from '@/config/about'
 import { useAuth } from '@/hooks/useAuth'
+import { JoinCommunityCard } from '@/components/WhatsAppCommunity'
 
 /** Public page: who we are, how it works, and the upcoming matches. Works logged in or out. */
 export function AboutPage() {
@@ -67,6 +68,8 @@ export function AboutPage() {
           ))}
         </ol>
       </section>
+
+      <JoinCommunityCard text="Match announcements, registration alerts and team chat happen in our WhatsApp community. Anyone is welcome." />
 
       <section className="space-y-3">
         <h2 className="text-xl font-extrabold">Ground rules</h2>
