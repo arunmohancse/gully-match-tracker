@@ -4,8 +4,10 @@ import { BrandLockup } from '@/components/BrandLockup'
 import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
 import { FullPageSpinner } from '@/components/RouteGuards'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 import { AppLayout } from './AppLayout'
+import { CricketLoader } from '@/components/CricketLoader'
 
 /** For pages that work both logged in (full app shell) and logged out (minimal shell), e.g. shared match links. */
 export function ViewerLayout() {
@@ -15,12 +17,13 @@ export function ViewerLayout() {
 
   return (
     <div className="min-h-screen">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+      <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3">
         <span className="text-brand">
           <BrandLockup />
         </span>
         <span className="flex items-center gap-4 text-sm font-medium">
-          <Link to="/about" className="text-slate-600 hover:underline">
+          <ThemeToggle className="-mr-2" />
+          <Link to="/about" className="text-muted hover:underline">
             About
           </Link>
           <Link to="/login" className="text-brand underline">
@@ -29,11 +32,11 @@ export function ViewerLayout() {
         </span>
       </header>
       <main className="mx-auto max-w-4xl p-4 md:p-8">
-        <Suspense fallback={<p className="text-slate-500">Loading...</p>}>
+        <Suspense fallback={<CricketLoader label="Loading page" />}>
           <Outlet />
         </Suspense>
       </main>
-      <footer className="space-y-2 border-t border-slate-200 bg-white py-4 text-center">
+      <footer className="space-y-2 border-t border-line bg-surface py-4 text-center">
         <InstagramLink />
         <PartOfParent />
       </footer>

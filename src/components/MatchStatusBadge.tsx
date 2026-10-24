@@ -1,20 +1,22 @@
 import { Badge } from '@/components/ui/badge'
 import type { Match } from '@/types/domain'
-import { STATUS_LABEL } from '@/utils/matchStatus'
+import { matchStatusLabel } from '@/utils/matchStatus'
 import { opensOnDay } from '@/utils/registration'
 
 const STYLES: Record<Match['status'], string> = {
-  DRAFT: 'bg-yellow-100 text-yellow-800',
-  UPCOMING: 'bg-sky-100 text-sky-800',
-  OPEN: 'bg-green-100 text-green-800',
-  FULL: 'bg-orange-100 text-orange-800',
-  CLOSED: 'bg-slate-200 text-slate-700',
-  COMPLETED: 'bg-blue-100 text-blue-800',
-  CANCELLED: 'bg-slate-200 text-slate-500 line-through',
+  DRAFT: 'bg-warning-tint text-warning',
+  UPCOMING: 'bg-info-soft text-info',
+  OPEN: 'bg-success-tint text-success',
+  FULL: 'bg-warning-tint text-warning',
+  CLOSED: 'bg-surface-4 text-fg-2',
+  COMPLETED: 'bg-info-soft text-info',
+  CANCELLED: 'bg-surface-4 text-subtle line-through',
 }
 
-/** A published match whose registration has not opened yet shows "Registration not open yet" instead of "Registration open". The opening day is shown inside the match. */
-export function MatchStatusBadge({ match }: { match: Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'> }) {
-  if (opensOnDay(match)) return <Badge className={STYLES.UPCOMING}>{STATUS_LABEL.UPCOMING}</Badge>
-  return <Badge className={STYLES[match.status]}>{STATUS_LABEL[match.status]}</Badge>
+type StatusFields = Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'>
+
+/** "Registration not open yet" until the opening day; the opening day itself is shown inside the match. */
+export function MatchStatusBadge({ match }: { match: StatusFields }) {
+  const status = opensOnDay(match) ? 'UPCOMING' : match.status
+  return <Badge className={STYLES[status]}>{matchStatusLabel(match)}</Badge>
 }

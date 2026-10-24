@@ -1,4 +1,5 @@
-import type { MatchStatus } from '@/types/domain'
+import type { Match, MatchStatus } from '@/types/domain'
+import { opensOnDay } from './registration'
 
 export const STATUS_LABEL: Record<MatchStatus, string> = {
   DRAFT: 'Draft',
@@ -8,6 +9,11 @@ export const STATUS_LABEL: Record<MatchStatus, string> = {
   CLOSED: 'Registration closed',
   COMPLETED: 'Completed',
   CANCELLED: 'Cancelled',
+}
+
+/** A published match whose registration has not opened yet reads "Registration not open yet" instead of "Registration open". */
+export function matchStatusLabel(match: Pick<Match, 'status' | 'registration_opens_at' | 'registration_closes_at'>): string {
+  return opensOnDay(match) ? STATUS_LABEL.UPCOMING : STATUS_LABEL[match.status]
 }
 
 export interface StatusAction {

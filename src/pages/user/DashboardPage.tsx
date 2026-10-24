@@ -1,28 +1,36 @@
 import { Link } from 'react-router-dom'
 import { MyDuesCard } from '@/components/MyDuesCard'
 import { MatchList } from '@/components/MatchList'
+import { NextMatchHero } from '@/components/NextMatchHero'
+import { PageHeader } from '@/components/PageHeader'
 import { RegistrationItem } from '@/components/RegistrationItem'
 import { useAuth } from '@/hooks/useAuth'
+import { useMatches } from '@/hooks/useMatches'
 import { useMyRegistrations } from '@/hooks/useRegistrations'
-import { todayISO } from '@/utils/dates'
+import { formatShortDate, formatWeekday, todayISO } from '@/utils/dates'
 import { splitRegistrations } from '@/utils/registration'
 
 export function DashboardPage() {
   const { profile } = useAuth()
+  const today = todayISO()
   const { data: registrations } = useMyRegistrations()
-  const { upcoming } = splitRegistrations(registrations ?? [], todayISO())
+  const { upcoming } = splitRegistrations(registrations ?? [], today)
+  const { data: matches } = useMatches('upcoming')
+  const hasNext = (matches ?? []).some((m) => m.status !== 'CANCELLED')
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Hi {profile?.full_name.split(' ')[0]}</h1>
+    <div className="space-y-5">
+      <PageHeader eyebrow={`${formatWeekday(today)}, ${formatShortDate(today).replace(/ \d{4}$/, '')}`} title={`Hi ${profile?.full_name.split(' ')[0] ?? 'there'}`} />
 
       <MyDuesCard />
+
+      <NextMatchHero basePath="/matches" actionLabel="View match" />
 
       {upcoming.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-slate-700">My registrations</h2>
-            <Link to="/my-registrations" className="text-sm font-medium text-brand underline">
+            <h2 className="font-extrabold">My registrations</h2>
+            <Link to="/my-registrations" className="text-sm font-bold text-brand hover:underline">
               See all
             </Link>
           </div>
@@ -35,8 +43,21 @@ export function DashboardPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="font-semibold text-slate-700">Upcoming matches</h2>
-        <MatchList scope="upcoming" basePath="/matches" actionLabel="View match" emptyText="No upcoming matches yet. Check back soon." hideCancelled />
+        <div className="flex items-center justify-between">
+          <h2 className="font-extrabold">Coming up</h2>
+          <Link to="/matches" className="text-sm font-bold text-brand hover:underline">
+            All matches
+          </Link>
+        </div>
+        <MatchList
+          scope="upcoming"
+          basePath="/matches"
+          actionLabel="View match"
+          emptyText={hasNext ? 'Nothing else scheduled yet.' : 'No upcoming matches yet. Check back soon.'}
+          hideCancelled
+          variant="row"
+          skip={1}
+        />
       </section>
     </div>
   )

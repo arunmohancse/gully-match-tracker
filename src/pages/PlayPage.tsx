@@ -5,8 +5,8 @@ export function PlayPage() {
   return (
     <div className="mx-auto max-w-xl space-y-4">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-brand">Gully Dash</h1>
-        <p className="text-slate-600">Time your swing, hit the big ones and see how long you last.</p>
+        <h1 className="font-display text-5xl font-bold uppercase leading-none tracking-wide text-brand">Gully Dash</h1>
+        <p className="text-muted">Time your swing, hit the big ones and see how long you last.</p>
       </div>
       <GullyDash />
     </div>

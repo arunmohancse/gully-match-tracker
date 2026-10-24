@@ -7,6 +7,8 @@ import { toFriendlyMessage } from '@/lib/errors'
 import { AUDIT_CATEGORIES, describeAudit, type AuditCategory } from '@/utils/audit'
 import { formatShortDate } from '@/utils/dates'
 import { formatReminded } from '@/utils/reminders'
+import { PageHeader } from '@/components/PageHeader'
+import { CricketLoader } from '@/components/CricketLoader'
 
 /** Admin activity log: who did what, newest first. Optionally filtered to one match via ?match=<id>. */
 export function ActivityPage() {
@@ -39,14 +41,14 @@ export function ActivityPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Activity</h1>
+      <PageHeader title="Activity" />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor="type" className="text-sm font-medium">
             Type
           </label>
-          <select id="type" value={category} onChange={(e) => update({ type: e.target.value as AuditCategory })} className="h-11 w-full rounded-md border border-slate-300 bg-white px-3">
+          <select id="type" value={category} onChange={(e) => update({ type: e.target.value as AuditCategory })} className="h-11 w-full rounded-md border border-line-strong bg-surface px-3">
             {(Object.keys(AUDIT_CATEGORIES) as AuditCategory[]).map((c) => (
               <option key={c} value={c}>
                 {AUDIT_CATEGORIES[c].label}
@@ -58,7 +60,7 @@ export function ActivityPage() {
           <label htmlFor="match" className="text-sm font-medium">
             Match
           </label>
-          <select id="match" value={matchId} onChange={(e) => update({ match: e.target.value })} className="h-11 w-full rounded-md border border-slate-300 bg-white px-3">
+          <select id="match" value={matchId} onChange={(e) => update({ match: e.target.value })} className="h-11 w-full rounded-md border border-line-strong bg-surface px-3">
             <option value="">All matches</option>
             {(matches ?? []).map((m) => (
               <option key={m.id} value={m.id}>
@@ -69,10 +71,10 @@ export function ActivityPage() {
         </div>
       </div>
 
-      {isLoading && <p className="text-slate-500">Loading activity...</p>}
+      {isLoading && <CricketLoader label="Loading activity" />}
       {error && (
         <div className="space-y-2">
-          <p role="alert" className="text-red-600">
+          <p role="alert" className="text-danger">
             {toFriendlyMessage(error)}
           </p>
           <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -80,15 +82,15 @@ export function ActivityPage() {
           </Button>
         </div>
       )}
-      {!isLoading && !error && entries.length === 0 && <p className="text-slate-500">No activity found.</p>}
+      {!isLoading && !error && entries.length === 0 && <p className="text-subtle">No activity found.</p>}
 
       {entries.length > 0 && (
         <Card className="p-0">
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line-soft">
             {entries.map((e) => (
               <li key={e.id} className="px-3 py-3">
                 <p className="text-sm">{describeAudit(e, names)}</p>
-                <p className="text-xs text-slate-500">{formatReminded(e.created_at)}</p>
+                <p className="text-xs text-subtle">{formatReminded(e.created_at)}</p>
               </li>
             ))}
           </ul>

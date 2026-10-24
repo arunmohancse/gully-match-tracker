@@ -13,27 +13,30 @@ import { ShareMatchButton } from '@/components/ShareMatchButton'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useChangeMatchStatus, useMatch } from '@/hooks/useMatches'
+import { useMatchCounts } from '@/hooks/useRegistrations'
 import { toFriendlyMessage } from '@/lib/errors'
 import { LinkButton } from '@/components/ui/link-button'
 import { opensLater } from '@/utils/registration'
 import { cancelAction, isUnopened, nextStepAction, secondaryStatusActions, type StatusAction } from '@/utils/matchStatus'
+import { CricketLoader } from '@/components/CricketLoader'
 
 export function AdminMatchPage() {
   const { id } = useParams()
   const { data: match, isLoading, error } = useMatch(id)
+  const { data: counts } = useMatchCounts(id ? [id] : [])
   const changeStatus = useChangeMatchStatus()
   const [pending, setPending] = useState<StatusAction | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  if (isLoading) return <p className="text-slate-500">Loading match...</p>
+  if (isLoading) return <CricketLoader label="Loading match" />
   if (error) {
     return (
-      <p role="alert" className="text-red-600">
+      <p role="alert" className="text-danger">
         {toFriendlyMessage(error)}
       </p>
     )
   }
-  if (!match) return <p className="text-slate-600">Match not found.</p>
+  if (!match) return <p className="text-muted">Match not found.</p>
 
   async function confirm() {
     if (!pending || !match) return
@@ -60,10 +63,10 @@ export function AdminMatchPage() {
 
   return (
     <div className="space-y-4">
-      <MatchDetails match={match} editTo={canEdit ? `/admin/matches/${match.id}/edit` : undefined} />
+      <MatchDetails match={match} backTo="/admin/matches" counts={counts?.[0]} editTo={canEdit ? `/admin/matches/${match.id}/edit` : undefined} />
 
       <Card className="space-y-2">
-        <h2 className="font-semibold">Manage</h2>
+        <h2 className="font-extrabold">Manage</h2>
         {/* One clear next step. A finished match has none, so the useful thing to do next is copy it. */}
         {next ? (
           <Button className="w-full" variant={next.to === 'OPEN' || next.to === 'UPCOMING' ? 'default' : 'outline'} onClick={() => ask(next)}>
@@ -89,26 +92,26 @@ export function AdminMatchPage() {
           </div>
         )}
         {match.status === 'DRAFT' && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-subtle">
             {publishFirst
               ? 'Draft matches are visible only to admins. Publish it to show it to players now; registration opens by itself on the registration opening day.'
               : 'Draft matches are visible only to admins. Publish it to show it to players as "Registration not open yet", or set a future registration opening day in Edit and it will open by itself that day.'}
           </p>
         )}
         {match.status === 'UPCOMING' && (
-          <p className="text-sm text-slate-500">Players can see this match but cannot register yet. Press Open registration when you are ready.</p>
+          <p className="text-sm text-subtle">Players can see this match but cannot register yet. Press Open registration when you are ready.</p>
         )}
       </Card>
 
       {match.status !== 'DRAFT' && (
         <Card className="space-y-3">
-          <h2 className="font-semibold">Share</h2>
+          <h2 className="font-extrabold">Share with the group</h2>
           <div className="space-y-1">
-            <h3 className="text-sm text-slate-600">Match announcement</h3>
+            <h3 className="text-sm text-muted">Match announcement</h3>
             <ShareMatchButton match={match} />
           </div>
-          <div className="space-y-1 border-t border-slate-100 pt-3">
-            <h3 className="text-sm text-slate-600">Player list (main and waiting list)</h3>
+          <div className="space-y-1 border-t border-line-soft pt-3">
+            <h3 className="text-sm text-muted">Player list (main and waiting list)</h3>
             <ShareListButton match={match} />
           </div>
         </Card>
@@ -132,10 +135,10 @@ export function AdminMatchPage() {
       </Button>
 
       {cancel && (
-        <Card className="space-y-2 border-red-200">
-          <h2 className="font-semibold text-red-800">Danger zone</h2>
-          <p className="text-sm text-slate-600">Cancelling cannot be undone. Players will see the match as cancelled.</p>
-          <Button variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50 sm:w-auto" onClick={() => ask(cancel)}>
+        <Card className="space-y-2 border-danger-line">
+          <h2 className="font-extrabold text-danger">Danger zone</h2>
+          <p className="text-sm text-muted">Cancelling cannot be undone. Players will see the match as cancelled.</p>
+          <Button variant="outline" className="w-full border-danger-line text-danger hover:bg-danger-soft sm:w-auto" onClick={() => ask(cancel)}>
             {cancel.label}
           </Button>
         </Card>

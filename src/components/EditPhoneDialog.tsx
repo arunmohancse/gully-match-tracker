@@ -37,9 +37,9 @@ export function EditPhoneDialog({ player, onClose }: { player: PlayerSummary | n
     <Dialog.Root open={!!player} onOpenChange={(o) => !o && close()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 space-y-4 rounded-lg bg-white p-5 shadow-lg">
+        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 space-y-4 rounded-lg bg-surface p-5 shadow-lg">
           <Dialog.Title className="text-lg font-semibold">Change phone for {player?.full_name}</Dialog.Title>
-          <Dialog.Description className="text-sm text-slate-600">
+          <Dialog.Description className="text-sm text-muted">
             Current number: {player?.phone ?? 'none'}. The change takes effect right away and is recorded in the activity history.
           </Dialog.Description>
           <form onSubmit={save} className="space-y-4" noValidate>
@@ -47,7 +47,7 @@ export function EditPhoneDialog({ player, onClose }: { player: PlayerSummary | n
               <Input id="adminNewPhone" type="tel" autoComplete="off" placeholder="98765 43210" value={value} onChange={(e) => setValue(e.target.value)} />
             </Field>
             {error && (
-              <p role="alert" className="text-sm text-red-600">
+              <p role="alert" className="text-sm text-danger">
                 {error}
               </p>
             )}

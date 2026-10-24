@@ -25,23 +25,23 @@ export function PhoneRequestsCard() {
   return (
     <Card className="space-y-3">
       <div>
-        <h2 className="text-lg font-semibold">Phone number change requests ({data.length})</h2>
-        <p className="text-sm text-slate-600">Message the new number on WhatsApp to confirm it is really them, then approve.</p>
+        <h2 className="font-extrabold">Phone number change requests ({data.length})</h2>
+        <p className="text-sm text-muted">Message the new number on WhatsApp to confirm it is really them, then approve.</p>
       </div>
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
-      <ul className="divide-y divide-slate-100">
+      <ul className="divide-y divide-line-soft">
         {data.map((r) => {
           const chat = buildWhatsAppChatUrl(r.new_phone)
           return (
             <li key={r.id} className="space-y-2 py-3 first:pt-0 last:pb-0">
               <div>
                 <div className="font-medium">{r.full_name}</div>
-                <div className="text-sm text-slate-600">
-                  {r.current_phone ?? 'No phone'} → <span className="font-medium text-slate-900">{r.new_phone}</span>
+                <div className="text-sm text-muted">
+                  {r.current_phone ?? 'No phone'} → <span className="font-medium text-fg">{r.new_phone}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">

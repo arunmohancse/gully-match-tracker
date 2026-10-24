@@ -25,7 +25,7 @@ export function PlayerPaymentInfo({ match, reg, variant = 'full' }: Props) {
   // Shared cost, expenses not divided yet.
   if (isShared(match) && owed === null && unpaid) {
     return (
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-muted">
         {full ? 'The cost is shared equally after the match. Your share will appear here once the organiser has calculated it.' : 'Cost shared after the match'}
       </p>
     )
@@ -36,14 +36,14 @@ export function PlayerPaymentInfo({ match, reg, variant = 'full' }: Props) {
 
   return (
     <div className="space-y-1">
-      <div className={full ? 'text-sm text-slate-600' : 'sr-only'}>{label}</div>
+      <div className={full ? 'text-sm text-muted' : 'sr-only'}>{label}</div>
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        {!full && <span className="text-slate-600">{label}:</span>}
+        {!full && <span className="text-muted">{label}:</span>}
         <PaymentBadge status={reg.payment_status} />
         {amount != null && <span className="font-semibold">{formatINR(amount)}</span>}
       </div>
       {full && unpaid && (
-        <p className="whitespace-pre-line text-xs text-slate-600">
+        <p className="whitespace-pre-line text-xs text-muted">
           {instructions ? `How to pay:\n${instructions}` : 'Pay the organiser. They will mark it as paid.'}
         </p>
       )}

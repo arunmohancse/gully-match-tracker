@@ -4,11 +4,13 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { BrandLockup } from '@/components/BrandLockup'
 import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { authService } from '@/services/authService'
+import { CricketLoader } from '@/components/CricketLoader'
 
 const USER_NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -44,13 +46,14 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-0 md:pl-56">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:shadow">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-surface focus:px-3 focus:py-2 focus:shadow">
         Skip to content
       </a>
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r border-slate-200 bg-white p-4 md:flex">
-        <div className="mb-6 text-brand">
+      <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r border-line bg-surface p-4 md:flex">
+        <div className="mb-6 flex items-start justify-between gap-2 text-brand">
           <BrandLockup />
+          <ThemeToggle className="-mr-2 shrink-0 text-fg" />
         </div>
         <nav className="flex flex-1 flex-col gap-1" aria-label="Main">
           {nav.map(({ to, label, icon: Icon, end }) => (
@@ -59,22 +62,22 @@ export function AppLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                cn('flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium', isActive ? 'bg-brand/10 text-brand' : 'hover:bg-slate-100')
+                cn('flex items-center gap-2 rounded-lg px-3 py-2 text-sm', isActive ? 'bg-brand/10 font-bold text-brand' : 'font-medium hover:bg-surface-3')
               }
             >
               <Icon className="size-4" aria-hidden /> {label}
             </NavLink>
           ))}
         </nav>
-        <div className="space-y-2 border-t border-slate-200 pt-3 text-sm">
+        <div className="space-y-2 border-t border-line pt-3 text-sm">
           <div className="space-y-1.5 pb-1 text-center">
-            <NavLink to="/about" className="block text-xs text-slate-500 hover:text-brand hover:underline">
+            <NavLink to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
               About us
             </NavLink>
             <InstagramLink label="Instagram" />
             <PartOfParent />
           </div>
-          <div className="truncate text-slate-600">
+          <div className="truncate text-muted">
             {profile?.full_name}
             {isAdmin && ' (Admin)'}
           </div>
@@ -82,45 +85,50 @@ export function AppLayout() {
             <LogOut className="size-4" aria-hidden /> {signingOut ? 'Signing out...' : 'Sign out'}
           </Button>
           {error && (
-            <p role="alert" className="text-red-600">
+            <p role="alert" className="text-danger">
               {error}
             </p>
           )}
         </div>
       </aside>
 
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+      <header className="sticky top-0 z-30 flex h-15 items-center justify-between border-b border-line bg-surface/95 px-4 backdrop-blur md:hidden">
         <span className="text-brand">
           <BrandLockup />
         </span>
-        <Button variant="ghost" size="sm" onClick={handleSignOut} loading={signingOut} aria-label="Sign out">
-          <LogOut className="size-4" aria-hidden />
-        </Button>
+        <span className="flex items-center gap-1">
+          <ThemeToggle />
+          <Button variant="ghost" size="sm" onClick={handleSignOut} loading={signingOut} aria-label="Sign out">
+            <LogOut className="size-4" aria-hidden />
+          </Button>
+        </span>
       </header>
 
       <main id="main" tabIndex={-1} className="mx-auto max-w-4xl p-4 outline-none md:p-8">
         {error && (
-          <p role="alert" className="mb-3 text-sm text-red-600 md:hidden">
+          <p role="alert" className="mb-3 text-sm text-danger md:hidden">
             {error}
           </p>
         )}
-        <Suspense fallback={<p className="text-slate-500">Loading...</p>}>
+        <Suspense fallback={<CricketLoader label="Loading page" />}>
           <Outlet />
         </Suspense>
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 flex border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Main">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Main">
         {nav.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
             className={({ isActive }) =>
-              cn('flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium', isActive ? 'text-brand' : 'text-slate-500')
+              cn('group flex flex-1 flex-col items-center gap-1 pb-2 pt-2.5 text-[11px]', isActive ? 'font-extrabold text-brand' : 'font-semibold text-subtle')
             }
           >
-            <Icon className="size-5" aria-hidden />
+            <span className="flex h-7 w-14 items-center justify-center rounded-full group-aria-[current=page]:bg-brand/12">
+              <Icon className="size-5" aria-hidden />
+            </span>
             {label === 'My Registrations' ? 'Mine' : label}
           </NavLink>
         ))}

@@ -9,6 +9,7 @@ import type { Match } from '@/types/domain'
 import { buildPlayerListMessage } from '@/utils/playerList'
 import { buildWhatsAppShareUrl } from '@/utils/whatsapp'
 import { copyText } from '@/utils/clipboard'
+import { CricketLoader } from '@/components/CricketLoader'
 
 /** Admin: send the current main list and waiting list to a WhatsApp group (you pick the group in WhatsApp). */
 export function ShareListButton({ match }: { match: Match }) {
@@ -16,10 +17,10 @@ export function ShareListButton({ match }: { match: Match }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState<string | null>(null)
 
-  if (isLoading) return <p className="text-sm text-slate-500">Loading player list...</p>
+  if (isLoading) return <CricketLoader size="sm" label="Loading player list" />
   if (error || !regs) {
     return (
-      <p role="alert" className="text-sm text-red-600">
+      <p role="alert" className="text-sm text-danger">
         {toFriendlyMessage(error)}
       </p>
     )
@@ -48,13 +49,13 @@ export function ShareListButton({ match }: { match: Match }) {
         <LinkButton onClick={copy}>{copied ? 'List copied' : 'Copy list'}</LinkButton>
       </div>
       <details>
-        <summary className="cursor-pointer text-sm text-slate-600">Preview the list</summary>
-        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 p-3 text-sm" aria-label="Player list message">
+        <summary className="cursor-pointer text-sm text-muted">Preview the list</summary>
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-surface-2 p-3 text-sm" aria-label="Player list message">
           {message}
         </pre>
       </details>
       {copyError && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {copyError}
         </p>
       )}

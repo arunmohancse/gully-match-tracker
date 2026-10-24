@@ -20,11 +20,11 @@ export function ReminderQueue({ regs, match, onClose }: { regs: AdminRegistratio
   }
 
   return (
-    <Card className="space-y-3 border-green-300">
+    <Card className="space-y-3 border-success-line">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="font-semibold">WhatsApp reminders ({opened.size} of {regs.length} opened)</h2>
-          <p className="text-sm text-slate-600">
+          <h2 className="font-extrabold">WhatsApp reminders ({opened.size} of {regs.length} opened)</h2>
+          <p className="text-sm text-muted">
             WhatsApp links cannot send messages automatically. Open each chat below, check the message, and press <strong>Send</strong> in WhatsApp yourself. Then come
             back here for the next one.
           </p>
@@ -39,22 +39,22 @@ export function ReminderQueue({ regs, match, onClose }: { regs: AdminRegistratio
           <MessageCircle className="size-4" aria-hidden /> Open next chat: {next.player?.full_name ?? 'player'}
         </Button>
       ) : (
-        <p role="status" className="rounded-md bg-green-50 p-2 text-sm text-green-800">
+        <p role="status" className="rounded-md bg-success-soft p-2 text-sm text-success">
           All chats opened. Make sure you pressed Send in each WhatsApp window.
         </p>
       )}
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
 
-      <ul className="divide-y divide-slate-100 rounded-md border border-slate-200">
+      <ul className="divide-y divide-line-soft rounded-md border border-line">
         {regs.map((r) => (
           <li key={r.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
             <span className="flex items-center gap-2">
-              {opened.has(r.id) && <Check className="size-4 text-green-700" aria-label="Opened" />}
+              {opened.has(r.id) && <Check className="size-4 text-success" aria-label="Opened" />}
               {r.player?.full_name ?? 'Unknown player'}
             </span>
             <Button size="sm" variant="outline" onClick={() => void open(r)}>

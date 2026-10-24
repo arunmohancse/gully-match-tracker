@@ -459,7 +459,7 @@ export function GullyDash() {
         ref={canvasRef}
         role="img"
         aria-label="Gully Dash cricket game. Tap or press Space to hit the ball as it reaches the bat."
-        className="w-full cursor-pointer select-none rounded-lg border border-slate-200 bg-white"
+        className="w-full cursor-pointer select-none rounded-lg border border-line bg-surface"
         style={{ aspectRatio: `${W} / ${H}`, touchAction: 'manipulation' }}
       />
       {finished ? (
@@ -467,10 +467,10 @@ export function GullyDash() {
           <Button onClick={shareScore}>
             <Share2 className="size-4" aria-hidden /> Share score
           </Button>
-          {note && <p className="text-center text-xs text-slate-500">{note}</p>}
+          {note && <p className="text-center text-xs text-subtle">{note}</p>}
         </div>
       ) : (
-        <p className="text-center text-xs text-slate-500">Tap, click or press Space to swing.</p>
+        <p className="text-center text-xs text-subtle">Tap, click or press Space to swing.</p>
       )}
       <p className="sr-only" aria-live="polite">
         {status}

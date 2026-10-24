@@ -6,23 +6,23 @@ import type { RosterEntry } from '@/types/domain'
 function Section({ title, entries, empty, tone }: { title: string; entries: RosterEntry[]; empty: string; tone: 'green' | 'orange' }) {
   return (
     <section aria-label={title}>
-      <h3 className={cn('mb-2 text-sm font-semibold uppercase tracking-wide', tone === 'green' ? 'text-green-700' : 'text-orange-700')}>
+      <h3 className={cn('mb-2 text-sm font-semibold uppercase tracking-wide', tone === 'green' ? 'text-success' : 'text-warning')}>
         {title} ({entries.length})
       </h3>
       {entries.length === 0 ? (
-        <p className="text-sm text-slate-500">{empty}</p>
+        <p className="text-sm text-subtle">{empty}</p>
       ) : (
-        <ol className="divide-y divide-slate-100 rounded-md border border-slate-200">
+        <ol className="divide-y divide-line-soft rounded-md border border-line">
           {entries.map((e) => (
             <li
               key={`${e.list_type}-${e.list_position}`}
-              className={cn('flex items-center gap-3 px-3 py-2 text-sm', e.is_me && 'bg-green-50 font-semibold')}
+              className={cn('flex items-center gap-3 px-3 py-2 text-sm', e.is_me && 'bg-success-soft font-semibold')}
               aria-current={e.is_me ? 'true' : undefined}
             >
-              <span className="w-6 text-right text-slate-500">{e.list_position}.</span>
+              <span className="w-6 text-right text-subtle">{e.list_position}.</span>
               <span className="flex-1">{e.display_name}</span>
               {e.is_me && (
-                <span className="flex items-center gap-1 text-xs text-green-700">
+                <span className="flex items-center gap-1 text-xs text-success">
                   <Check className="size-3" aria-hidden /> You
                 </span>
               )}

@@ -50,27 +50,27 @@ export function SettleUpPanel({ match }: { match: Match }) {
 
   return (
     <Card className="space-y-3">
-      <h2 className="font-semibold">Settle up: share the cost</h2>
+      <h2 className="font-extrabold">Settle up: share the cost</h2>
 
       {f.shares_calculated && f.share_amount != null && !f.shares_stale && (
-        <p role="status" className="rounded-md bg-green-50 p-2 text-sm text-green-800">
+        <p role="status" className="rounded-md bg-success-soft p-2 text-sm text-success">
           Calculated: each of {f.main_count} players owes <strong>{money(f.share_amount)}</strong>.
         </p>
       )}
       {f.shares_stale && (
-        <p role="alert" className="rounded-md bg-orange-50 p-2 text-sm text-orange-800">
+        <p role="alert" className="rounded-md bg-warning-soft p-2 text-sm text-warning">
           The expenses or the main list changed after the shares were calculated. Recalculate so every player owes the right amount.
         </p>
       )}
       {done && !f.shares_stale && <p className="sr-only" role="status">{done}</p>}
 
       {preview && (
-        <p className="text-sm text-slate-700">
+        <p className="text-sm text-fg-2">
           {money(f.expenses_total)} ÷ {f.main_count} players = {money(preview.exact)}, rounded up to <strong>{money(preview.share)}</strong> each
           {preview.surplus > 0 ? ` (${money(preview.surplus)} over the expenses).` : '.'}
         </p>
       )}
-      {blocker && <p className="text-sm text-slate-600">{blocker}</p>}
+      {blocker && <p className="text-sm text-muted">{blocker}</p>}
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1.5">
@@ -81,7 +81,7 @@ export function SettleUpPanel({ match }: { match: Match }) {
             id="share-step"
             value={step}
             onChange={(e) => setStep(Number(e.target.value) as ShareStep)}
-            className="h-11 rounded-md border border-slate-300 bg-white px-3"
+            className="h-11 rounded-md border border-line-strong bg-surface px-3"
           >
             {SHARE_STEPS.map((s) => (
               <option key={s} value={s}>

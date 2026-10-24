@@ -17,16 +17,16 @@ export function AuthMethods({ emailLabel, children }: { emailLabel: string; chil
       <GoogleButton />
       {showForm ? (
         <>
-          <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-slate-400" aria-hidden>
-            <span className="h-px flex-1 bg-slate-200" />
+          <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-faint" aria-hidden>
+            <span className="h-px flex-1 bg-line" />
             or
-            <span className="h-px flex-1 bg-slate-200" />
+            <span className="h-px flex-1 bg-line" />
           </div>
           {children}
         </>
       ) : (
         <p className="text-center">
-          <button type="button" className="text-sm font-medium text-brand underline" aria-expanded={false} onClick={() => setOpen(true)}>
+          <button type="button" className="min-h-11 w-full rounded-xl border border-line-strong text-sm font-bold hover:bg-surface-3 focus-visible:outline-2 focus-visible:outline-brand" aria-expanded={false} onClick={() => setOpen(true)}>
             {emailLabel}
           </button>
         </p>

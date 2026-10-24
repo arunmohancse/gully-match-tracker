@@ -5,13 +5,14 @@ import { useFinancials } from '@/hooks/usePayments'
 import { toFriendlyMessage } from '@/lib/errors'
 import { cn } from '@/lib/utils'
 import { formatINR } from '@/utils/money'
+import { CricketLoader } from '@/components/CricketLoader'
 
 export function Tile({ label, value, tone, hint }: { label: string; value: ReactNode; tone?: 'good' | 'bad' | 'warn'; hint?: string }) {
   return (
-    <div className="rounded-md border border-slate-200 p-3">
-      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
-      <div className={cn('text-xl font-bold', tone === 'good' && 'text-green-700', tone === 'bad' && 'text-red-700', tone === 'warn' && 'text-orange-700')}>{value}</div>
-      {hint && <div className="text-xs text-slate-500">{hint}</div>}
+    <div className="rounded-md border border-line p-3">
+      <div className="text-xs uppercase tracking-wide text-subtle">{label}</div>
+      <div className={cn('text-xl font-bold', tone === 'good' && 'text-success', tone === 'bad' && 'text-danger', tone === 'warn' && 'text-warning')}>{value}</div>
+      {hint && <div className="text-xs text-subtle">{hint}</div>}
     </div>
   )
 }
@@ -20,11 +21,13 @@ export function Tile({ label, value, tone, hint }: { label: string; value: React
 export function PaymentSummary({ matchId }: { matchId: string }) {
   const { data, isLoading, error, refetch } = useFinancials([matchId])
 
-  if (isLoading) return <Card className="text-slate-500">Loading payment summary...</Card>
+  if (isLoading) return <Card>
+      <CricketLoader size="sm" label="Loading payment summary" />
+    </Card>
   if (error) {
     return (
       <Card className="space-y-2">
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="text-danger">
           {toFriendlyMessage(error)}
         </p>
         <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -39,7 +42,7 @@ export function PaymentSummary({ matchId }: { matchId: string }) {
   if (f.cost_model === 'SHARED_COST') {
     return (
       <Card className="space-y-3">
-        <h2 className="font-semibold">Payment summary</h2>
+        <h2 className="font-extrabold">Payment summary</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Tile label="Expenses" value={formatINR(f.expenses_total)} />
           <Tile label="Players sharing" value={f.main_count} hint="Main list" />
@@ -56,10 +59,10 @@ export function PaymentSummary({ matchId }: { matchId: string }) {
             <Tile label="If everyone pays" value={formatINR(f.projected_balance)} hint="Left over from rounding up" />
           )}
         </div>
-        {f.shares_stale && <p className="text-sm text-orange-800">Shares are out of date. Recalculate them below.</p>}
-        {f.waived_count > 0 && <p className="text-sm text-slate-600">{f.waived_count} player(s) have their share waived.</p>}
+        {f.shares_stale && <p className="text-sm text-warning">Shares are out of date. Recalculate them below.</p>}
+        {f.waived_count > 0 && <p className="text-sm text-muted">{f.waived_count} player(s) have their share waived.</p>}
         {f.refunds_due > 0 && (
-          <p role="status" className="rounded-md bg-orange-50 p-2 text-sm text-orange-800">
+          <p role="status" className="rounded-md bg-warning-soft p-2 text-sm text-warning">
             Refunds due: {formatINR(f.refunds_due)} for cancelled players who had paid. Mark them as refunded once returned.
           </p>
         )}
@@ -71,7 +74,7 @@ export function PaymentSummary({ matchId }: { matchId: string }) {
 
   return (
     <Card className="space-y-3">
-      <h2 className="font-semibold">Payment summary</h2>
+      <h2 className="font-extrabold">Payment summary</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {hasFee && <Tile label="Expected" value={formatINR(f.expected)} hint={`${f.main_count} players × ${formatINR(f.registration_fee)}`} />}
         {hasFee && <Tile label="Collected" value={formatINR(f.collected)} tone="good" hint={`${f.paid_count} paid`} />}
@@ -80,9 +83,9 @@ export function PaymentSummary({ matchId }: { matchId: string }) {
         <Tile label="Balance" value={formatINR(f.balance)} tone={f.balance < 0 ? 'bad' : 'good'} hint="Collected − expenses" />
         {hasFee && <Tile label="If everyone pays" value={formatINR(f.projected_balance)} tone={f.projected_balance < 0 ? 'bad' : undefined} hint="Collected + pending − expenses" />}
       </div>
-      {f.waived_count > 0 && <p className="text-sm text-slate-600">{f.waived_count} player(s) have their fee waived.</p>}
+      {f.waived_count > 0 && <p className="text-sm text-muted">{f.waived_count} player(s) have their fee waived.</p>}
       {f.refunds_due > 0 && (
-        <p role="status" className="rounded-md bg-orange-50 p-2 text-sm text-orange-800">
+        <p role="status" className="rounded-md bg-warning-soft p-2 text-sm text-warning">
           Refunds due: {formatINR(f.refunds_due)} for cancelled players who had paid. Mark them as refunded once returned.
         </p>
       )}

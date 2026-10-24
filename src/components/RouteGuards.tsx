@@ -2,9 +2,10 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { AccountGate } from '@/components/AccountGate'
 import { PhoneGate } from '@/components/PhoneGate'
 import { useAuth } from '@/hooks/useAuth'
+import { CricketLoader } from '@/components/CricketLoader'
 
 export function FullPageSpinner() {
-  return <div className="grid min-h-screen place-items-center text-slate-500">Loading...</div>
+  return <CricketLoader fullScreen label="Loading Gully League" />
 }
 
 /** UX guard only. Authorization is enforced by Supabase RLS/RPCs. */

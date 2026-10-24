@@ -23,6 +23,23 @@ export function formatWeekday(iso: string): string {
   return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long' })
 }
 
+/** "2026-10-25" -> { day: '25', month: 'OCT', weekday: 'SUN' }: the calendar block on match cards. */
+export function dateBlockParts(iso: string): { day: string; month: string; weekday: string } {
+  const { m, d } = parseDate(iso)
+  return { day: String(d).padStart(2, '0'), month: MONTHS[m - 1].slice(0, 3).toUpperCase(), weekday: formatWeekday(iso).slice(0, 3).toUpperCase() }
+}
+
+/** How far off a match is, for the "Next match" card: "Today", "Tomorrow", "In 5 days", or the weekday a week or more out. */
+export function relativeDayLabel(iso: string, today: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const [ty, tm, td] = today.split('-').map(Number)
+  const days = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 86_400_000)
+  if (days === 0) return 'Today'
+  if (days === 1) return 'Tomorrow'
+  if (days > 1 && days < 7) return `In ${days} days`
+  return formatWeekday(iso)
+}
+
 /** "06:00:00" -> "6:00 AM" */
 export function formatTime(time: string): string {
   const [h, m] = time.split(':').map(Number)

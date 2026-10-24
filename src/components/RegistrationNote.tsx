@@ -6,7 +6,7 @@ import { hasPayments } from '@/utils/cost'
 export function RegistrationNote({ match }: { match: Match }) {
   if (!brand.registrationNote || !hasPayments(match)) return null
   return (
-    <p className="rounded-md bg-amber-50 p-2 text-sm text-amber-900">
+    <p className="rounded-md bg-warning-soft p-2 text-sm text-warning">
       <span className="font-semibold">Note:</span> {brand.registrationNote}
     </p>
   )

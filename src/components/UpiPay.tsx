@@ -20,8 +20,8 @@ function QrPicture({ uri }: { uri: string }) {
       cancelled = true
     }
   }, [uri])
-  if (!src) return <p className="text-sm text-slate-500">Preparing QR code...</p>
-  return <img src={src} alt="UPI QR code with the amount filled in" width={240} height={240} className="rounded-md border border-slate-200" />
+  if (!src) return <p className="text-sm text-subtle">Preparing QR code...</p>
+  return <img src={src} alt="UPI QR code with the amount filled in" width={240} height={240} className="rounded-md border border-line" />
 }
 
 /**
@@ -79,16 +79,16 @@ export function UpiPay({ communityId, amount, note }: { communityId: string; amo
           {copied ? 'Copied' : 'Copy UPI ID'}
         </Button>
       </div>
-      <p className="text-sm text-slate-700">
+      <p className="text-sm text-fg-2">
         UPI ID: <span className="select-all font-mono font-semibold break-all">{upiId}</span>
       </p>
       {showQr && <QrPicture uri={uri} />}
       {message && (
-        <p role="status" className="text-sm text-slate-700">
+        <p role="status" className="text-sm text-fg-2">
           {message}
         </p>
       )}
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-subtle">
         On your phone: save the QR (it goes to your downloads or gallery), open GPay, PhonePe or Paytm, tap Scan QR and pick the saved image. Check the amount before you confirm.
       </p>
     </div>

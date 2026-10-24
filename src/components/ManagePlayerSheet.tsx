@@ -10,8 +10,8 @@ function Item({ children, onClick, danger, disabled }: { children: ReactNode; on
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex min-h-11 w-full items-center rounded-md px-3 text-left text-base hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-50',
-        danger ? 'text-red-700 hover:bg-red-50' : 'text-slate-800',
+        'flex min-h-11 w-full items-center rounded-md px-3 text-left text-base hover:bg-surface-3 focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-50',
+        danger ? 'text-danger hover:bg-danger-soft' : 'text-fg',
       )}
     >
       {children}
@@ -22,7 +22,7 @@ function Item({ children, onClick, danger, disabled }: { children: ReactNode; on
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="space-y-0.5">
-      <div className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</div>
+      <div className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-subtle">{title}</div>
       {children}
     </div>
   )
@@ -54,9 +54,9 @@ export function ManagePlayerSheet({ player, resetOpen, busy, onClose, onBlock, o
     <Dialog.Root open={!!player} onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85vh] max-w-md space-y-1 overflow-y-auto rounded-t-xl bg-white p-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg sm:inset-x-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-xl">
+        <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85vh] max-w-md space-y-1 overflow-y-auto rounded-t-xl bg-surface p-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg sm:inset-x-4 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-xl">
           <Dialog.Title className="px-3 pt-2 text-lg font-semibold">{player?.full_name}</Dialog.Title>
-          <Dialog.Description className="px-3 text-sm text-slate-600">{player?.phone ?? 'No phone number'}</Dialog.Description>
+          <Dialog.Description className="px-3 text-sm text-muted">{player?.phone ?? 'No phone number'}</Dialog.Description>
 
           {player && (
             <>
@@ -92,7 +92,7 @@ export function ManagePlayerSheet({ player, resetOpen, busy, onClose, onBlock, o
           )}
 
           <div className="pt-2">
-            <Dialog.Close className="min-h-11 w-full rounded-md border border-slate-300 px-3 text-base font-medium hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-brand">
+            <Dialog.Close className="min-h-11 w-full rounded-md border border-line-strong px-3 text-base font-medium hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand">
               Close
             </Dialog.Close>
           </div>

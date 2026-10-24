@@ -38,14 +38,14 @@ export function PhoneGate() {
         <div className="flex justify-center text-brand">
           <BrandLockup large />
         </div>
-        <h1 className="text-center text-xl font-bold">One last step</h1>
-        <p className="text-center text-sm text-slate-600">Add your WhatsApp number so organisers can reach you about matches and payments.</p>
+        <h1 className="text-center font-display text-3xl font-bold leading-none">One last step</h1>
+        <p className="text-center text-sm text-muted">Add your WhatsApp number so organisers can reach you about matches and payments.</p>
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
           <Field label="Phone (WhatsApp)" htmlFor="phone">
             <Input id="phone" type="tel" autoComplete="tel" placeholder="98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </Field>
           {error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {error}
             </p>
           )}

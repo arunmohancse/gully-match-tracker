@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/card'
 export function NotFoundPage() {
   return (
     <Card className="space-y-3">
-      <h1 className="text-xl font-bold">Page not found</h1>
-      <p className="text-slate-600">This page doesn&apos;t exist. The link may be mistyped or out of date.</p>
+      <h1 className="font-display text-3xl font-bold leading-none">Page not found</h1>
+      <p className="text-muted">This page doesn&apos;t exist. The link may be mistyped or out of date.</p>
       <Button asChild>
         <Link to="/">Go to home</Link>
       </Button>

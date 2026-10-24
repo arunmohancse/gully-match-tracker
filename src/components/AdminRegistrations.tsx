@@ -11,6 +11,7 @@ import { toFriendlyMessage } from '@/lib/errors'
 import type { AdminRegistration, Match } from '@/types/domain'
 import { formatClock } from '@/utils/dates'
 import { amountText, canTrackPayment, hasPayments } from '@/utils/cost'
+import { CricketLoader } from '@/components/CricketLoader'
 
 type Action = { type: 'cancel' | 'demote' | 'promote'; reg: AdminRegistration }
 
@@ -20,10 +21,10 @@ function Row({ reg, children, detail }: { reg: AdminRegistration; children: Reac
   return (
     <li className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:gap-3">
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        <span className="w-7 shrink-0 text-right text-slate-500">{reg.list_position}.</span>
+        <span className="w-7 shrink-0 text-right text-subtle">{reg.list_position}.</span>
         <div className="min-w-0 flex-1">
           <div className="truncate font-medium">{nameOf(reg)}</div>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">{detail}</div>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">{detail}</div>
         </div>
       </div>
       {/* On phones the buttons sit on their own line under the name, lined up with it. */}
@@ -41,11 +42,13 @@ export function AdminRegistrations({ match }: { match: Match }) {
   const [swapId, setSwapId] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
 
-  if (isLoading) return <Card className="text-slate-500">Loading registrations...</Card>
+  if (isLoading) return <Card>
+      <CricketLoader size="sm" label="Loading registrations" />
+    </Card>
   if (error) {
     return (
       <Card className="space-y-2">
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="text-danger">
           {toFriendlyMessage(error)}
         </p>
         <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -118,18 +121,18 @@ export function AdminRegistrations({ match }: { match: Match }) {
   return (
     <div className="space-y-4">
       <Card className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">Registrations</h2>
-        <span className="text-sm text-slate-600">
+        <h2 className="font-extrabold">Registrations</h2>
+        <span className="text-sm text-muted">
           {main.length} / {match.max_players} main list · {waiting.length} waiting
         </span>
       </Card>
 
       <Card className="space-y-2 p-0">
-        <h3 className="px-3 pt-3 text-sm font-semibold uppercase tracking-wide text-green-700">Main list ({main.length})</h3>
+        <h3 className="px-3 pt-3 text-sm font-semibold uppercase tracking-wide text-success">Main list ({main.length})</h3>
         {main.length === 0 ? (
-          <p className="px-3 pb-3 text-sm text-slate-500">Nobody registered yet.</p>
+          <p className="px-3 pb-3 text-sm text-subtle">Nobody registered yet.</p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line-soft">
             {main.map((r) => (
               <Row
                 key={r.id}
@@ -153,7 +156,7 @@ export function AdminRegistrations({ match }: { match: Match }) {
                     Move to waiting
                   </Button>
                 )}
-                <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50" onClick={() => open('cancel', r)}>
+                <Button size="sm" variant="outline" className="border-danger-line text-danger hover:bg-danger-soft" onClick={() => open('cancel', r)}>
                   Cancel
                 </Button>
               </Row>
@@ -163,17 +166,17 @@ export function AdminRegistrations({ match }: { match: Match }) {
       </Card>
 
       <Card className="space-y-2 p-0">
-        <h3 className="px-3 pt-3 text-sm font-semibold uppercase tracking-wide text-orange-700">Waiting list ({waiting.length})</h3>
+        <h3 className="px-3 pt-3 text-sm font-semibold uppercase tracking-wide text-warning">Waiting list ({waiting.length})</h3>
         {waiting.length === 0 ? (
-          <p className="px-3 pb-3 text-sm text-slate-500">Nobody is waiting.</p>
+          <p className="px-3 pb-3 text-sm text-subtle">Nobody is waiting.</p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-line-soft">
             {waiting.map((r) => (
               <Row key={r.id} reg={r} detail={<span>Registered {formatClock(r.registered_at)}</span>}>
                 <Button size="sm" variant="outline" onClick={() => open('promote', r)}>
                   Promote to main
                 </Button>
-                <Button size="sm" variant="outline" className="border-red-300 text-red-700 hover:bg-red-50" onClick={() => open('cancel', r)}>
+                <Button size="sm" variant="outline" className="border-danger-line text-danger hover:bg-danger-soft" onClick={() => open('cancel', r)}>
                   Cancel
                 </Button>
               </Row>
@@ -185,20 +188,20 @@ export function AdminRegistrations({ match }: { match: Match }) {
       {cancelled.length > 0 && (
         <Card className="p-0">
           <details>
-            <summary className="cursor-pointer px-3 py-3 text-sm font-semibold text-slate-600">Cancelled ({cancelled.length})</summary>
-            <ul className="divide-y divide-slate-100">
+            <summary className="cursor-pointer px-3 py-3 text-sm font-semibold text-muted">Cancelled ({cancelled.length})</summary>
+            <ul className="divide-y divide-line-soft">
               {cancelled.map((r) => (
                 <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
                   <span>{nameOf(r)}</span>
                   {r.payment_status === 'PAID' ? (
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">Paid: refund needed</span>
+                      <span className="rounded-full bg-danger-tint px-2 py-0.5 text-xs font-semibold text-danger">Paid: refund needed</span>
                       <PaymentActions reg={r} match={match} />
                     </span>
                   ) : r.payment_status === 'REFUNDED' ? (
-                    <span className="text-slate-500">Cancelled · refunded</span>
+                    <span className="text-subtle">Cancelled · refunded</span>
                   ) : (
-                    <span className="text-slate-500">Cancelled</span>
+                    <span className="text-subtle">Cancelled</span>
                   )}
                 </li>
               ))}
@@ -226,7 +229,7 @@ export function AdminRegistrations({ match }: { match: Match }) {
               <label htmlFor="swap" className="text-sm font-medium">
                 Move this main-list player to the waiting list
               </label>
-              <select id="swap" value={swapId} onChange={(e) => setSwapId(e.target.value)} className="h-11 w-full rounded-md border border-slate-300 bg-white px-3">
+              <select id="swap" value={swapId} onChange={(e) => setSwapId(e.target.value)} className="h-11 w-full rounded-md border border-line-strong bg-surface px-3">
                 <option value="">Choose a player...</option>
                 {main.map((m) => (
                   <option key={m.id} value={m.id}>

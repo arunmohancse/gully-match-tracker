@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { InstagramLink } from '@/components/InstagramLink'
 import { PartOfParent } from '@/components/ParentBrand'
+import { AppearanceCard } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Field } from '@/components/ui/field'
@@ -10,11 +11,12 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
+import { initials } from '@/utils/initials'
 import { isResetOpen, validateNewPassword } from '@/utils/password'
 import { normalizePhone } from '@/utils/phone'
 
 export function ProfilePage() {
-  const { profile, session, setProfile, refreshProfile } = useAuth()
+  const { profile, session, setProfile, refreshProfile, isAdmin } = useAuth()
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null)
@@ -40,9 +42,19 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Profile</h1>
+      <section className="flex items-center gap-4 rounded-2xl bg-pitch p-4 text-on-pitch sm:p-5">
+        <span className="grid size-16 shrink-0 place-items-center rounded-full bg-stumps font-display text-3xl font-bold text-[#3b2f05]" aria-hidden>
+          {initials(profile.full_name)}
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate font-display text-3xl font-bold leading-none">{profile.full_name}</h1>
+          <p className="mt-1 text-sm font-semibold text-on-pitch-muted">{isAdmin ? 'Admin' : 'Player'}</p>
+        </div>
+      </section>
+      <AppearanceCard />
       <Card>
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <h2 className="font-extrabold">Account</h2>
           <Field label="Email" htmlFor="email">
             <Input id="email" value={session.user.email ?? ''} disabled readOnly />
           </Field>
@@ -50,7 +62,7 @@ export function ProfilePage() {
             <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </Field>
           {message && (
-            <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-red-600' : 'text-sm text-green-700'}>
+            <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-danger' : 'text-sm text-success'}>
               {message.text}
             </p>
           )}
@@ -61,7 +73,7 @@ export function ProfilePage() {
       </Card>
       <PhoneCard userId={session.user.id} phone={profile.phone} onChanged={refreshProfile} />
       <div className="space-y-2 pt-4 text-center md:hidden">
-        <Link to="/about" className="block text-xs text-slate-500 hover:text-brand hover:underline">
+        <Link to="/about" className="block text-xs text-subtle hover:text-brand hover:underline">
           About us
         </Link>
         <InstagramLink />
@@ -118,10 +130,10 @@ function PhoneCard({ userId, phone, onChanged }: { userId: string; phone: string
 
   return (
     <Card className="space-y-3">
-      <h2 className="text-lg font-semibold">Phone (WhatsApp)</h2>
-      <p className="text-base">{phone ?? 'Not added yet'}</p>
+      <h2 className="font-extrabold">Phone (WhatsApp)</h2>
+      <p className="text-base font-semibold">{phone ?? 'Not added yet'}</p>
       {open && (
-        <div role="status" className="space-y-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
+        <div role="status" className="space-y-2 rounded-md bg-warning-soft p-3 text-sm text-warning">
           <p>
             Waiting for an admin to approve your new number <span className="font-medium">{open.new_phone}</span>. Until then your old number stays.
           </p>
@@ -130,13 +142,13 @@ function PhoneCard({ userId, phone, onChanged }: { userId: string; phone: string
           </Button>
         </div>
       )}
-      {!open && rejected && !editing && <p className="text-sm text-slate-600">Your last request to change this number ({request.new_phone}) was not approved.</p>}
+      {!open && rejected && !editing && <p className="text-sm text-muted">Your last request to change this number ({request.new_phone}) was not approved.</p>}
       {editing ? (
         <form onSubmit={submit} className="space-y-3" noValidate>
           <Field label="New phone number" htmlFor="newPhone">
             <Input id="newPhone" type="tel" autoComplete="tel" placeholder="98765 43210" value={value} onChange={(e) => setValue(e.target.value)} />
           </Field>
-          <p className="text-xs text-slate-500">An admin has to approve the change. Your current number stays until then.</p>
+          <p className="text-xs text-subtle">An admin has to approve the change. Your current number stays until then.</p>
           <div className="flex gap-2">
             <Button type="submit" loading={busy}>
               {busy ? 'Sending...' : 'Send request'}
@@ -154,7 +166,7 @@ function PhoneCard({ userId, phone, onChanged }: { userId: string; phone: string
         )
       )}
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
@@ -192,8 +204,8 @@ function ChangePasswordCard({ onChanged }: { onChanged: () => Promise<void> }) {
   return (
     <Card>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <h2 className="text-lg font-semibold">Change password</h2>
-        <p className="text-sm text-slate-600">An admin has allowed you to set a new password. You do not need the old one.</p>
+        <h2 className="font-extrabold">Change password</h2>
+        <p className="text-sm text-muted">An admin has allowed you to set a new password. You do not need the old one.</p>
         <Field label="New password" htmlFor="newPassword">
           <Input id="newPassword" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
@@ -201,7 +213,7 @@ function ChangePasswordCard({ onChanged }: { onChanged: () => Promise<void> }) {
           <Input id="confirmPassword" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
         </Field>
         {message && (
-          <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-red-600' : 'text-sm text-green-700'}>
+          <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-danger' : 'text-sm text-success'}>
             {message.text}
           </p>
         )}

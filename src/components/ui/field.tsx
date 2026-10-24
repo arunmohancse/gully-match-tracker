@@ -9,7 +9,7 @@ export function Field({ label, htmlFor, error, children }: { label: string; html
       </label>
       {children}
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

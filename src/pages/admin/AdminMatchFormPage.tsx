@@ -4,6 +4,8 @@ import { MatchForm } from '@/components/MatchForm'
 import { useMatch, useMatches, useSaveMatch } from '@/hooks/useMatches'
 import { toFriendlyMessage } from '@/lib/errors'
 import { copyMatchToForm, formToInput, type MatchFormValues } from '@/utils/matchForm'
+import { PageHeader } from '@/components/PageHeader'
+import { CricketLoader } from '@/components/CricketLoader'
 
 /** Handles /admin/matches/new, /admin/matches/new?copy=<match id> and /admin/matches/:id/edit. */
 export function AdminMatchFormPage() {
@@ -18,9 +20,9 @@ export function AdminMatchFormPage() {
   const save = useSaveMatch()
   const [error, setError] = useState<string | null>(null)
 
-  if (isEdit && isLoading) return <p className="text-slate-500">Loading match...</p>
-  if (isEdit && !match) return <p className="text-slate-600">Match not found.</p>
-  if (!isEdit && (loadingAll || (copyId && loadingSource))) return <p className="text-slate-500">Loading...</p>
+  if (isEdit && isLoading) return <CricketLoader label="Loading match" />
+  if (isEdit && !match) return <p className="text-muted">Match not found.</p>
+  if (!isEdit && (loadingAll || (copyId && loadingSource))) return <CricketLoader label="Loading" />
 
   // A copy starts from the chosen match. A plain new match starts with the venue and map link of the latest one,
   // since most matches are at the same turf.
@@ -48,9 +50,9 @@ export function AdminMatchFormPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">{isEdit ? 'Edit match' : source ? 'Copy match' : 'Create match'}</h1>
+      <PageHeader title={isEdit ? 'Edit match' : source ? 'Copy match' : 'New match'} />
       {source && (
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted">
           Copied from <span className="font-medium">{source.title}</span>. Check the title and date, then create it. Players and payments are not copied.
         </p>
       )}

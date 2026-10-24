@@ -39,18 +39,18 @@ export function TempPasswordDialog({ player, onClose }: { player: PlayerSummary 
     <Dialog.Root open={!!player} onOpenChange={(o) => !o && close()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 space-y-4 rounded-lg bg-white p-5 shadow-lg">
+        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-sm -translate-y-1/2 space-y-4 rounded-lg bg-surface p-5 shadow-lg">
           <Dialog.Title className="text-lg font-semibold">Temporary password for {player?.full_name}</Dialog.Title>
-          <Dialog.Description className="text-sm text-slate-600">
+          <Dialog.Description className="text-sm text-muted">
             {done
               ? 'Password set. They have been signed out everywhere. This is the only time it is shown, so share it now.'
               : 'This replaces their current password and signs them out everywhere. You will then share the new one with them.'}
           </Dialog.Description>
-          <p className="rounded-md bg-slate-100 px-3 py-2 text-center font-mono text-lg tracking-wide" aria-label="Temporary password">
+          <p className="rounded-md bg-surface-3 px-3 py-2 text-center font-mono text-lg tracking-wide" aria-label="Temporary password">
             {password}
           </p>
           {error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {error}
             </p>
           )}
@@ -65,7 +65,7 @@ export function TempPasswordDialog({ player, onClose }: { player: PlayerSummary 
                 {copied ? 'Copied' : 'Copy password'}
               </Button>
               {whatsapp && (
-                <a href={whatsapp} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center rounded-md bg-brand px-4 text-sm font-medium text-white">
+                <a href={whatsapp} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center rounded-md bg-brand px-4 text-sm font-medium text-brand-foreground">
                   Send on WhatsApp
                 </a>
               )}

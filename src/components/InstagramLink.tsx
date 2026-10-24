@@ -21,7 +21,7 @@ export function InstagramLink({ label = 'Follow us on Instagram', className }: {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={cn('inline-flex items-center justify-center gap-1.5 text-xs text-slate-500 hover:text-brand hover:underline', className)}
+      className={cn('inline-flex items-center justify-center gap-1.5 text-xs text-subtle hover:text-brand hover:underline', className)}
     >
       <InstagramGlyph className="size-4 shrink-0" />
       <span>

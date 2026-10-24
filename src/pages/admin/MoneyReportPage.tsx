@@ -13,6 +13,8 @@ import { daysAgoISO, formatShortDate, todayISO } from '@/utils/dates'
 import { isUnopened } from '@/utils/matchStatus'
 import { formatINR } from '@/utils/money'
 import { moneyReport } from '@/utils/moneyReport'
+import { PageHeader } from '@/components/PageHeader'
+import { CricketLoader } from '@/components/CricketLoader'
 
 type Preset = 'ALL' | 'MONTH' | 'DAYS30' | 'CUSTOM'
 
@@ -33,11 +35,11 @@ export function MoneyReportPage() {
   const live = useMemo(() => (matches ?? []).filter((m) => !isUnopened(m.status) && m.status !== 'CANCELLED'), [matches])
   const { data: financials, isLoading: loadingMoney } = useFinancials(live.map((m) => m.id), live.length > 0)
 
-  if (isLoading) return <p className="text-slate-500">Loading matches...</p>
+  if (isLoading) return <CricketLoader label="Loading matches" />
   if (error) {
     return (
       <div className="space-y-2">
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="text-danger">
           {toFriendlyMessage(error)}
         </p>
         <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -59,11 +61,11 @@ export function MoneyReportPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Money report</h1>
+      <PageHeader title="Money report" />
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Period">
         {PRESETS.map((p) => (
-          <Button key={p.key} size="sm" variant={preset === p.key ? 'default' : 'outline'} aria-pressed={preset === p.key} onClick={() => setPreset(p.key)}>
+          <Button key={p.key} size="sm" className="rounded-full" variant={preset === p.key ? 'default' : 'outline'} aria-pressed={preset === p.key} onClick={() => setPreset(p.key)}>
             {p.label}
           </Button>
         ))}
@@ -82,15 +84,15 @@ export function MoneyReportPage() {
         </div>
       )}
       {badRange && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           The From date must be on or before the To date.
         </p>
       )}
 
       {live.length === 0 ? (
-        <Card className="text-slate-600">No published matches yet.</Card>
+        <Card className="text-muted">No published matches yet.</Card>
       ) : loadingMoney || !report ? (
-        !badRange && <p className="text-slate-500">Loading money...</p>
+        !badRange && <CricketLoader size="sm" label="Loading money" />
       ) : (
         <>
           <Card className="space-y-3">
@@ -100,31 +102,31 @@ export function MoneyReportPage() {
               <Tile label="Balance" value={formatINR(report.balance)} tone={report.balance < 0 ? 'bad' : 'good'} hint="Collected − expenses" />
               <Tile label="Matches" value={report.matches} />
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-subtle">
               Counted by match date, including upcoming matches in the period. Shared-cost matches count once their shares are calculated
               {report.notCalculated > 0 ? ` (${report.notCalculated} not calculated yet, left out)` : ''}.
             </p>
           </Card>
 
           {report.rows.length === 0 ? (
-            <p className="text-slate-500">No matches in this period.</p>
+            <p className="text-subtle">No matches in this period.</p>
           ) : (
             <Card className="p-0">
-              <ul className="divide-y divide-slate-100">
+              <ul className="divide-y divide-line-soft">
                 {report.rows.map((r) => (
                   <li key={r.match.id}>
-                    <Link to={`/admin/payments/${r.match.id}`} className="flex items-center gap-3 px-3 py-3 hover:bg-slate-50">
+                    <Link to={`/admin/payments/${r.match.id}`} className="flex items-center gap-3 px-3 py-3 hover:bg-surface-2">
                       <div className="min-w-0 flex-1">
                         <div className="truncate font-medium">{r.match.title}</div>
-                        <div className="text-sm text-slate-600">{formatShortDate(r.match.match_date)}</div>
+                        <div className="text-sm text-muted">{formatShortDate(r.match.match_date)}</div>
                       </div>
                       <div className="text-right text-sm">
                         <div>
-                          {formatINR(r.collected)} <span className="text-slate-500">in</span> · {formatINR(r.expenses)} <span className="text-slate-500">out</span>
+                          {formatINR(r.collected)} <span className="text-subtle">in</span> · {formatINR(r.expenses)} <span className="text-subtle">out</span>
                         </div>
-                        <div className={cn('font-medium', r.balance < 0 ? 'text-red-700' : 'text-green-700')}>{formatINR(r.balance)}</div>
+                        <div className={cn('font-medium', r.balance < 0 ? 'text-danger' : 'text-success')}>{formatINR(r.balance)}</div>
                       </div>
-                      <ChevronRight className="size-4 shrink-0 text-slate-400" aria-hidden />
+                      <ChevronRight className="size-4 shrink-0 text-faint" aria-hidden />
                     </Link>
                   </li>
                 ))}
