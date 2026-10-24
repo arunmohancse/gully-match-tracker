@@ -21,25 +21,9 @@ function saveDismissed() {
   }
 }
 
-/** Small "Join our WhatsApp community" link, for footers next to the Instagram link. Nothing when no link is configured. */
-export function CommunityLink({ label = 'Join our WhatsApp community', className }: { label?: string; className?: string }) {
-  if (!brand.whatsappCommunity) return null
-  return (
-    <a
-      href={brand.whatsappCommunity}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn('inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-subtle hover:text-brand hover:underline', className)}
-    >
-      <MessageCircle className="size-4 shrink-0" aria-hidden />
-      {label}
-    </a>
-  )
-}
-
 /**
  * Invite card. With `dismissible` (dashboards) it has a close button and hides for good on this device once
- * closed or once Join is tapped; the footer link stays for later.
+ * closed or once Join is tapped; the "Stay in the loop" links (SocialLinks) stay for later.
  */
 export function JoinCommunityCard({ dismissible, title, text, className }: { dismissible?: boolean; title?: string; text?: string; className?: string }) {
   const [hidden, setHidden] = useState(() => dismissible && readDismissed())

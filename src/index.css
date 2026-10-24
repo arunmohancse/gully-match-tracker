@@ -46,6 +46,8 @@
   --color-warning-line: var(--warning-line);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+  --color-insta: var(--insta);
+  --color-insta-soft: var(--insta-soft);
   --color-on-pitch: var(--on-pitch);
   --color-on-pitch-muted: var(--on-pitch-muted);
   --color-pitch-track: var(--pitch-track);
@@ -89,6 +91,8 @@
   --warning-line: oklch(90.1% 0.076 70.697); /* orange-200 */
   --info: oklch(42.4% 0.199 265.638); /* blue-800 */
   --info-soft: oklch(93.2% 0.032 255.585); /* blue-100 */
+  --insta: #b8306c; /* Instagram pink, for its icon tile */
+  --insta-soft: #fde8f1;
   --pitch-a: #0c6b35;
   --pitch-b: #0e773d;
   --on-pitch: #ffffff;
@@ -130,6 +134,8 @@
   --warning-line: #5a4119;
   --info: #93bcf4;
   --info-soft: #15243a;
+  --insta: #f08bb8;
+  --insta-soft: #2a1f2e;
   --pitch-a: #0f3b23;
   --pitch-b: #124428;
   --on-pitch: #f1f7f2;

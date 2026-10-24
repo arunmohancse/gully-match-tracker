@@ -1,13 +1,13 @@
 import { lazy, Suspense, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { InstagramLink } from '@/components/InstagramLink'
 import { BrandLockup } from '@/components/BrandLockup'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
 import { CricketLoader } from '@/components/CricketLoader'
 import { JoinCommunityCard } from '@/components/WhatsAppCommunity'
+import { SocialLinks } from '@/components/SocialLinks'
 
 const GullyDash = lazy(() => import('@/components/GullyDash').then((m) => ({ default: m.GullyDash })))
 
@@ -54,7 +54,7 @@ export function AccountGate({ status }: { status: 'PENDING' | 'BLOCKED' }) {
             text="Match announcements and team chat happen there, and it helps the admins recognise you."
           />
         )}
-        {pending && <InstagramLink label="Follow us on Instagram" />}
+        {pending && <SocialLinks only="instagram" />}
         {pending && (
           <div className="space-y-1 text-left">
             <p className="text-center text-sm font-medium text-fg-2">Or play a quick game while you wait</p>
