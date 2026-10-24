@@ -42,7 +42,7 @@ export function LoginPage() {
             <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </Field>
           {error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {error}
             </p>
           )}
@@ -61,7 +61,7 @@ export function LoginPage() {
           About {brand.name}
         </Link>
       </p>
-      <p className="text-center text-sm text-slate-600">
+      <p className="text-center text-sm text-muted">
         New here?{' '}
         <Link to="/signup" className="font-medium text-brand underline">
           Create an account

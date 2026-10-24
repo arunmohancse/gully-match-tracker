@@ -48,7 +48,7 @@ export function PaymentInstructionsCard({ communityId }: { communityId: string }
       <details>
         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold">Payment settings {configured ? '' : '(not set)'}</summary>
         <form onSubmit={onSubmit} className="space-y-3 px-4 pb-4" noValidate>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted">
             Set once for all matches. With a UPI id, players get a Pay with UPI button and a QR code with their exact amount already filled in.
           </p>
           <Field label="UPI ID" htmlFor="upi-id" error={upiError}>
@@ -61,7 +61,7 @@ export function PaymentInstructionsCard({ communityId }: { communityId: string }
             <Textarea id="payment-instructions" value={value.instructions} onChange={(e) => edit({ instructions: e.target.value })} placeholder="Pay within 2 days of the match" />
           </Field>
           {message && (
-            <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-red-600' : 'text-sm text-green-700'}>
+            <p role={message.type === 'error' ? 'alert' : 'status'} className={message.type === 'error' ? 'text-sm text-danger' : 'text-sm text-success'}>
               {message.text}
             </p>
           )}

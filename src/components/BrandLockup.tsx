@@ -8,9 +8,9 @@ export function BrandLockup({ large, className }: { large?: boolean; className?:
     <span className={cn('inline-flex items-center gap-2', className)}>
       <BrandLogo className={large ? 'size-12 text-4xl' : undefined} />
       <span className="flex flex-col text-left leading-tight">
-        <span className={cn('font-bold', large ? 'text-xl' : 'text-base')}>{brand.name}</span>
+        <span className={cn('font-display font-bold uppercase tracking-wide', large ? 'text-3xl' : 'text-[21px] leading-none')}>{brand.name}</span>
         {brand.subtitle && (
-          <span className={cn('font-medium uppercase tracking-widest text-slate-500', large ? 'text-xs' : 'text-[10px]')}>{brand.subtitle}</span>
+          <span className={cn('font-bold uppercase tracking-[0.2em] text-subtle', large ? 'text-xs' : 'text-[10px]')}>{brand.subtitle}</span>
         )}
       </span>
     </span>

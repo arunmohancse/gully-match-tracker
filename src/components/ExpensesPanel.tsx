@@ -9,6 +9,7 @@ import { useDeleteExpense, useExpenses, useSaveExpense } from '@/hooks/usePaymen
 import { toFriendlyMessage } from '@/lib/errors'
 import type { Expense } from '@/types/domain'
 import { EXPENSE_CATEGORIES, formatINR, parseMoney } from '@/utils/money'
+import { CricketLoader } from '@/components/CricketLoader'
 
 const EMPTY = { description: '', category: 'Turf', amount: '' }
 
@@ -71,39 +72,39 @@ export function ExpensesPanel({ matchId }: { matchId: string }) {
   return (
     <Card className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Expenses</h2>
+        <h2 className="font-extrabold">Expenses</h2>
         <span className="font-semibold">{formatINR(total)}</span>
       </div>
 
-      {isLoading && <p className="text-slate-500">Loading expenses...</p>}
+      {isLoading && <CricketLoader size="sm" label="Loading expenses" />}
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {toFriendlyMessage(error)}
         </p>
       )}
-      {!isLoading && !error && expenses.length === 0 && <p className="text-sm text-slate-500">No expenses recorded yet.</p>}
+      {!isLoading && !error && expenses.length === 0 && <p className="text-sm text-subtle">No expenses recorded yet.</p>}
 
       {expenses.length > 0 && (
-        <ul className="divide-y divide-slate-100 rounded-md border border-slate-200">
+        <ul className="divide-y divide-line-soft rounded-md border border-line">
           {expenses.map((x) => (
             <li key={x.id} className="flex items-center gap-2 px-3 py-2 text-sm">
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium">{x.description}</div>
-                <div className="text-slate-500">{x.category}</div>
+                <div className="text-subtle">{x.category}</div>
               </div>
               <span className="font-semibold">{formatINR(x.amount)}</span>
               <Button size="sm" variant="ghost" aria-label={`Edit ${x.description}`} onClick={() => startEdit(x)}>
                 <Pencil className="size-4" aria-hidden />
               </Button>
               <Button size="sm" variant="ghost" aria-label={`Delete ${x.description}`} onClick={() => { setDeleteError(null); setToDelete(x) }}>
-                <Trash2 className="size-4 text-red-600" aria-hidden />
+                <Trash2 className="size-4 text-danger" aria-hidden />
               </Button>
             </li>
           ))}
         </ul>
       )}
 
-      <form onSubmit={onSubmit} className="space-y-3 border-t border-slate-100 pt-3" noValidate>
+      <form onSubmit={onSubmit} className="space-y-3 border-t border-line-soft pt-3" noValidate>
         <h3 className="text-sm font-semibold">{editingId ? 'Edit expense' : 'Add expense'}</h3>
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Description" htmlFor="exp-desc" error={errors.description}>
@@ -122,7 +123,7 @@ export function ExpensesPanel({ matchId }: { matchId: string }) {
           </Field>
         </div>
         {formError && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger">
             {formError}
           </p>
         )}

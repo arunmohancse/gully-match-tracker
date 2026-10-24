@@ -19,6 +19,9 @@ import { formatShortDate } from '@/utils/dates'
 import { amountText, canTrackPayment, hasPayments, isShared } from '@/utils/cost'
 import { formatINR } from '@/utils/money'
 import { canRemind } from '@/utils/reminders'
+import { PageHeader } from '@/components/PageHeader'
+import { Segmented } from '@/components/ui/segmented'
+import { CricketLoader } from '@/components/CricketLoader'
 
 type Filter = 'ALL' | 'UNPAID' | 'PAID'
 
@@ -32,16 +35,16 @@ export function PaymentMatchPage() {
   const { data: regs, error: regsError } = useAdminRegistrations(matchId)
   const { data: lastReminders } = useLastReminders(matchId)
 
-  if (isLoading) return <p className="text-slate-500">Loading match...</p>
+  if (isLoading) return <CricketLoader label="Loading match" />
   if (error) {
     return (
-      <p role="alert" className="text-red-600">
+      <p role="alert" className="text-danger">
         {toFriendlyMessage(error)}
       </p>
     )
   }
 
-  if (!match) return <p className="text-slate-600">Match not found.</p>
+  if (!match) return <p className="text-muted">Match not found.</p>
 
   const main = (regs ?? []).filter((r) => r.status === 'ACTIVE' && r.list_type === 'MAIN_LIST')
   const rows = main.filter((r) => filter === 'ALL' || r.payment_status === filter)
@@ -63,13 +66,10 @@ export function PaymentMatchPage() {
 
   return (
     <div className="space-y-4">
-      <Link to="/admin/payments" className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline">
+      <Link to="/admin/payments" className="inline-flex min-h-10 items-center gap-1 text-sm font-bold text-brand hover:underline">
         <ArrowLeft className="size-4" aria-hidden /> All matches
       </Link>
-      <div>
-        <h1 className="text-2xl font-bold">{match.title}</h1>
-        <p className="text-slate-600">{formatShortDate(match.match_date)}</p>
-      </div>
+      <PageHeader eyebrow={formatShortDate(match.match_date)} title={match.title} />
 
       <>
               <PaymentInstructionsCard communityId={match.community_id} />
@@ -82,14 +82,18 @@ export function PaymentMatchPage() {
               {hasPayments(match) ? (
                 <Card className="space-y-3 p-0">
                   <div className="flex flex-wrap items-center justify-between gap-2 px-3 pt-3">
-                    <h2 className="font-semibold">Main list payments</h2>
-                    <div className="flex gap-2" role="group" aria-label="Filter payments">
-                      {(['ALL', 'UNPAID', 'PAID'] as const).map((f) => (
-                        <Button key={f} size="sm" variant={filter === f ? 'default' : 'outline'} aria-pressed={filter === f} onClick={() => setFilter(f)}>
-                          {f === 'ALL' ? 'All' : f === 'UNPAID' ? 'Unpaid' : 'Paid'}
-                        </Button>
-                      ))}
-                    </div>
+                    <h2 className="font-extrabold">Main list payments</h2>
+                    <Segmented
+                      label="Filter payments"
+                      className="w-full sm:w-64"
+                      value={filter}
+                      onChange={setFilter}
+                      options={[
+                        { value: 'ALL', label: 'All' },
+                        { value: 'UNPAID', label: 'Unpaid' },
+                        { value: 'PAID', label: 'Paid' },
+                      ]}
+                    />
                   </div>
 
                   {remindable.length > 0 && (
@@ -104,19 +108,19 @@ export function PaymentMatchPage() {
                   )}
 
                   {isShared(match) && main.some((r) => r.amount_due == null && r.payment_status === 'UNPAID') && (
-                    <p className="px-3 text-sm text-slate-600">
+                    <p className="px-3 text-sm text-muted">
                       Some players have no share yet. Add the expenses and calculate the shares (above) so they know what to pay.
                     </p>
                   )}
                   {regsError && (
-                    <p role="alert" className="px-3 text-sm text-red-600">
+                    <p role="alert" className="px-3 text-sm text-danger">
                       {toFriendlyMessage(regsError)}
                     </p>
                   )}
                   {rows.length === 0 ? (
-                    <p className="px-3 pb-3 text-sm text-slate-500">No players to show.</p>
+                    <p className="px-3 pb-3 text-sm text-subtle">No players to show.</p>
                   ) : (
-                    <ul className="divide-y divide-slate-100">
+                    <ul className="divide-y divide-line-soft">
                       {rows.map((r) => {
                         const selectable = remindable.some((x) => x.id === r.id)
                         return (
@@ -125,7 +129,7 @@ export function PaymentMatchPage() {
                             {selectable ? (
                               <input
                                 type="checkbox"
-                                className="size-5 accent-green-700"
+                                className="size-5 accent-brand"
                                 checked={picked.has(r.id)}
                                 onChange={() => toggle(r.id)}
                                 aria-label={`Select ${r.player?.full_name ?? 'player'} for a reminder`}
@@ -133,10 +137,10 @@ export function PaymentMatchPage() {
                             ) : (
                               <span className="w-5" aria-hidden />
                             )}
-                            <span className="w-6 text-right text-slate-500">{r.list_position}.</span>
+                            <span className="w-6 text-right text-subtle">{r.list_position}.</span>
                             <div className="min-w-0 flex-1">
                               <div className="truncate font-medium">{r.player?.full_name ?? 'Unknown player'}</div>
-                              <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                              <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
                                 <PaymentBadge status={r.payment_status} />
                                 <span>{amountText(match, r)}</span>
                                 {r.payment_method && <span>· {r.payment_method}</span>}
@@ -157,18 +161,18 @@ export function PaymentMatchPage() {
                   )}
                 </Card>
               ) : (
-                <Card className="text-sm text-slate-600">This match is free, so there are no player payments to track.</Card>
+                <Card className="text-sm text-muted">This match is free, so there are no player payments to track.</Card>
               )}
 
               {refunds.length > 0 && (
                 <Card className="space-y-2 p-0">
-                  <h2 className="px-3 pt-3 font-semibold">Refunds due</h2>
-                  <ul className="divide-y divide-slate-100">
+                  <h2 className="px-3 pt-3 font-extrabold">Refunds due</h2>
+                  <ul className="divide-y divide-line-soft">
                     {refunds.map((r) => (
                       <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-3">
                         <div>
                           <div className="font-medium">{r.player?.full_name ?? 'Unknown player'}</div>
-                          <div className="text-sm text-slate-600">{r.payment_amount != null ? formatINR(r.payment_amount) : ''} paid, then cancelled</div>
+                          <div className="text-sm text-muted">{r.payment_amount != null ? formatINR(r.payment_amount) : ''} paid, then cancelled</div>
                         </div>
                         <PaymentActions reg={r} match={match} />
                       </li>

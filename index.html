@@ -5,7 +5,23 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="%THEME_COLOR%" />
+    <meta name="theme-color" content="%THEME_COLOR%" data-light="%THEME_COLOR%" />
+    <script>
+      // Apply the saved light/dark theme before the first paint (no white flash). Mirrors src/lib/theme.ts.
+      (function () {
+        var pref = null
+        try { pref = localStorage.getItem('theme') } catch (e) {}
+        var dark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (!dark) return
+        document.documentElement.classList.add('dark')
+        document.documentElement.style.colorScheme = 'dark'
+        var meta = document.querySelector('meta[name="theme-color"]')
+        if (meta) meta.content = '#0a100c'
+      })()
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" />
     <meta name="description" content="%APP_DESCRIPTION%" />
     <meta property="og:title" content="%APP_NAME%" />
     <meta property="og:description" content="%APP_DESCRIPTION%" />
@@ -13,7 +29,28 @@
     <title>%APP_NAME%</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Boot screen while the app downloads; React replaces it. Same delivery as src/components/CricketLoader.tsx. -->
+      <div role="status" style="min-height: 100vh; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px">
+        <svg viewBox="0 0 140 64" width="176" height="80" aria-hidden="true">
+          <line class="cl-ground" x1="4" y1="58.5" x2="136" y2="58.5" stroke-width="1.5" stroke-linecap="round" />
+          <ellipse class="cl-shadow" cx="0" cy="58" rx="6" ry="1.6" />
+          <rect class="cl-wood" x="112" y="24" width="3.5" height="34" rx="1.2" />
+          <rect class="cl-wood" x="118.5" y="24" width="3.5" height="34" rx="1.2" />
+          <rect class="cl-wood" x="125" y="24" width="3.5" height="34" rx="1.2" />
+          <rect class="cl-wood cl-bail" x="111.5" y="21" width="7.5" height="2.2" rx="1" />
+          <rect class="cl-wood cl-bail cl-bail-2" x="120" y="21" width="7.5" height="2.2" rx="1" />
+          <g class="cl-ball">
+            <g class="cl-spin">
+              <circle cx="0" cy="0" r="6" />
+              <path d="M-2 -5.6 C1 -2 1 2 -2 5.6" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="1.2 1.2" opacity="0.9" />
+            </g>
+          </g>
+        </svg>
+        <p aria-hidden="true" style="margin: 0; font: 700 20px 'Barlow Condensed', sans-serif; letter-spacing: 0.03em; color: var(--muted)">Padding up…</p>
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Loading Gully League</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

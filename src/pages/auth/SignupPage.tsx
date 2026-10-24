@@ -47,7 +47,7 @@ export function SignupPage() {
   return (
     <AuthShell title="Create account">
       {created && (
-        <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+        <p role="status" className="rounded-md bg-success-soft p-3 text-sm text-success">
           Account created. If you aren't logged in automatically, check your email to confirm, then log in. An admin must approve your account before you can register for matches.
         </p>
       )}
@@ -66,7 +66,7 @@ export function SignupPage() {
             <Input id="password" type="password" autoComplete="new-password" value={form.password} onChange={set('password')} />
           </Field>
           {formError && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {formError}
             </p>
           )}
@@ -75,7 +75,7 @@ export function SignupPage() {
           </Button>
         </form>
       </AuthMethods>
-      <p className="text-center text-sm text-slate-600">
+      <p className="text-center text-sm text-muted">
         Already registered?{' '}
         <Link to="/login" className="font-medium text-brand underline">
           Log in

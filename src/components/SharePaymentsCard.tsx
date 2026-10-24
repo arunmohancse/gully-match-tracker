@@ -14,6 +14,7 @@ import { buildUpiUri, paymentInstructionsText } from '@/utils/upi'
 import { makeUpiQrImage, shareOrDownloadImage } from '@/utils/upiImage'
 import { buildWhatsAppShareUrl } from '@/utils/whatsapp'
 import { copyText } from '@/utils/clipboard'
+import { CricketLoader } from '@/components/CricketLoader'
 
 interface QrShare {
   upiId: string
@@ -56,16 +57,16 @@ function ShareBlock({ title, hint, message, qr }: { title: string; hint: string;
   }
 
   return (
-    <div className="space-y-2 rounded-md border border-slate-200 p-3">
+    <div className="space-y-2 rounded-md border border-line p-3">
       <div>
         <h3 className="font-medium">{title}</h3>
-        <p className="text-sm text-slate-600">{hint}</p>
+        <p className="text-sm text-muted">{hint}</p>
       </div>
       {message && (
         <>
           <details>
-            <summary className="cursor-pointer text-sm text-slate-600">Preview message</summary>
-            <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 p-3 text-sm">{message}</pre>
+            <summary className="cursor-pointer text-sm text-muted">Preview message</summary>
+            <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap rounded-md bg-surface-2 p-3 text-sm">{message}</pre>
           </details>
           <div className="flex flex-wrap gap-2">
             <Button asChild>
@@ -84,12 +85,12 @@ function ShareBlock({ title, hint, message, qr }: { title: string; hint: string;
             )}
           </div>
           {qrNote && (
-            <p role="status" className="text-sm text-slate-600">
+            <p role="status" className="text-sm text-muted">
               {qrNote}
             </p>
           )}
           {copyError && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {copyError}
             </p>
           )}
@@ -111,10 +112,12 @@ export function SharePaymentsCard({ match }: { match: Match }) {
   const { data: settings } = usePaymentSettings(match.community_id)
 
   if (!hasPayments(match)) return null
-  if (finLoading || regsLoading) return <Card className="text-slate-500">Loading payment sharing...</Card>
+  if (finLoading || regsLoading) return <Card>
+      <CricketLoader size="sm" label="Loading payment sharing" />
+    </Card>
   if (regsError) {
     return (
-      <Card role="alert" className="text-red-600">
+      <Card role="alert" className="text-danger">
         {toFriendlyMessage(regsError)}
       </Card>
     )
@@ -134,9 +137,9 @@ export function SharePaymentsCard({ match }: { match: Match }) {
 
   return (
     <Card className="space-y-3">
-      <h2 className="font-semibold">Share payment details on WhatsApp</h2>
+      <h2 className="font-extrabold">Share payment details on WhatsApp</h2>
       {!instructions.trim() && (
-        <p role="status" className="rounded-md bg-amber-50 p-2 text-sm text-amber-900">
+        <p role="status" className="rounded-md bg-warning-soft p-2 text-sm text-warning">
           Payment settings are not set, so the messages will not say where to pay. Add your UPI id under Payment settings above.
         </p>
       )}

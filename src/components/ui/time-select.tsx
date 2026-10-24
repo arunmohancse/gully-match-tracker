@@ -3,7 +3,7 @@ import { joinTime, splitTime, type TimeParts } from '@/utils/timeParts'
 const HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1))
 const STEP_MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'))
 
-const selectClass = 'h-11 w-full rounded-md border border-slate-300 bg-white px-2 text-base focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-50'
+const selectClass = 'h-11 w-full rounded-xl border border-line-strong bg-surface px-2 text-base focus-visible:outline-2 focus-visible:outline-brand disabled:opacity-50'
 
 interface Props {
   /** Id of the hour dropdown, so a <label htmlFor> points at it. */

@@ -62,7 +62,7 @@ export function MatchForm({ match, defaults, submitting, error, submitLabel, sub
       <Field label="Google Maps link (optional)" htmlFor="mapUrl" error={errors.mapUrl}>
         <Input id="mapUrl" type="url" inputMode="url" value={values.mapUrl} onChange={set('mapUrl')} placeholder="https://maps.app.goo.gl/..." />
       </Field>
-      <p className="-mt-2 text-sm text-slate-500">In Google Maps, open the turf, tap Share, then Copy link, and paste it here. Players get an Open in Google Maps button.</p>
+      <p className="-mt-2 text-sm text-subtle">In Google Maps, open the turf, tap Share, then Copy link, and paste it here. Players get an Open in Google Maps button.</p>
 
       <Field label="Maximum players" htmlFor="maxPlayers" error={errors.maxPlayers}>
         <Input id="maxPlayers" type="number" inputMode="numeric" min={1} value={values.maxPlayers} onChange={set('maxPlayers')} />
@@ -70,18 +70,18 @@ export function MatchForm({ match, defaults, submitting, error, submitLabel, sub
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-medium">How is the cost paid?</legend>
-        <label className="flex items-start gap-3 rounded-md border border-slate-200 p-3">
-          <input type="radio" name="costModel" className="mt-1 size-4 accent-green-700" checked={values.costModel === 'SHARED_COST'} onChange={() => setValues({ ...values, costModel: 'SHARED_COST' })} />
+        <label className="flex items-start gap-3 rounded-md border border-line p-3">
+          <input type="radio" name="costModel" className="mt-1 size-4 accent-brand" checked={values.costModel === 'SHARED_COST'} onChange={() => setValues({ ...values, costModel: 'SHARED_COST' })} />
           <span>
             <span className="block font-medium">Shared after the match</span>
-            <span className="block text-sm text-slate-600">No fee up front. After the match you add the expenses and they are split equally among the main-list players.</span>
+            <span className="block text-sm text-muted">No fee up front. After the match you add the expenses and they are split equally among the main-list players.</span>
           </span>
         </label>
-        <label className="flex items-start gap-3 rounded-md border border-slate-200 p-3">
-          <input type="radio" name="costModel" className="mt-1 size-4 accent-green-700" checked={values.costModel === 'FIXED_FEE'} onChange={() => setValues({ ...values, costModel: 'FIXED_FEE' })} />
+        <label className="flex items-start gap-3 rounded-md border border-line p-3">
+          <input type="radio" name="costModel" className="mt-1 size-4 accent-brand" checked={values.costModel === 'FIXED_FEE'} onChange={() => setValues({ ...values, costModel: 'FIXED_FEE' })} />
           <span>
             <span className="block font-medium">Fixed fee per player</span>
-            <span className="block text-sm text-slate-600">Every player pays the same amount, set now.</span>
+            <span className="block text-sm text-muted">Every player pays the same amount, set now.</span>
           </span>
         </label>
         {values.costModel === 'FIXED_FEE' && (
@@ -102,14 +102,14 @@ export function MatchForm({ match, defaults, submitting, error, submitLabel, sub
           <Input id="closesAt" type="date" value={values.closesAt} onChange={set('closesAt')} />
         </Field>
       </div>
-      <p className="-mt-2 text-sm text-slate-500">Registration opens at the opening time (the start of the day if left blank) and closes at the end of the closing day. Leave the days blank for no limit.</p>
+      <p className="-mt-2 text-sm text-subtle">Registration opens at the opening time (the start of the day if left blank) and closes at the end of the closing day. Leave the days blank for no limit.</p>
 
       <Field label="Rules & instructions" htmlFor="rules">
         <Textarea id="rules" value={values.rules} onChange={set('rules')} />
       </Field>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

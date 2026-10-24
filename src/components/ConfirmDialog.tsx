@@ -38,12 +38,12 @@ export function ConfirmDialog({
     <Dialog.Root open={open} onOpenChange={(next) => !loading && onOpenChange(next)}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-h-[90vh] max-w-sm -translate-y-1/2 space-y-4 overflow-y-auto rounded-lg bg-white p-5 shadow-lg">
+        <Dialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-h-[90vh] max-w-sm -translate-y-1/2 space-y-4 overflow-y-auto rounded-lg bg-surface p-5 shadow-lg">
           <Dialog.Title className="text-lg font-semibold">{title}</Dialog.Title>
-          <Dialog.Description className="text-sm text-slate-600">{description}</Dialog.Description>
+          <Dialog.Description className="text-sm text-muted">{description}</Dialog.Description>
           {children}
           {error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger">
               {error}
             </p>
           )}

@@ -6,6 +6,7 @@ import { BrandLockup } from '@/components/BrandLockup'
 import { useAuth } from '@/hooks/useAuth'
 import { toFriendlyMessage } from '@/lib/errors'
 import { authService } from '@/services/authService'
+import { CricketLoader } from '@/components/CricketLoader'
 
 const GullyDash = lazy(() => import('@/components/GullyDash').then((m) => ({ default: m.GullyDash })))
 
@@ -34,22 +35,22 @@ export function AccountGate({ status }: { status: 'PENDING' | 'BLOCKED' }) {
         <div className="flex justify-center text-brand">
           <BrandLockup large />
         </div>
-        <h1 className="text-xl font-bold">{pending ? 'Waiting for approval' : 'Account blocked'}</h1>
-        <p className="text-sm text-slate-600">
+        <h1 className="font-display text-3xl font-bold leading-none">{pending ? 'Waiting for approval' : 'Account blocked'}</h1>
+        <p className="text-sm text-muted">
           {pending
             ? 'Thanks for signing up. An admin needs to approve your account before you can register for matches. Check back soon.'
             : 'Your account has been blocked. Please contact the organiser if you think this is a mistake.'}
         </p>
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger">
             {error}
           </p>
         )}
         {pending && <InstagramLink label="While you wait, follow us on Instagram" />}
         {pending && (
           <div className="space-y-1 text-left">
-            <p className="text-center text-sm font-medium text-slate-700">Or play a quick game while you wait</p>
-            <Suspense fallback={<p className="text-center text-xs text-slate-500">Loading game...</p>}>
+            <p className="text-center text-sm font-medium text-fg-2">Or play a quick game while you wait</p>
+            <Suspense fallback={<CricketLoader size="sm" label="Loading game" className="justify-center" />}>
               <GullyDash />
             </Suspense>
           </div>

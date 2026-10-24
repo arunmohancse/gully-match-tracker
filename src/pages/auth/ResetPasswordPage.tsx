@@ -42,7 +42,7 @@ export function ResetPasswordPage() {
   if (done) {
     return (
       <AuthShell title="Password changed">
-        <p role="status" className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+        <p role="status" className="rounded-md bg-success-soft p-3 text-sm text-success">
           Your password has been changed. You can log in with the new one now.
         </p>
         <Link to="/login?email=1" className="block text-center text-sm font-medium text-brand underline">
@@ -54,7 +54,7 @@ export function ResetPasswordPage() {
 
   return (
     <AuthShell title="Reset password">
-      <p className="text-sm text-slate-600">Ask an admin to allow a password reset for your account first. Then enter your details and a new password.</p>
+      <p className="text-sm text-muted">Ask an admin to allow a password reset for your account first. Then enter your details and a new password.</p>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <Field label="Email" htmlFor="email">
           <Input id="email" type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
@@ -69,7 +69,7 @@ export function ResetPasswordPage() {
           <Input id="confirm" type="password" autoComplete="new-password" value={form.confirm} onChange={set('confirm')} />
         </Field>
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger">
             {error}
           </p>
         )}
@@ -77,7 +77,7 @@ export function ResetPasswordPage() {
           {submitting ? 'Saving...' : 'Change password'}
         </Button>
       </form>
-      <p className="text-center text-sm text-slate-600">
+      <p className="text-center text-sm text-muted">
         <Link to="/login?email=1" className="font-medium text-brand underline">
           Back to log in
         </Link>

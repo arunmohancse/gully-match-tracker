@@ -109,7 +109,7 @@ export function PaymentActions({ reg, match }: { reg: AdminRegistration; match: 
                 <label htmlFor="pay-method" className="text-sm font-medium">
                   Method
                 </label>
-                <select id="pay-method" value={method} onChange={(e) => setMethod(e.target.value)} className="h-11 w-full rounded-md border border-slate-300 bg-white px-3">
+                <select id="pay-method" value={method} onChange={(e) => setMethod(e.target.value)} className="h-11 w-full rounded-md border border-line-strong bg-surface px-3">
                   {PAYMENT_METHODS.map((m) => (
                     <option key={m}>{m}</option>
                   ))}

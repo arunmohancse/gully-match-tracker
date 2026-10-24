@@ -11,7 +11,7 @@ export function ParentLogo({ className }: { className?: string }) {
 /** Small "A [Playfest] community" mark for page and sidebar footers. */
 export function PartOfParent({ className }: { className?: string }) {
   return (
-    <div className={cn('flex items-center justify-center gap-2 text-xs text-slate-500', className)}>
+    <div className={cn('flex items-center justify-center gap-2 text-xs text-subtle', className)}>
       <span>A</span>
       <ParentLogo className="h-6" />
       <span>community</span>

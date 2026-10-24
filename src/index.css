@@ -1,10 +1,290 @@
 @import "tailwindcss";
 
+/* `dark:` utilities follow the .dark class that src/lib/theme.ts puts on <html>, not the OS setting directly. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand: #0e773d;
   --color-brand-foreground: #ffffff;
+  --color-stumps: #f2c94c;
+  /* Body text, and the tall scoreboard-style face for page titles, dates and amounts (font-display). */
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Theme colors. Use these (bg-surface, text-muted, border-line, text-danger, ...) instead of raw palette
+ * classes like bg-white or text-slate-600, so every screen follows light/dark automatically.
+ * Light values are the Tailwind shades the app was built with; dark values are in .dark below.
+ */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-line-soft: var(--line-soft);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-faint: var(--faint);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-tint: var(--danger-tint);
+  --color-danger-line: var(--danger-line);
+  --color-danger-solid: var(--danger-solid);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-tint: var(--success-tint);
+  --color-success-line: var(--success-line);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-tint: var(--warning-tint);
+  --color-warning-line: var(--warning-line);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-on-pitch: var(--on-pitch);
+  --color-on-pitch-muted: var(--on-pitch-muted);
+  --color-pitch-track: var(--pitch-track);
+  --color-pitch-button: var(--pitch-button);
+  --color-pitch-button-fg: var(--pitch-button-fg);
+}
+
+/* Mowed-pitch stripes behind the "next match" card and page heroes. */
+@utility bg-pitch {
+  background-color: var(--pitch-a);
+  background-image: repeating-linear-gradient(90deg, var(--pitch-a) 0 28px, var(--pitch-b) 28px 56px);
+}
+
+:root {
+  color-scheme: light;
+  --canvas: oklch(98.4% 0.003 247.858); /* slate-50 */
+  --surface: #ffffff;
+  --surface-2: oklch(98.4% 0.003 247.858); /* slate-50 */
+  --surface-3: oklch(96.8% 0.007 247.896); /* slate-100 */
+  --surface-4: oklch(92.9% 0.013 255.508); /* slate-200 */
+  --line-soft: oklch(96.8% 0.007 247.896); /* slate-100 */
+  --line: oklch(92.9% 0.013 255.508); /* slate-200 */
+  --line-strong: oklch(86.9% 0.022 252.894); /* slate-300 */
+  --fg: oklch(20.8% 0.042 265.755); /* slate-900 */
+  --fg-2: oklch(37.2% 0.044 257.287); /* slate-700 */
+  --muted: oklch(44.6% 0.043 257.281); /* slate-600 */
+  --subtle: oklch(55.4% 0.046 257.417); /* slate-500 */
+  --faint: oklch(70.4% 0.04 256.788); /* slate-400 */
+  --danger: oklch(57.7% 0.245 27.325); /* red-600 */
+  --danger-soft: oklch(97.1% 0.013 17.38); /* red-50 */
+  --danger-tint: oklch(93.6% 0.032 17.717); /* red-100 */
+  --danger-line: oklch(88.5% 0.062 18.334); /* red-200 */
+  --danger-solid: oklch(57.7% 0.245 27.325); /* red-600, with white text */
+  --success: oklch(52.7% 0.154 150.069); /* green-700 */
+  --success-soft: oklch(98.2% 0.018 155.826); /* green-50 */
+  --success-tint: oklch(96.2% 0.044 156.743); /* green-100 */
+  --success-line: oklch(87.1% 0.15 154.449); /* green-300 */
+  --warning: oklch(47% 0.157 37.304); /* orange-800 */
+  --warning-soft: oklch(98% 0.016 73.684); /* orange-50 */
+  --warning-tint: oklch(95.4% 0.038 75.164); /* orange-100 */
+  --warning-line: oklch(90.1% 0.076 70.697); /* orange-200 */
+  --info: oklch(42.4% 0.199 265.638); /* blue-800 */
+  --info-soft: oklch(93.2% 0.032 255.585); /* blue-100 */
+  --pitch-a: #0c6b35;
+  --pitch-b: #0e773d;
+  --on-pitch: #ffffff;
+  --on-pitch-muted: #d3ebdc;
+  --pitch-track: rgb(255 255 255 / 0.22);
+  --pitch-button: #ffffff;
+  --pitch-button-fg: #0b6332;
+}
+
+.dark {
+  color-scheme: dark;
+  --color-brand: #3dcb79;
+  --color-brand-foreground: #05200e;
+  --canvas: #0a100c;
+  --surface: #121a15;
+  --surface-2: #16201a;
+  --surface-3: #1b261f;
+  --surface-4: #26342b;
+  --line-soft: #1e2a23;
+  --line: #26342b;
+  --line-strong: #34453a;
+  --fg: #e8f0ea;
+  --fg-2: #c9d5cd;
+  --muted: #a9b8ae;
+  --subtle: #97a89c;
+  --faint: #6f8275;
+  --danger: #ff8a7d;
+  --danger-soft: #2a1412;
+  --danger-tint: #3a1714;
+  --danger-line: #5c2620;
+  --danger-solid: #c42b1f;
+  --success: #7bdfa4;
+  --success-soft: #12261a;
+  --success-tint: #173323;
+  --success-line: #2a5a3d;
+  --warning: #f3b65e;
+  --warning-soft: #2a1e0c;
+  --warning-tint: #33240e;
+  --warning-line: #5a4119;
+  --info: #93bcf4;
+  --info-soft: #15243a;
+  --pitch-a: #0f3b23;
+  --pitch-b: #124428;
+  --on-pitch: #f1f7f2;
+  --on-pitch-muted: #b2d3be;
+  --pitch-track: rgb(255 255 255 / 0.16);
+  --pitch-button: #3dcb79;
+  --pitch-button-fg: #05200e;
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-canvas text-fg antialiased;
+}
+
+/*
+ * Cricket loader (components/CricketLoader.tsx, and the boot screen in index.html):
+ * a ball is bowled, pitches, and knocks the bails off. Fades in after 200 ms so quick loads never flash.
+ */
+:root {
+  --wood: #b7792b;
+  --ball: #c62828;
+}
+.dark {
+  --wood: #d9a55a;
+  --ball: #e5483c;
+}
+.cl-root {
+  animation: cl-fade 0.3s ease 0.2s both;
+}
+.cl-wood {
+  fill: var(--wood);
+}
+.cl-ground {
+  stroke: var(--line-strong);
+}
+.cl-shadow {
+  fill: var(--fg);
+  opacity: 0.12;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cl-shadow 1.6s linear infinite;
+}
+.cl-ball {
+  animation: cl-delivery 1.6s infinite;
+}
+.cl-ball circle,
+.cl-ball-static circle {
+  fill: var(--ball);
+}
+.cl-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cl-spin 0.45s linear infinite;
+}
+.cl-bail {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cl-bail 1.6s ease-out infinite;
+}
+.cl-bail-2 {
+  animation-name: cl-bail-2;
+}
+@keyframes cl-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cl-delivery {
+  0% {
+    transform: translate(10px, 14px);
+    opacity: 0;
+    animation-timing-function: ease-in;
+  }
+  8% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(66px, 52px);
+    animation-timing-function: ease-out;
+  }
+  78% {
+    transform: translate(110px, 36px);
+    opacity: 1;
+  }
+  86%,
+  100% {
+    transform: translate(110px, 36px);
+    opacity: 0;
+  }
+}
+@keyframes cl-shadow {
+  0% {
+    transform: translateX(10px) scale(0.4);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(66px) scale(1);
+    opacity: 0.16;
+  }
+  78% {
+    transform: translateX(110px) scale(0.6);
+    opacity: 0.1;
+  }
+  86%,
+  100% {
+    transform: translateX(110px) scale(0.6);
+    opacity: 0;
+  }
+}
+@keyframes cl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cl-bail {
+  0%,
+  77% {
+    transform: none;
+    opacity: 1;
+  }
+  90% {
+    transform: translate(-6px, -14px) rotate(-70deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-9px, -6px) rotate(-120deg);
+    opacity: 0;
+  }
+}
+@keyframes cl-bail-2 {
+  0%,
+  77% {
+    transform: none;
+    opacity: 1;
+  }
+  90% {
+    transform: translate(7px, -16px) rotate(60deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(11px, -8px) rotate(110deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cl-root,
+  .cl-ball,
+  .cl-shadow,
+  .cl-spin,
+  .cl-bail {
+    animation: none;
+  }
+  .cl-ball {
+    transform: translate(66px, 52px);
+  }
+  .cl-shadow {
+    transform: translateX(66px);
+  }
 }

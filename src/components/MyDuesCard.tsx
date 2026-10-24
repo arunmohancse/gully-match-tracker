@@ -14,12 +14,12 @@ export function MyDuesCard() {
   if (dues.length === 0) return null
 
   return (
-    <Card className="space-y-3 border-orange-300 bg-orange-50">
+    <Card className="space-y-3 border-warning-line bg-warning-soft">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-semibold text-orange-900">Payments due</h2>
-        <span className="text-lg font-bold text-orange-900">{formatINR(total)}</span>
+        <h2 className="font-extrabold text-warning">Payments due</h2>
+        <span className="font-display text-2xl font-bold text-warning">{formatINR(total)}</span>
       </div>
-      <ul className="divide-y divide-orange-200">
+      <ul className="divide-y divide-warning-line">
         {dues.map(({ registration: r, amount }) => (
           <li key={r.id} className="space-y-2 py-3 first:pt-0 last:pb-0">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -27,7 +27,7 @@ export function MyDuesCard() {
                 <Link to={`/matches/${r.match.id}`} className="font-medium hover:underline">
                   {r.match.title}
                 </Link>
-                <div className="text-sm text-slate-600">{formatShortDate(r.match.match_date)}</div>
+                <div className="text-sm text-muted">{formatShortDate(r.match.match_date)}</div>
               </div>
               <div className="flex items-center gap-2">
                 <PaymentBadge status={r.payment_status} />
@@ -38,7 +38,7 @@ export function MyDuesCard() {
           </li>
         ))}
       </ul>
-      <p className="text-xs text-slate-600">After you pay, the organiser marks it as paid and it disappears from this list.</p>
+      <p className="text-xs text-muted">After you pay, the organiser marks it as paid and it disappears from this list.</p>
     </Card>
   )
 }

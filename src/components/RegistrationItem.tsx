@@ -16,10 +16,10 @@ export function RegistrationItem({ registration: r }: { registration: Registrati
         </Link>
         {active ? <ListBadge listType={r.list_type} position={r.list_position} /> : <CancelledBadge />}
       </div>
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-muted">
         {formatShortDate(r.match.match_date)} · {formatTime(r.match.start_time)} · {r.match.venue}
       </p>
-      {r.match.status === 'CANCELLED' && <p className="text-sm text-slate-500">This match was cancelled.</p>}
+      {r.match.status === 'CANCELLED' && <p className="text-sm text-subtle">This match was cancelled.</p>}
       <PlayerPaymentInfo match={r.match} reg={r} variant="compact" />
     </Card>
   )

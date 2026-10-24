@@ -3,15 +3,15 @@ import type { ListType, PaymentStatus } from '@/types/domain'
 import { listLabel } from '@/utils/registration'
 
 export function ListBadge({ listType, position }: { listType: ListType; position: number | null }) {
-  const style = listType === 'MAIN_LIST' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+  const style = listType === 'MAIN_LIST' ? 'bg-success-tint text-success' : 'bg-warning-tint text-warning'
   return <Badge className={style}>{listLabel(listType, position)}</Badge>
 }
 
 const PAYMENT_STYLE: Record<PaymentStatus, string> = {
-  PAID: 'bg-green-100 text-green-800',
-  UNPAID: 'bg-red-100 text-red-800',
-  REFUNDED: 'bg-slate-200 text-slate-700',
-  WAIVED: 'bg-blue-100 text-blue-800',
+  PAID: 'bg-success-tint text-success',
+  UNPAID: 'bg-danger-tint text-danger',
+  REFUNDED: 'bg-surface-4 text-fg-2',
+  WAIVED: 'bg-info-soft text-info',
 }
 
 export function PaymentBadge({ status }: { status: PaymentStatus }) {
@@ -19,5 +19,5 @@ export function PaymentBadge({ status }: { status: PaymentStatus }) {
 }
 
 export function CancelledBadge() {
-  return <Badge className="bg-slate-200 text-slate-500">CANCELLED</Badge>
+  return <Badge className="bg-surface-4 text-subtle">CANCELLED</Badge>
 }
